@@ -25,24 +25,24 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         if (!email || !password) return null;
 
-        const user = await db.users.findFirst({
-          where: { email },
-        });
+        const users = await db.users.findMany({});
+        console.log("[AUTH] Checking credentials for:", users);
+        const user = users.find((u) => u.email === email);
 
-        console.log("[AUTH] User found:", user ? user.email : "NOT FOUND");
+        console.log("[AUTH] User found:", user?.email || "NOT FOUND");
 
         if (!user || !user.password) return null;
 
-        const isValid = await bcrypt.compare(password, user.password);
+        const isValid = await bcrypt.compare(password, user?.password);
         console.log("[AUTH] Password valid:", isValid);
 
         if (!isValid) return null;
 
         return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          role: user.role as Role,
+          id: user?.id,
+          email: user?.email,
+          name: user?.name,
+          role: user?.role as Role,
         };
       },
     }),
