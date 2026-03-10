@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 
 export default async function WholesaleDashboardPage() {
   const session = await requireRole(["WHOLESALER", "ADMIN"] as never);
-
+  const now = new Date();
   const [inquiries, recentProducts] = await Promise.all([
     db.inquiry.findMany({
       where: { wholesalerId: session.user.id },
@@ -30,16 +30,20 @@ export default async function WholesaleDashboardPage() {
     }),
     db.product.findMany({
       where: {
-        createdAt: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
+        createdAt: { gte: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000) },
       },
       select: { id: true },
     }),
   ]);
 
-  const repliedCount = inquiries.filter((i) => i.status === "REPLIED").length;
-  const openCount = inquiries.filter((i) => i.status === "OPEN").length;
+  const repliedCount = inquiries.filter(
+    (i: { status: string }) => i.status === "REPLIED",
+  ).length;
+  const openCount = inquiries.filter(
+    (i: { status: string }) => i.status === "OPEN",
+  ).length;
   const totalMessages = inquiries.reduce(
-    (sum, i) => sum + i.messages.length,
+    (sum: number, i: { messages: { id: string }[] }) => sum + i.messages.length,
     0,
   );
 

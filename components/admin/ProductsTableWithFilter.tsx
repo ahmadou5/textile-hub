@@ -226,10 +226,7 @@ export default function ProductsTableWithFilter({
                   </span>
 
                   {/* Actions */}
-                  <ProductActions
-                    productId={product.id}
-                    productName={product.name}
-                  />
+                  <ProductActions productId={product.id} />
                 </div>
               );
             })}
