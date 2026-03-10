@@ -22,7 +22,7 @@ const createProductSchema = z.object({
 // GET — list all products
 export async function GET() {
   try {
-    const products = await db.product.findMany({
+    const products = await db.products.findMany({
       orderBy: { createdAt: "desc" },
     });
     return NextResponse.json(products);
@@ -64,9 +64,11 @@ export async function POST(req: Request) {
     }
 
     // Convert to cents/kobo before saving
-    const product = await db.product.create({
+    const product = await db.products.create({
       data: {
         ...rest,
+        id: crypto.randomUUID(),
+        updatedAt: new Date(),
         description: rest.description ?? null,
         imageUrl: rest.imageUrl || null,
         retailPricePerYard: Math.round(retailPricePerYard * 100),

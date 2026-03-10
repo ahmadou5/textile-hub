@@ -20,7 +20,7 @@ export async function PATCH(
       return NextResponse.json({ error: "Invalid status" }, { status: 400 });
     }
 
-    const inquiry = await db.inquiry.update({
+    const inquiry = await db.inquiries.update({
       where: { id },
       data: { status },
     });
