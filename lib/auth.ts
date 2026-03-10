@@ -6,7 +6,7 @@ import bcrypt from "bcryptjs";
 import { db } from "@/lib/db";
 import { authConfig } from "@/auth.config";
 import { redirect } from "next/navigation";
-import type { Role } from "@prisma/client";
+import { Role } from "@/prisma/generated/prisma/enums";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
