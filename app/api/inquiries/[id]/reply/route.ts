@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { z } from "zod";
+import { Prisma } from "@prisma/client";
 
 const replySchema = z.object({
   message: z.string().min(1, "Reply cannot be empty").max(5000),
@@ -40,28 +41,30 @@ export async function POST(
     }
 
     // Create message + update status in one transaction
-    const result = await db.$transaction(async (tx) => {
-      const message = await tx.message.create({
-        data: {
-          body: parsed.data.message,
-          inquiryId,
-          senderId: session.user.id,
-        },
-        include: {
-          sender: { select: { id: true, name: true, role: true } },
-        },
-      });
-
-      // Only update status if not already CLOSED
-      if (inquiry.status !== "CLOSED") {
-        await tx.inquiry.update({
-          where: { id: inquiryId },
-          data: { status: "REPLIED" },
+    const result = await db.$transaction(
+      async (tx: Prisma.TransactionClient) => {
+        const message = await tx.message.create({
+          data: {
+            body: parsed.data.message,
+            inquiryId,
+            senderId: session.user.id,
+          },
+          include: {
+            sender: { select: { id: true, name: true, role: true } },
+          },
         });
-      }
 
-      return message;
-    });
+        // Only update status if not already CLOSED
+        if (inquiry.status !== "CLOSED") {
+          await tx.inquiry.update({
+            where: { id: inquiryId },
+            data: { status: "REPLIED" },
+          });
+        }
+
+        return message;
+      },
+    );
 
     return NextResponse.json(result, { status: 201 });
   } catch (error) {

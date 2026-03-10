@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { z } from "zod";
+import { Prisma } from "@/lib/generated/prisma/client";
 
 const createInquirySchema = z.object({
   productId: z.string().min(1, "Product ID is required"),
@@ -48,26 +49,28 @@ export async function POST(req: Request) {
     }
 
     // Create inquiry + first message in a transaction
-    const inquiry = await db.$transaction(async (tx) => {
-      const newInquiry = await tx.inquiry.create({
-        data: {
-          subject,
-          status: "OPEN",
-          wholesalerId: session.user.id,
-          productId,
-        },
-      });
+    const inquiry = await db.$transaction(
+      async (tx: Prisma.TransactionClient) => {
+        const newInquiry = await tx.inquiry.create({
+          data: {
+            subject,
+            status: "OPEN",
+            wholesalerId: session.user.id,
+            productId,
+          },
+        });
 
-      await tx.message.create({
-        data: {
-          body: message,
-          inquiryId: newInquiry.id,
-          senderId: session.user.id,
-        },
-      });
+        await tx.message.create({
+          data: {
+            body: message,
+            inquiryId: newInquiry.id,
+            senderId: session.user.id,
+          },
+        });
 
-      return newInquiry;
-    });
+        return newInquiry;
+      },
+    );
 
     return NextResponse.json(
       { inquiryId: inquiry.id, message: "Inquiry submitted successfully" },
