@@ -38,7 +38,7 @@ export default async function WholesaleInquiriesPage() {
   const session = await requireRole(["WHOLESALER", "ADMIN"] as never);
 
   const inquiries = await db.inquiries.findMany({
-    where: { wholesalerId: session.user.id },
+    where: { wholesalerId: session?.user.id },
     orderBy: { updatedAt: "desc" },
     include: {
       products: { select: { id: true, name: true, category: true } },

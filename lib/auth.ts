@@ -1,10 +1,10 @@
 import NextAuth from "next-auth";
-import Credentials from "next-auth/providers/credentials"; // ✅ use this not CredentialsProvider
+import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { db } from "@/lib/db";
 import { authConfig } from "@/auth.config";
-import { redirect } from "next/navigation";
 import { Role } from "./generated/prisma/enums";
+import { auth as getAuth } from "@/lib/auth"; // for requireRole
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
@@ -47,12 +47,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   ],
 });
 
+// ─── requireRole as a separate export ─────────────────────────────────────
 export async function requireRole(role: Role | Role[]) {
+  const { redirect } = await import("next/navigation"); // ✅ dynamic import
   const session = await auth();
   if (!session?.user) redirect("/login");
 
   const roles = Array.isArray(role) ? role : [role];
-  if (!roles.includes(session.user.role as Role)) {
+  if (!roles.includes(session?.user.role as Role)) {
     redirect("/unauthorized");
   }
 

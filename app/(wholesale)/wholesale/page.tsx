@@ -21,7 +21,7 @@ export default async function WholesaleDashboardPage() {
   const now = new Date();
   const [inquiries, recentProducts] = await Promise.all([
     db.inquiries.findMany({
-      where: { wholesalerId: session.user.id },
+      where: { wholesalerId: session?.user.id },
       include: {
         products: { select: { name: true } },
         messages: { select: { id: true } },
@@ -87,7 +87,7 @@ export default async function WholesaleDashboardPage() {
             letterSpacing: "-0.03em",
           }}
         >
-          {session.user.name?.split(" ")[0] ?? "Wholesaler"}
+          {session?.user.name?.split(" ")[0] ?? "Wholesaler"}
         </h1>
         <p
           className="text-slate-500 text-sm"

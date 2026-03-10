@@ -76,8 +76,8 @@ export default async function WholesaleInquiryThreadPage({
 
   // Wholesalers can only see their own inquiries
   if (
-    session.user.role === "WHOLESALER" &&
-    inquiry.users.id !== session.user.id
+    session?.user.role === "WHOLESALER" &&
+    inquiry.users.id !== session?.user.id
   ) {
     redirect("/wholesale/inquiries");
   }
@@ -193,7 +193,8 @@ export default async function WholesaleInquiryThreadPage({
             const isAdminMsg =
               (msg as { sender: { role: string } }).sender.role === "ADMIN";
             const isOwnMsg =
-              (msg as { sender: { id: string } }).sender.id === session.user.id;
+              (msg as { sender: { id: string } }).sender.id ===
+              session?.user.id;
             const prevMsg = index > 0 ? inquiry.messages[index - 1] : null;
             const showDateSep =
               !prevMsg ||

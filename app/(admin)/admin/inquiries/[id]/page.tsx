@@ -271,7 +271,7 @@ export default async function AdminInquiryThreadPage({ params }: PageProps) {
               className="text-[9px] font-bold text-[#D4A853]"
               style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
             >
-              {(session.user.name ?? "A").charAt(0).toUpperCase()}
+              {(session?.user.name ?? "A").charAt(0).toUpperCase()}
             </span>
           </div>
           <span

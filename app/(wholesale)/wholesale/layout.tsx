@@ -15,7 +15,7 @@ export default async function WholesaleLayout({
       className="min-h-screen flex"
       style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
     >
-      <WholesaleSidebar userName={session.user.name ?? "Wholesaler"} />
+      <WholesaleSidebar userName={session?.user.name ?? "Wholesaler"} />
       <main
         className="flex-1 min-h-screen"
         style={{
