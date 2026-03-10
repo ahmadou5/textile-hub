@@ -43,26 +43,27 @@ export default function LoginPage() {
   async function onSubmit(values: LoginValues) {
     setLoading(true);
     setError(null);
+    try {
+      const result = await signIn("credentials", {
+        email: values.email,
+        password: values.password,
+        redirect: true,
+        callbackUrl: "/",
+      });
 
-    const result = await signIn("credentials", {
-      email: values.email,
-      password: values.password,
-      redirect: false,
-    });
+      console.log("[LOGIN_RESULT]", result);
 
-    console.log("[LOGIN_RESULT]", result);
+      setLoading(false);
 
-    setLoading(false);
-
-    if (result?.error) {
-      setError(result.error);
-      toast.error(`Login failed: ${result.error}`);
-      return;
+      toast.success("Login successful!");
+      router.push("/");
+      router.refresh();
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast.error(`Login failed. : ${error.message}`);
+      }
+      setError("Login failed. Please check your credentials and try again.");
     }
-
-    toast.success("Login successful!");
-    router.push("/");
-    router.refresh();
   }
 
   return (
