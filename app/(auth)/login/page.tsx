@@ -50,11 +50,13 @@ export default function LoginPage() {
       redirect: false,
     });
 
+    console.log("[LOGIN_RESULT]", result);
+
     setLoading(false);
 
     if (result?.error) {
-      setError("Invalid email or password");
-      toast.error("Login failed: Invalid email or password");
+      setError(result.error);
+      toast.error(`Login failed: ${result.error}`);
       return;
     }
 
