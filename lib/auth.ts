@@ -4,8 +4,6 @@ import bcrypt from "bcryptjs";
 import { db } from "@/lib/db";
 import { authConfig } from "@/auth.config";
 
-import { auth as getAuth } from "@/lib/auth"; // for requireRole
-import { ChevronsRightLeft } from "lucide-react";
 import { Role } from "@prisma/client";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({

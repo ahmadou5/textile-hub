@@ -1,5 +1,6 @@
 import { Role } from "@prisma/client";
 import type { NextAuthConfig } from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
 
 export const authConfig: NextAuthConfig = {
   pages: {
@@ -43,5 +44,12 @@ export const authConfig: NextAuthConfig = {
       return session;
     },
   },
-  providers: [],
+  providers: [
+    CredentialsProvider({
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" },
+      },
+    }),
+  ],
 };
