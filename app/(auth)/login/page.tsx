@@ -61,7 +61,7 @@ export default function LoginPage() {
     setLoading(false);
 
     toast.success("Login successful!");
-    router.push(result.url || "/wholesale");
+    router.push("/wholesale");
     router.refresh();
   }
 
