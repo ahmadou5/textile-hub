@@ -1,7 +1,5 @@
-// lib/auth.ts
 import NextAuth from "next-auth";
-import CredentialsProvider from "next-auth/providers/credentials";
-import { PrismaAdapter } from "@auth/prisma-adapter";
+import Credentials from "next-auth/providers/credentials"; // ✅ use this not CredentialsProvider
 import bcrypt from "bcryptjs";
 import { db } from "@/lib/db";
 import { authConfig } from "@/auth.config";
@@ -10,11 +8,9 @@ import { Role } from "./generated/prisma/enums";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
-  //adapter: PrismaAdapter(db),
   session: { strategy: "jwt" },
   providers: [
-    CredentialsProvider({
-      name: "credentials",
+    Credentials({
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
@@ -22,31 +18,35 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
-        const user = await db.users.findUnique({
-          where: { email: credentials.email as string },
-        });
+        try {
+          const user = await db.users.findUnique({
+            where: { email: credentials.email as string },
+          });
 
-        if (!user || !user.password) return null;
+          if (!user || !user.password) return null;
 
-        const passwordMatch = await bcrypt.compare(
-          credentials.password as string,
-          user.password,
-        );
+          const isValid = await bcrypt.compare(
+            credentials.password as string,
+            user.password,
+          );
 
-        if (!passwordMatch) return null;
+          if (!isValid) return null;
 
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          role: user.role,
-        };
+          return {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            role: user.role as string,
+          };
+        } catch (error) {
+          console.error("[AUTH_AUTHORIZE_ERROR]", error);
+          return null;
+        }
       },
     }),
   ],
 });
 
-// ─── Helper: require a specific role or redirect ───────────────────────────
 export async function requireRole(role: Role | Role[]) {
   const session = await auth();
   if (!session?.user) redirect("/login");
