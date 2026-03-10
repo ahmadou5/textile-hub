@@ -3,9 +3,10 @@ import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { db } from "@/lib/db";
 import { authConfig } from "@/auth.config";
-import { Role } from "./generated/prisma/enums";
+
 import { auth as getAuth } from "@/lib/auth"; // for requireRole
 import { ChevronsRightLeft } from "lucide-react";
+import { Role } from "@prisma/client";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
@@ -41,7 +42,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           id: user.id,
           email: user.email,
           name: user.name,
-          role: user.role as string,
+          role: user.role as Role,
         };
       },
     }),

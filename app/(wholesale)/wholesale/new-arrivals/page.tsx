@@ -16,7 +16,6 @@ import {
   TrendingDown,
 } from "lucide-react";
 import type { Metadata } from "next";
-import { productsModel } from "@/lib/generated/prisma/models";
 
 export const metadata: Metadata = {
   title: "New Arrivals — TextileHub Wholesale",

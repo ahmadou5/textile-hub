@@ -1,3 +1,4 @@
+import { Role } from "@prisma/client";
 import type { NextAuthConfig } from "next-auth";
 
 export const authConfig: NextAuthConfig = {
@@ -37,7 +38,7 @@ export const authConfig: NextAuthConfig = {
     session({ session, token }) {
       if (token && session.user) {
         session.user.id = token.id as string;
-        session.user.role = token.role as string; // ✅ plain string, no Prisma import
+        session.user.role = token.role as Role; // ✅ plain string, no Prisma import
       }
       return session;
     },

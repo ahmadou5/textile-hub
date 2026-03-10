@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { z } from "zod";
-import { Prisma } from "@/lib/generated/prisma/browser";
+import { Prisma } from "@prisma/client";
 
 const createInquirySchema = z.object({
   productId: z.string().min(1, "Product ID is required"),
