@@ -5,6 +5,7 @@ import { db } from "@/lib/db";
 import { authConfig } from "@/auth.config";
 import { Role } from "./generated/prisma/enums";
 import { auth as getAuth } from "@/lib/auth"; // for requireRole
+import { ChevronsRightLeft } from "lucide-react";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
@@ -28,10 +29,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             where: { email: email },
           });
 
+          console.log("[AUTH_AUTHORIZE]", { user });
+
           if (!user || !user.password) return null;
 
           const isValid = password === user.password;
-
+          console.log("[AUTH_LOGIN]", { email, isValid });
           if (!isValid) return null;
 
           return {
