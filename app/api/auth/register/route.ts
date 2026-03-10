@@ -14,7 +14,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const existingUser = await db.user.findUnique({ where: { email } });
+    const existingUser = await db.users.findUnique({ where: { email } });
 
     if (existingUser) {
       return NextResponse.json(
@@ -25,12 +25,14 @@ export async function POST(req: Request) {
 
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    const user = await db.user.create({
+    const user = await db.users.create({
       data: {
+        id: crypto.randomUUID(),
         name,
         email,
         password: hashedPassword,
-        role: "WHOLESALER", // default role for self-registration
+        role: "WHOLESALER",
+        updatedAt: new Date(),
       },
     });
 
