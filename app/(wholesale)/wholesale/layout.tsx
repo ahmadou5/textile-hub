@@ -1,7 +1,7 @@
 // app/(wholesale)/wholesale/layout.tsx
 import { requireRole } from "@/lib/auth";
 import WholesaleSidebar from "@/components/wholesale/WholeSaleSidebar";
-import { Role } from "@/lib/generated/prisma/enums";
+import { Role } from "@/prisma/generated/prisma/enums";
 
 export default async function WholesaleLayout({
   children,
