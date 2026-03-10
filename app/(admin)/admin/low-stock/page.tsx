@@ -46,10 +46,11 @@ export default async function LowStockPage() {
   });
 
   const criticalCount = lowStockProducts.filter(
-    (p) => p.totalYardsInStock < CRITICAL,
+    (p: { totalYardsInStock: number }) => p.totalYardsInStock < CRITICAL,
   ).length;
   const lowCount = lowStockProducts.filter(
-    (p) => p.totalYardsInStock >= CRITICAL && p.totalYardsInStock < LOW,
+    (p: { totalYardsInStock: number }) =>
+      p.totalYardsInStock >= CRITICAL && p.totalYardsInStock < LOW,
   ).length;
 
   // Overall stock health for context bar
@@ -253,127 +254,141 @@ export default async function LowStockPage() {
 
           {/* Rows */}
           <div className="divide-y divide-slate-100">
-            {lowStockProducts.map((product, index) => {
-              const isCritical = product.totalYardsInStock < CRITICAL;
-              const barPct = Math.max(
-                (product.totalYardsInStock / MAX_DISPLAY) * 100,
-                2,
-              );
+            {lowStockProducts.map(
+              (
+                product: {
+                  totalYardsInStock: number;
+                  id: string;
+                  name: string;
+                  createdAt: Date;
+                  category: string;
+                  wholesalePricePerYard: number;
+                },
+                index: number,
+              ) => {
+                const isCritical = product.totalYardsInStock < CRITICAL;
+                const barPct = Math.max(
+                  (product.totalYardsInStock / MAX_DISPLAY) * 100,
+                  2,
+                );
 
-              return (
-                <div
-                  key={product.id}
-                  className="grid grid-cols-[1fr_120px_160px_120px_140px] gap-4 px-5 py-4 items-center bg-white"
-                  style={{
-                    background: isCritical
-                      ? "rgba(239,68,68,0.02)"
-                      : "rgba(245,158,11,0.015)",
-                  }}
-                >
-                  {/* Name */}
-                  <div className="min-w-0 space-y-0.5">
-                    <div className="flex items-center gap-2">
-                      {isCritical && (
-                        <ShieldAlert
-                          size={13}
-                          className="text-red-500 flex-shrink-0"
-                        />
-                      )}
-                      <Link
-                        href={`/admin/products`}
-                        className="text-sm font-semibold text-slate-800 truncate hover:text-[#D4A853]
+                return (
+                  <div
+                    key={product.id}
+                    className="grid grid-cols-[1fr_120px_160px_120px_140px] gap-4 px-5 py-4 items-center bg-white"
+                    style={{
+                      background: isCritical
+                        ? "rgba(239,68,68,0.02)"
+                        : "rgba(245,158,11,0.015)",
+                    }}
+                  >
+                    {/* Name */}
+                    <div className="min-w-0 space-y-0.5">
+                      <div className="flex items-center gap-2">
+                        {isCritical && (
+                          <ShieldAlert
+                            size={13}
+                            className="text-red-500 flex-shrink-0"
+                          />
+                        )}
+                        <Link
+                          href={`/admin/products`}
+                          className="text-sm font-semibold text-slate-800 truncate hover:text-[#D4A853]
                           transition-[color] duration-150
                           focus-visible:outline-none focus-visible:underline"
+                          style={{
+                            fontFamily: "var(--font-dm-sans, sans-serif)",
+                          }}
+                        >
+                          {product.name}
+                        </Link>
+                      </div>
+                      <p
+                        className="text-[11px] text-slate-400 truncate"
                         style={{
                           fontFamily: "var(--font-dm-sans, sans-serif)",
                         }}
                       >
-                        {product.name}
-                      </Link>
+                        Added{" "}
+                        {product.createdAt.toLocaleDateString("en-NG", {
+                          day: "numeric",
+                          month: "short",
+                        })}
+                      </p>
                     </div>
-                    <p
-                      className="text-[11px] text-slate-400 truncate"
+
+                    {/* Category */}
+                    <Badge
+                      variant="outline"
+                      className="text-[10px] font-medium border-slate-200 text-slate-500 h-auto py-0.5 w-fit"
+                    >
+                      {product.category}
+                    </Badge>
+
+                    {/* Stock level + bar */}
+                    <div className="space-y-1.5">
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`text-sm font-bold tabular-nums ${
+                            isCritical ? "text-red-500" : "text-amber-500"
+                          }`}
+                          style={{ fontFamily: "var(--font-syne, sans-serif)" }}
+                        >
+                          {product.totalYardsInStock}
+                        </span>
+                        <span
+                          className="text-xs text-slate-400"
+                          style={{
+                            fontFamily: "var(--font-dm-sans, sans-serif)",
+                          }}
+                        >
+                          yards
+                        </span>
+                        <Badge
+                          className={`text-[9px] font-bold border h-auto py-0.5 px-1.5 ${
+                            isCritical
+                              ? "bg-red-50 text-red-500 border-red-200"
+                              : "bg-amber-50 text-amber-600 border-amber-200"
+                          }`}
+                          variant="outline"
+                        >
+                          {isCritical ? "CRITICAL" : "LOW"}
+                        </Badge>
+                      </div>
+                      {/* Mini bar */}
+                      <div
+                        className="h-1.5 rounded-full overflow-hidden"
+                        style={{ background: "rgba(0,0,0,0.06)" }}
+                      >
+                        <div
+                          className="h-full rounded-full"
+                          style={{
+                            width: `${barPct}%`,
+                            background: isCritical
+                              ? "linear-gradient(90deg, #dc2626, #ef4444)"
+                              : "linear-gradient(90deg, #d97706, #f59e0b)",
+                            boxShadow: isCritical
+                              ? "0 0 4px rgba(239,68,68,0.5)"
+                              : "0 0 4px rgba(245,158,11,0.4)",
+                          }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Wholesale price */}
+                    <span
+                      className="text-sm font-medium text-slate-700 tabular-nums"
                       style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
                     >
-                      Added{" "}
-                      {product.createdAt.toLocaleDateString("en-NG", {
-                        day: "numeric",
-                        month: "short",
-                      })}
-                    </p>
+                      {formatPrice(product.wholesalePricePerYard)}
+                    </span>
+
+                    {/* Restock CTA */}
+                    <RestockButton productName={product.name} />
                   </div>
-
-                  {/* Category */}
-                  <Badge
-                    variant="outline"
-                    className="text-[10px] font-medium border-slate-200 text-slate-500 h-auto py-0.5 w-fit"
-                  >
-                    {product.category}
-                  </Badge>
-
-                  {/* Stock level + bar */}
-                  <div className="space-y-1.5">
-                    <div className="flex items-center gap-2">
-                      <span
-                        className={`text-sm font-bold tabular-nums ${
-                          isCritical ? "text-red-500" : "text-amber-500"
-                        }`}
-                        style={{ fontFamily: "var(--font-syne, sans-serif)" }}
-                      >
-                        {product.totalYardsInStock}
-                      </span>
-                      <span
-                        className="text-xs text-slate-400"
-                        style={{
-                          fontFamily: "var(--font-dm-sans, sans-serif)",
-                        }}
-                      >
-                        yards
-                      </span>
-                      <Badge
-                        className={`text-[9px] font-bold border h-auto py-0.5 px-1.5 ${
-                          isCritical
-                            ? "bg-red-50 text-red-500 border-red-200"
-                            : "bg-amber-50 text-amber-600 border-amber-200"
-                        }`}
-                        variant="outline"
-                      >
-                        {isCritical ? "CRITICAL" : "LOW"}
-                      </Badge>
-                    </div>
-                    {/* Mini bar */}
-                    <div
-                      className="h-1.5 rounded-full overflow-hidden"
-                      style={{ background: "rgba(0,0,0,0.06)" }}
-                    >
-                      <div
-                        className="h-full rounded-full"
-                        style={{
-                          width: `${barPct}%`,
-                          background: isCritical
-                            ? "linear-gradient(90deg, #dc2626, #ef4444)"
-                            : "linear-gradient(90deg, #d97706, #f59e0b)",
-                          boxShadow: isCritical
-                            ? "0 0 4px rgba(239,68,68,0.5)"
-                            : "0 0 4px rgba(245,158,11,0.4)",
-                        }}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Wholesale price */}
-                  <span
-                    className="text-sm font-medium text-slate-700 tabular-nums"
-                    style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
-                  >
-                    {formatPrice(product.wholesalePricePerYard)}
-                  </span>
-
-                  {/* Restock CTA */}
-                  <RestockButton productName={product.name} />
-                </div>
-              );
-            })}
+                );
+              },
+            )}
           </div>
 
           {/* Table footer summary */}
