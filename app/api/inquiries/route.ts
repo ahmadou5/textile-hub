@@ -19,7 +19,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    if (session.user.role !== "WHOLESALER" && session.user.role !== "ADMIN") {
+    if (session?.user.role !== "WHOLESALER" && session?.user.role !== "ADMIN") {
       return NextResponse.json(
         { error: "Only wholesalers can submit inquiries" },
         { status: 403 },
@@ -57,7 +57,7 @@ export async function POST(req: Request) {
             productId,
             subject,
             status: "OPEN",
-            wholesalerId: session.user.id,
+            wholesalerId: session?.user.id,
             updatedAt: new Date(),
           },
         });
@@ -67,7 +67,7 @@ export async function POST(req: Request) {
             id: crypto.randomUUID(), // same here if messages.id is required
             body: message,
             inquiryId: newInquiry.id,
-            senderId: session.user.id,
+            senderId: session?.user.id,
           },
         });
 

@@ -15,7 +15,7 @@ export default async function AdminLayout({
       className="min-h-screen flex"
       style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
     >
-      <AdminSidebar adminName={session.user.name ?? "Admin"} />
+      <AdminSidebar adminName={session?.user.name ?? "Admin"} />
 
       {/* Main content */}
       <main className="flex-1 flex flex-col min-h-screen bg-[#F7F4EF]">
