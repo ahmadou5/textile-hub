@@ -1,6 +1,5 @@
-// auth.config.ts
-import type { Role } from "@prisma/client";
 import type { NextAuthConfig } from "next-auth";
+import { Role } from "./lib/generated/prisma/enums";
 
 export const authConfig: NextAuthConfig = {
   pages: {
