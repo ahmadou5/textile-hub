@@ -26,7 +26,9 @@ export default async function AdminProductsPage() {
     },
   });
 
-  const lowStockCount = products.filter((p) => p.totalYardsInStock < 20).length;
+  const lowStockCount = products.filter(
+    (p: { totalYardsInStock: number }) => p.totalYardsInStock < 20,
+  ).length;
 
   return (
     <div className="p-6 lg:p-8 space-y-6 max-w-6xl">
