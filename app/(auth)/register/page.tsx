@@ -17,6 +17,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import Link from "next/link";
+import { toast } from "sonner";
 
 const registerSchema = z
   .object({
@@ -64,9 +65,13 @@ export default function RegisterPage() {
 
     if (!res.ok) {
       setError(data.error || "Something went wrong");
+      toast.error(
+        `Registration failed: ${data.error || "Something went wrong"}`,
+      );
       return;
     }
 
+    toast.success("Registration successful!");
     router.push("/login?registered=true");
   }
 

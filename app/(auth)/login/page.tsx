@@ -18,6 +18,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import Link from "next/link";
+import { toast } from "sonner";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -43,27 +44,23 @@ export default function LoginPage() {
     setLoading(true);
     setError(null);
 
-    try {
-      const result = await signIn("credentials", {
-        email: values.email,
-        password: values.password,
-        redirect: false,
-      });
+    const result = await signIn("credentials", {
+      email: values.email,
+      password: values.password,
+      redirect: false,
+    });
 
-      setLoading(false);
-      if (result?.error) {
-        //setError("Invalid email or password");
-        return;
-      }
-      router.push("/");
-      router.refresh();
-    } catch (error) {
-      setLoading(false);
-      if (error instanceof Error) {
-        setError("An unexpected error occurred: " + error.message);
-      }
+    setLoading(false);
+
+    if (result?.error) {
       setError("Invalid email or password");
+      toast.error("Login failed: Invalid email or password");
+      return;
     }
+
+    toast.success("Login successful!");
+    router.push("/");
+    router.refresh();
   }
 
   return (
