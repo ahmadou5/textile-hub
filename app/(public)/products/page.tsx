@@ -12,6 +12,14 @@ export const metadata: Metadata = {
 };
 
 async function ProductGrid() {
+  const users = await db.users.findMany({
+    orderBy: { createdAt: "desc" },
+    select: {
+      name: true,
+      email: true,
+      role: true,
+    },
+  });
   const products = await db.products.findMany({
     orderBy: { createdAt: "desc" },
     select: {
@@ -42,6 +50,14 @@ async function ProductGrid() {
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5">
+      <div className="flex">
+        {users.length !== 0 &&
+          users.map((user) => (
+            <p className="ml-auto mr-auto" key={user.email}>
+              {user.name}
+            </p>
+          ))}
+      </div>
       {products.map((product) => (
         <ProductCard key={product.id} {...product} />
       ))}
