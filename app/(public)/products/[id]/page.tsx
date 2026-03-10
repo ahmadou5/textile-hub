@@ -15,7 +15,7 @@ export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const { id } = await params;
-  const product = await db.product.findUnique({
+  const product = await db.products.findUnique({
     where: { id },
     select: { name: true, description: true },
   });
@@ -40,7 +40,7 @@ function formatPrice(cents: number): string {
 export default async function ProductDetailPage({ params }: PageProps) {
   const { id } = await params;
 
-  const product = await db.product.findUnique({
+  const product = await db.products.findUnique({
     where: { id },
     select: {
       id: true,
