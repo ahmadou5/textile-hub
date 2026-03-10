@@ -58,7 +58,7 @@ export default async function AdminDashboardPage() {
     ]);
 
   const criticalCount = lowStockProducts.filter(
-    (p) => p.totalYardsInStock < 10,
+    (p: { totalYardsInStock: number }) => p.totalYardsInStock < 10,
   ).length;
 
   const stats = [
@@ -213,27 +213,37 @@ export default async function AdminDashboardPage() {
             </Link>
           </div>
           <div className="divide-y divide-red-50">
-            {lowStockProducts.slice(0, 3).map((p) => (
-              <div
-                key={p.id}
-                className="flex items-center justify-between px-5 py-3"
-              >
-                <span
-                  className="text-sm text-slate-700 font-medium"
-                  style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
-                >
-                  {p.name}
-                </span>
-                <span
-                  className={`text-sm font-bold tabular-nums ${
-                    p.totalYardsInStock < 10 ? "text-red-500" : "text-amber-500"
-                  }`}
-                  style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
-                >
-                  {p.totalYardsInStock} yds
-                </span>
-              </div>
-            ))}
+            {lowStockProducts
+              .slice(0, 3)
+              .map(
+                (p: {
+                  id: string;
+                  name: string;
+                  totalYardsInStock: number;
+                }) => (
+                  <div
+                    key={p.id}
+                    className="flex items-center justify-between px-5 py-3"
+                  >
+                    <span
+                      className="text-sm text-slate-700 font-medium"
+                      style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+                    >
+                      {p.name}
+                    </span>
+                    <span
+                      className={`text-sm font-bold tabular-nums ${
+                        p.totalYardsInStock < 10
+                          ? "text-red-500"
+                          : "text-amber-500"
+                      }`}
+                      style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+                    >
+                      {p.totalYardsInStock} yds
+                    </span>
+                  </div>
+                ),
+              )}
             {lowStockProducts.length > 3 && (
               <div className="px-5 py-2.5">
                 <Link
@@ -275,58 +285,68 @@ export default async function AdminDashboardPage() {
         </div>
 
         <div className="space-y-2">
-          {recentProducts.map((product) => (
-            <div
-              key={product.id}
-              className="flex items-center gap-4 px-4 py-3.5 rounded-2xl bg-white"
-              style={{
-                border: "1px solid rgba(0,0,0,0.06)",
-                boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
-              }}
-            >
+          {recentProducts.map(
+            (product: {
+              id: string;
+              name: string;
+              category: string;
+              retailPricePerYard: number;
+              totalYardsInStock: number;
+              createdAt: Date;
+            }) => (
               <div
-                className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-                style={{ background: "#F1EDE4" }}
+                key={product.id}
+                className="flex items-center gap-4 px-4 py-3.5 rounded-2xl bg-white"
+                style={{
+                  border: "1px solid rgba(0,0,0,0.06)",
+                  boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+                }}
               >
-                <span className="text-sm">🧵</span>
+                <div
+                  className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+                  style={{ background: "#F1EDE4" }}
+                >
+                  <span className="text-sm">🧵</span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p
+                    className="text-sm font-semibold text-slate-800 truncate"
+                    style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+                  >
+                    {product.name}
+                  </p>
+                  <p
+                    className="text-xs text-slate-400 mt-0.5"
+                    style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+                  >
+                    {product.category} ·{" "}
+                    {formatPrice(product.retailPricePerYard)}
+                    /yd
+                  </p>
+                </div>
+                <div className="flex items-center gap-3 flex-shrink-0">
+                  <span
+                    className={`text-xs font-semibold tabular-nums ${
+                      product.totalYardsInStock < 10
+                        ? "text-red-500"
+                        : product.totalYardsInStock < 20
+                          ? "text-amber-500"
+                          : "text-slate-400"
+                    }`}
+                    style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+                  >
+                    {product.totalYardsInStock} yds
+                  </span>
+                  <span
+                    className="text-xs text-slate-300"
+                    style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+                  >
+                    {timeAgo(product.createdAt)}
+                  </span>
+                </div>
               </div>
-              <div className="flex-1 min-w-0">
-                <p
-                  className="text-sm font-semibold text-slate-800 truncate"
-                  style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
-                >
-                  {product.name}
-                </p>
-                <p
-                  className="text-xs text-slate-400 mt-0.5"
-                  style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
-                >
-                  {product.category} · {formatPrice(product.retailPricePerYard)}
-                  /yd
-                </p>
-              </div>
-              <div className="flex items-center gap-3 flex-shrink-0">
-                <span
-                  className={`text-xs font-semibold tabular-nums ${
-                    product.totalYardsInStock < 10
-                      ? "text-red-500"
-                      : product.totalYardsInStock < 20
-                        ? "text-amber-500"
-                        : "text-slate-400"
-                  }`}
-                  style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
-                >
-                  {product.totalYardsInStock} yds
-                </span>
-                <span
-                  className="text-xs text-slate-300"
-                  style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
-                >
-                  {timeAgo(product.createdAt)}
-                </span>
-              </div>
-            </div>
-          ))}
+            ),
+          )}
         </div>
       </div>
     </div>
