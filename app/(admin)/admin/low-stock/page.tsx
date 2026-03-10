@@ -31,7 +31,7 @@ const MAX_DISPLAY = 100; // bar scale cap
 export default async function LowStockPage() {
   await requireRole("ADMIN");
 
-  const lowStockProducts = await db.product.findMany({
+  const lowStockProducts = await db.products.findMany({
     where: { totalYardsInStock: { lt: LOW } },
     orderBy: { totalYardsInStock: "asc" }, // most critical first
     select: {
@@ -54,7 +54,7 @@ export default async function LowStockPage() {
   ).length;
 
   // Overall stock health for context bar
-  const totalProducts = await db.product.count();
+  const totalProducts = await db.products.count();
   const healthyCount = totalProducts - lowStockProducts.length;
 
   return (

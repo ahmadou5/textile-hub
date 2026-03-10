@@ -34,11 +34,11 @@ function timeAgo(date: Date): string {
 export default async function AdminInquiriesPage() {
   await requireRole("ADMIN");
 
-  const inquiries = await db.inquiry.findMany({
+  const inquiries = await db.inquiries.findMany({
     orderBy: { createdAt: "desc" },
     include: {
-      wholesaler: { select: { name: true, email: true } },
-      product: { select: { name: true, category: true } },
+      users: { select: { name: true, email: true } },
+      products: { select: { name: true, category: true } },
       messages: { select: { id: true }, orderBy: { createdAt: "desc" } },
     },
   });
@@ -101,118 +101,106 @@ export default async function AdminInquiriesPage() {
         </div>
       ) : (
         <div className="space-y-2">
-          {inquiries.map(
-            (inquiry: {
-              id: string;
-              status: string;
-              messages: string;
-              createdAt: Date;
-              wholesaler: { name: string; email: string };
-              product: { name: string };
-              subject: string;
-            }) => (
-              <Link
-                key={inquiry.id}
-                href={`/admin/inquiries/${inquiry.id}`}
-                className="group flex items-center gap-4 p-4 rounded-2xl bg-white border border-slate-200/80
+          {inquiries.map((inquiry) => (
+            <Link
+              key={inquiry.id}
+              href={`/admin/inquiries/${inquiry.id}`}
+              className="group flex items-center gap-4 p-4 rounded-2xl bg-white border border-slate-200/80
                 hover:border-[#D4A853]/40 hover:shadow-[0_4px_16px_rgba(212,168,83,0.08),0_1px_4px_rgba(0,0,0,0.04)]
                 hover:-translate-y-0.5
                 transition-[transform,box-shadow,border-color] duration-200
                 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D4A853]"
-              >
-                {/* Status dot */}
-                <div className="flex-shrink-0">
-                  <div
-                    className={`w-2.5 h-2.5 rounded-full ${STATUS_DOT[inquiry.status as keyof typeof STATUS_DOT]}`}
-                    style={{
-                      boxShadow:
-                        inquiry.status === "OPEN"
-                          ? "0 0 6px rgba(251,191,36,0.6)"
-                          : "none",
-                    }}
-                  />
-                </div>
-
-                {/* Avatar */}
+            >
+              {/* Status dot */}
+              <div className="flex-shrink-0">
                 <div
-                  className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 text-xs font-bold text-slate-600"
+                  className={`w-2.5 h-2.5 rounded-full ${STATUS_DOT[inquiry.status as keyof typeof STATUS_DOT]}`}
                   style={{
-                    background: "#F1EDE4",
-                    fontFamily: "var(--font-dm-sans, sans-serif)",
+                    boxShadow:
+                      inquiry.status === "OPEN"
+                        ? "0 0 6px rgba(251,191,36,0.6)"
+                        : "none",
                   }}
+                />
+              </div>
+
+              {/* Avatar */}
+              <div
+                className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 text-xs font-bold text-slate-600"
+                style={{
+                  background: "#F1EDE4",
+                  fontFamily: "var(--font-dm-sans, sans-serif)",
+                }}
+              >
+                {(inquiry.users.name ?? "?")
+                  .split(" ")
+                  .map((n) => n[0])
+                  .join("")
+                  .toUpperCase()
+                  .slice(0, 2)}
+              </div>
+
+              {/* Content */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span
+                    className={`text-sm font-semibold text-slate-800 truncate ${inquiry.status === "OPEN" ? "font-bold" : ""}`}
+                    style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+                  >
+                    {inquiry.users.name ?? inquiry.users.email}
+                  </span>
+                  <span className="text-slate-300 text-xs hidden sm:block">
+                    ·
+                  </span>
+                  <span
+                    className="text-xs text-slate-400 truncate hidden sm:block"
+                    style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+                  >
+                    {inquiry.products.name}
+                  </span>
+                </div>
+                <p
+                  className="text-sm text-slate-500 truncate mt-0.5"
+                  style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
                 >
-                  {(inquiry.wholesaler.name ?? "?")
-                    .split(" ")
-                    .map((n) => n[0])
-                    .join("")
-                    .toUpperCase()
-                    .slice(0, 2)}
-                </div>
+                  {inquiry.subject}
+                </p>
+              </div>
 
-                {/* Content */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span
-                      className={`text-sm font-semibold text-slate-800 truncate ${inquiry.status === "OPEN" ? "font-bold" : ""}`}
-                      style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
-                    >
-                      {inquiry.wholesaler.name ?? inquiry.wholesaler.email}
-                    </span>
-                    <span className="text-slate-300 text-xs hidden sm:block">
-                      ·
-                    </span>
-                    <span
-                      className="text-xs text-slate-400 truncate hidden sm:block"
-                      style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
-                    >
-                      {inquiry.product.name}
-                    </span>
-                  </div>
-                  <p
-                    className="text-sm text-slate-500 truncate mt-0.5"
-                    style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
-                  >
-                    {inquiry.subject}
-                  </p>
-                </div>
+              {/* Right meta */}
+              <div className="flex items-center gap-3 flex-shrink-0">
+                <span
+                  className="hidden sm:flex items-center gap-1 text-xs text-slate-400"
+                  style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+                >
+                  <MessageSquare size={11} />
+                  {inquiry.messages.length}
+                </span>
 
-                {/* Right meta */}
-                <div className="flex items-center gap-3 flex-shrink-0">
-                  <span
-                    className="hidden sm:flex items-center gap-1 text-xs text-slate-400"
-                    style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
-                  >
-                    <MessageSquare size={11} />
-                    {inquiry.messages.length}
-                  </span>
+                <Badge
+                  variant="outline"
+                  className={`text-[10px] font-semibold border h-auto py-0.5 px-2 hidden sm:flex ${
+                    STATUS_STYLES[inquiry.status as keyof typeof STATUS_STYLES]
+                  }`}
+                >
+                  {inquiry.status}
+                </Badge>
 
-                  <Badge
-                    variant="outline"
-                    className={`text-[10px] font-semibold border h-auto py-0.5 px-2 hidden sm:flex ${
-                      STATUS_STYLES[
-                        inquiry.status as keyof typeof STATUS_STYLES
-                      ]
-                    }`}
-                  >
-                    {inquiry.status}
-                  </Badge>
+                <span
+                  className="flex items-center gap-1 text-xs text-slate-400"
+                  style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+                >
+                  <Clock size={11} />
+                  {timeAgo(inquiry.createdAt)}
+                </span>
 
-                  <span
-                    className="flex items-center gap-1 text-xs text-slate-400"
-                    style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
-                  >
-                    <Clock size={11} />
-                    {timeAgo(inquiry.createdAt)}
-                  </span>
-
-                  <ChevronRight
-                    size={15}
-                    className="text-slate-300 group-hover:text-[#D4A853] group-hover:translate-x-0.5 transition-[color,transform] duration-200"
-                  />
-                </div>
-              </Link>
-            ),
-          )}
+                <ChevronRight
+                  size={15}
+                  className="text-slate-300 group-hover:text-[#D4A853] group-hover:translate-x-0.5 transition-[color,transform] duration-200"
+                />
+              </div>
+            </Link>
+          ))}
         </div>
       )}
     </div>

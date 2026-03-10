@@ -5,7 +5,7 @@ import ProductCard from "@/components/ProductCard";
 import { ProductGridSkeleton } from "@/components/ProductCardSkeleton";
 
 async function ProductGrid() {
-  const products = await db.product.findMany({
+  const products = await db.products.findMany({
     orderBy: { createdAt: "desc" },
     select: {
       id: true,
@@ -35,17 +35,9 @@ async function ProductGrid() {
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5">
-      {products.map(
-        (product: {
-          id: string;
-          name: string;
-          category: string;
-          retailPricePerYard: number;
-          imageUrl: string;
-        }) => (
-          <ProductCard key={product.id} {...product} />
-        ),
-      )}
+      {products.map((product) => (
+        <ProductCard key={product.id} {...product} />
+      ))}
     </div>
   );
 }

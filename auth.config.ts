@@ -1,5 +1,5 @@
 import type { NextAuthConfig } from "next-auth";
-import { Role } from "./prisma/generated/prisma/enums";
+import { Role } from "./lib/generated/prisma/enums";
 
 export const authConfig: NextAuthConfig = {
   pages: {

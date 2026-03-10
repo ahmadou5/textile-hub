@@ -37,15 +37,15 @@ function timeAgo(date: Date): string {
 export default async function WholesaleInquiriesPage() {
   const session = await requireRole(["WHOLESALER", "ADMIN"] as never);
 
-  const inquiries = await db.inquiry.findMany({
+  const inquiries = await db.inquiries.findMany({
     where: { wholesalerId: session.user.id },
     orderBy: { updatedAt: "desc" },
     include: {
-      product: { select: { id: true, name: true, category: true } },
+      products: { select: { id: true, name: true, category: true } },
       messages: {
         orderBy: { createdAt: "desc" },
         take: 1,
-        include: { sender: { select: { name: true, role: true } } },
+        include: { users: { select: { name: true, role: true } } },
       },
     },
   });
@@ -137,129 +137,117 @@ export default async function WholesaleInquiriesPage() {
         </div>
       ) : (
         <div className="space-y-2">
-          {inquiries.map(
-            (inquiry: {
-              id: string;
-              product: { name: string };
-              status: string;
-              subject: string;
-              messages: { body: string; content: string; sender: User }[];
-              createdAt: Date;
-              updatedAt: Date;
-            }) => {
-              const lastMsg = inquiry.messages[0];
-              const isReplied = inquiry.status === "REPLIED";
+          {inquiries.map((inquiry) => {
+            const lastMsg = inquiry.messages[0];
+            const isReplied = inquiry.status === "REPLIED";
 
-              return (
-                <Link
-                  key={inquiry.id}
-                  href={`/wholesale/inquiries/${inquiry.id}`}
-                  className="group flex items-center gap-4 p-4 rounded-2xl border
+            return (
+              <Link
+                key={inquiry.id}
+                href={`/wholesale/inquiries/${inquiry.id}`}
+                className="group flex items-center gap-4 p-4 rounded-2xl border
                   hover:-translate-y-0.5
                   transition-[transform,border-color,box-shadow] duration-200
                   focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500"
-                  style={{
-                    background: isReplied
-                      ? "rgba(16,185,129,0.04)"
-                      : "rgba(255,255,255,0.025)",
-                    borderColor: isReplied
+                style={{
+                  background: isReplied
+                    ? "rgba(16,185,129,0.04)"
+                    : "rgba(255,255,255,0.025)",
+                  borderColor: isReplied
+                    ? "rgba(16,185,129,0.18)"
+                    : "rgba(255,255,255,0.07)",
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLAnchorElement).style.borderColor =
+                    isReplied ? "rgba(16,185,129,0.3)" : "rgba(16,185,129,0.2)";
+                  (e.currentTarget as HTMLAnchorElement).style.boxShadow =
+                    "0 4px 20px rgba(16,185,129,0.06)";
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLAnchorElement).style.borderColor =
+                    isReplied
                       ? "rgba(16,185,129,0.18)"
-                      : "rgba(255,255,255,0.07)",
-                  }}
-                  onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLAnchorElement).style.borderColor =
+                      : "rgba(255,255,255,0.07)";
+                  (e.currentTarget as HTMLAnchorElement).style.boxShadow =
+                    "none";
+                }}
+              >
+                {/* Status dot */}
+                <div className="flex-shrink-0">
+                  <div
+                    className={`w-2.5 h-2.5 rounded-full ${STATUS_DOT[inquiry.status as keyof typeof STATUS_DOT]}`}
+                    style={
                       isReplied
-                        ? "rgba(16,185,129,0.3)"
-                        : "rgba(16,185,129,0.2)";
-                    (e.currentTarget as HTMLAnchorElement).style.boxShadow =
-                      "0 4px 20px rgba(16,185,129,0.06)";
-                  }}
-                  onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLAnchorElement).style.borderColor =
-                      isReplied
-                        ? "rgba(16,185,129,0.18)"
-                        : "rgba(255,255,255,0.07)";
-                    (e.currentTarget as HTMLAnchorElement).style.boxShadow =
-                      "none";
+                        ? { boxShadow: "0 0 6px rgba(16,185,129,0.6)" }
+                        : {}
+                    }
+                  />
+                </div>
+
+                {/* Product icon */}
+                <div
+                  className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+                  style={{
+                    background: "rgba(255,255,255,0.05)",
+                    border: "1px solid rgba(255,255,255,0.08)",
                   }}
                 >
-                  {/* Status dot */}
-                  <div className="flex-shrink-0">
-                    <div
-                      className={`w-2.5 h-2.5 rounded-full ${STATUS_DOT[inquiry.status as keyof typeof STATUS_DOT]}`}
-                      style={
-                        isReplied
-                          ? { boxShadow: "0 0 6px rgba(16,185,129,0.6)" }
-                          : {}
-                      }
-                    />
-                  </div>
+                  <span className="text-sm">🧵</span>
+                </div>
 
-                  {/* Product icon */}
-                  <div
-                    className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-                    style={{
-                      background: "rgba(255,255,255,0.05)",
-                      border: "1px solid rgba(255,255,255,0.08)",
-                    }}
-                  >
-                    <span className="text-sm">🧵</span>
-                  </div>
-
-                  {/* Content */}
-                  <div className="flex-1 min-w-0 space-y-0.5">
-                    <div className="flex items-center gap-2">
-                      <span
-                        className="text-sm font-semibold text-white truncate"
-                        style={{ fontFamily: "var(--font-syne, sans-serif)" }}
-                      >
-                        {inquiry.product.name}
-                      </span>
-                      {isReplied && (
-                        <span className="flex items-center gap-1 text-[10px] font-semibold text-emerald-400 flex-shrink-0">
-                          <CheckCircle2 size={10} />
-                          Replied
-                        </span>
-                      )}
-                    </div>
-                    <p
-                      className="text-xs text-slate-500 truncate"
-                      style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
-                    >
-                      {lastMsg
-                        ? `${lastMsg?.sender.role === "ADMIN" ? "Admin: " : "You: "}${lastMsg.body}`
-                        : inquiry.subject}
-                    </p>
-                  </div>
-
-                  {/* Right meta */}
-                  <div className="flex items-center gap-3 flex-shrink-0">
-                    <Badge
-                      variant="outline"
-                      className={`text-[10px] font-semibold border h-auto py-0.5 px-2 hidden sm:flex ${
-                        STATUS_STYLES[
-                          inquiry.status as keyof typeof STATUS_STYLES
-                        ]
-                      }`}
-                    >
-                      {inquiry.status}
-                    </Badge>
+                {/* Content */}
+                <div className="flex-1 min-w-0 space-y-0.5">
+                  <div className="flex items-center gap-2">
                     <span
-                      className="flex items-center gap-1 text-xs text-slate-600"
-                      style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+                      className="text-sm font-semibold text-white truncate"
+                      style={{ fontFamily: "var(--font-syne, sans-serif)" }}
                     >
-                      <Clock size={10} />
-                      {timeAgo(inquiry.updatedAt)}
+                      {inquiry.products.name}
                     </span>
-                    <ChevronRight
-                      size={14}
-                      className="text-slate-600 group-hover:text-emerald-400 group-hover:translate-x-0.5 transition-[color,transform] duration-200"
-                    />
+                    {isReplied && (
+                      <span className="flex items-center gap-1 text-[10px] font-semibold text-emerald-400 flex-shrink-0">
+                        <CheckCircle2 size={10} />
+                        Replied
+                      </span>
+                    )}
                   </div>
-                </Link>
-              );
-            },
-          )}
+                  <p
+                    className="text-xs text-slate-500 truncate"
+                    style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+                  >
+                    {lastMsg
+                      ? `${lastMsg?.users.role === "ADMIN" ? "Admin: " : "You: "}${lastMsg.body}`
+                      : inquiry.subject}
+                  </p>
+                </div>
+
+                {/* Right meta */}
+                <div className="flex items-center gap-3 flex-shrink-0">
+                  <Badge
+                    variant="outline"
+                    className={`text-[10px] font-semibold border h-auto py-0.5 px-2 hidden sm:flex ${
+                      STATUS_STYLES[
+                        inquiry.status as keyof typeof STATUS_STYLES
+                      ]
+                    }`}
+                  >
+                    {inquiry.status}
+                  </Badge>
+                  <span
+                    className="flex items-center gap-1 text-xs text-slate-600"
+                    style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+                  >
+                    <Clock size={10} />
+                    {timeAgo(inquiry.updatedAt)}
+                  </span>
+                  <ChevronRight
+                    size={14}
+                    className="text-slate-600 group-hover:text-emerald-400 group-hover:translate-x-0.5 transition-[color,transform] duration-200"
+                  />
+                </div>
+              </Link>
+            );
+          })}
         </div>
       )}
     </div>

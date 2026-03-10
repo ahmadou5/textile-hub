@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { z } from "zod";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@/lib/generated/prisma/browser";
 
 const createInquirySchema = z.object({
   productId: z.string().min(1, "Product ID is required"),
@@ -39,7 +39,7 @@ export async function POST(req: Request) {
     const { productId, subject, message } = parsed.data;
 
     // Verify product exists
-    const product = await db.product.findUnique({
+    const product = await db.products.findUnique({
       where: { id: productId },
       select: { id: true },
     });
@@ -51,17 +51,20 @@ export async function POST(req: Request) {
     // Create inquiry + first message in a transaction
     const inquiry = await db.$transaction(
       async (tx: Prisma.TransactionClient) => {
-        const newInquiry = await tx.inquiry.create({
+        const newInquiry = await tx.inquiries.create({
           data: {
+            id: crypto.randomUUID(), // ⚠️ your schema requires id — not auto-generated!
+            productId,
             subject,
             status: "OPEN",
             wholesalerId: session.user.id,
-            productId,
+            updatedAt: new Date(),
           },
         });
 
-        await tx.message.create({
+        await tx.messages.create({
           data: {
+            id: crypto.randomUUID(), // same here if messages.id is required
             body: message,
             inquiryId: newInquiry.id,
             senderId: session.user.id,

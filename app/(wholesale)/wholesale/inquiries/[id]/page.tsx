@@ -30,7 +30,7 @@ export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const { id } = await params;
-  const inquiry = await db.inquiry.findUnique({
+  const inquiry = await db.inquiries.findUnique({
     where: { id },
     select: { subject: true },
   });
@@ -56,17 +56,17 @@ export default async function WholesaleInquiryThreadPage({
   const session = await requireRole(["WHOLESALER", "ADMIN"] as never);
   const { id } = await params;
 
-  const inquiry = await db.inquiry.findUnique({
+  const inquiry = await db.inquiries.findUnique({
     where: { id },
     include: {
-      wholesaler: { select: { id: true } },
-      product: {
+      users: { select: { id: true } },
+      products: {
         select: { id: true, name: true, category: true, imageUrl: true },
       },
       messages: {
         orderBy: { createdAt: "asc" },
         include: {
-          sender: { select: { id: true, name: true, role: true } },
+          users: { select: { id: true, name: true, role: true } },
         },
       },
     },
@@ -77,7 +77,7 @@ export default async function WholesaleInquiryThreadPage({
   // Wholesalers can only see their own inquiries
   if (
     session.user.role === "WHOLESALER" &&
-    inquiry.wholesaler.id !== session.user.id
+    inquiry.users.id !== session.user.id
   ) {
     redirect("/wholesale/inquiries");
   }
@@ -136,10 +136,10 @@ export default async function WholesaleInquiryThreadPage({
             >
               <Package size={11} />
               <span className="text-slate-400 font-medium">
-                {inquiry.product.name}
+                {inquiry.products.name}
               </span>
               <span className="text-slate-600 hidden sm:block">
-                — {inquiry.product.category}
+                — {inquiry.products.category}
               </span>
             </div>
             <Separator
@@ -342,7 +342,7 @@ export default async function WholesaleInquiryThreadPage({
               To follow up, please submit a new inquiry.
             </p>
             <Link
-              href={`/wholesale/products/${inquiry.product.id}`}
+              href={`/wholesale/products/${inquiry.products.id}`}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold
                 text-emerald-400 border border-emerald-500/20 bg-emerald-500/8
                 hover:bg-emerald-500/15 hover:border-emerald-500/30
@@ -351,7 +351,7 @@ export default async function WholesaleInquiryThreadPage({
               style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
             >
               <MessageSquarePlus size={13} />
-              Start New Inquiry for {inquiry.product.name}
+              Start New Inquiry for {inquiry.products.name}
             </Link>
           </div>
         </div>

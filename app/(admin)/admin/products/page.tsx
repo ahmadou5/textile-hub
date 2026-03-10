@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default async function AdminProductsPage() {
   await requireRole("ADMIN");
 
-  const products = await db.product.findMany({
+  const products = await db.products.findMany({
     orderBy: { createdAt: "desc" },
     select: {
       id: true,

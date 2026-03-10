@@ -36,14 +36,14 @@ export default async function AdminDashboardPage() {
 
   const [productCount, openInquiries, lowStockProducts, recentProducts] =
     await Promise.all([
-      db.product.count(),
-      db.inquiry.count({ where: { status: "OPEN" } }),
-      db.product.findMany({
+      db.products.count(),
+      db.inquiries.count({ where: { status: "OPEN" } }),
+      db.products.findMany({
         where: { totalYardsInStock: { lt: 20 } },
         orderBy: { totalYardsInStock: "asc" },
         select: { id: true, name: true, totalYardsInStock: true },
       }),
-      db.product.findMany({
+      db.products.findMany({
         orderBy: { createdAt: "desc" },
         take: 4,
         select: {

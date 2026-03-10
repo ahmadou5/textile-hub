@@ -25,7 +25,7 @@ export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const { id } = await params;
-  const inquiry = await db.inquiry.findUnique({
+  const inquiry = await db.inquiries.findUnique({
     where: { id },
     select: { subject: true },
   });
@@ -50,11 +50,11 @@ export default async function AdminInquiryThreadPage({ params }: PageProps) {
   const session = await requireRole("ADMIN");
   const { id } = await params;
 
-  const inquiry = await db.inquiry.findUnique({
+  const inquiry = await db.inquiries.findUnique({
     where: { id },
     include: {
-      wholesaler: { select: { id: true, name: true, email: true } },
-      product: {
+      users: { select: { id: true, name: true, email: true } },
+      products: {
         select: {
           id: true,
           name: true,
@@ -66,7 +66,7 @@ export default async function AdminInquiryThreadPage({ params }: PageProps) {
       messages: {
         orderBy: { createdAt: "asc" },
         include: {
-          sender: { select: { id: true, name: true, role: true } },
+          users: { select: { id: true, name: true, role: true } },
         },
       },
     },
@@ -124,10 +124,10 @@ export default async function AdminInquiryThreadPage({ params }: PageProps) {
             >
               <User size={12} />
               <span className="font-medium text-slate-700">
-                {inquiry.wholesaler.name ?? inquiry.wholesaler.email}
+                {inquiry.users.name ?? inquiry.users.email}
               </span>
               <span className="text-slate-400 hidden sm:block">
-                {inquiry.wholesaler.email}
+                {inquiry.users.email}
               </span>
             </div>
 
@@ -140,9 +140,9 @@ export default async function AdminInquiryThreadPage({ params }: PageProps) {
               style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
             >
               <Package size={12} />
-              <span className="font-medium">{inquiry.product.name}</span>
+              <span className="font-medium">{inquiry.products.name}</span>
               <span className="text-slate-400 hidden sm:block">
-                — {inquiry.product.category}
+                — {inquiry.products.category}
               </span>
             </Link>
           </div>

@@ -20,15 +20,15 @@ export default async function WholesaleDashboardPage() {
   const session = await requireRole(["WHOLESALER", "ADMIN"] as never);
   const now = new Date();
   const [inquiries, recentProducts] = await Promise.all([
-    db.inquiry.findMany({
+    db.inquiries.findMany({
       where: { wholesalerId: session.user.id },
       include: {
-        product: { select: { name: true } },
+        products: { select: { name: true } },
         messages: { select: { id: true } },
       },
       orderBy: { updatedAt: "desc" },
     }),
-    db.product.findMany({
+    db.products.findMany({
       where: {
         createdAt: { gte: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000) },
       },

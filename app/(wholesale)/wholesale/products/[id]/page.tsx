@@ -25,7 +25,7 @@ export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const { id } = await params;
-  const product = await db.product.findUnique({
+  const product = await db.products.findUnique({
     where: { id },
     select: { name: true },
   });
@@ -53,7 +53,7 @@ export default async function WholesaleProductDetailPage({
 
   const { id } = await params;
 
-  const product = await db.product.findUnique({
+  const product = await db.products.findUnique({
     where: { id },
   });
 

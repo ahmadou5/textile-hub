@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { z } from "zod";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@/lib/generated/prisma/browser";
 
 const replySchema = z.object({
   message: z.string().min(1, "Reply cannot be empty").max(5000),
@@ -31,7 +31,7 @@ export async function POST(
       );
     }
 
-    const inquiry = await db.inquiry.findUnique({
+    const inquiry = await db.inquiries.findUnique({
       where: { id: inquiryId },
       select: { id: true, status: true },
     });
@@ -43,20 +43,21 @@ export async function POST(
     // Create message + update status in one transaction
     const result = await db.$transaction(
       async (tx: Prisma.TransactionClient) => {
-        const message = await tx.message.create({
+        const message = await tx.messages.create({
           data: {
+            id: crypto.randomUUID(), // same here if messages.id is required
             body: parsed.data.message,
             inquiryId,
             senderId: session.user.id,
           },
           include: {
-            sender: { select: { id: true, name: true, role: true } },
+            users: { select: { id: true, name: true, role: true } },
           },
         });
 
         // Only update status if not already CLOSED
         if (inquiry.status !== "CLOSED") {
-          await tx.inquiry.update({
+          await tx.inquiries.update({
             where: { id: inquiryId },
             data: { status: "REPLIED" },
           });
