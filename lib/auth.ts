@@ -26,15 +26,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         try {
           const user = await db.users.findUnique({
-            where: { email: email },
+            where: { email },
           });
 
-          console.log("[AUTH_AUTHORIZE]", { user });
+          console.log("[AUTH] User found:", user ? user.email : "NOT FOUND");
 
           if (!user || !user.password) return null;
 
-          const isValid = password === user.password;
-          console.log("[AUTH_LOGIN]", { email, isValid });
+          const isValid = await bcrypt.compare(password, user.password);
+          console.log("[AUTH] Password valid:", isValid);
+
           if (!isValid) return null;
 
           return {
