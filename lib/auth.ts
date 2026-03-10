@@ -25,7 +25,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (!email || !password) return null;
 
         try {
-          const user = await db.users.findUnique({
+          const user = await db.users.findFirst({
             where: { email },
           });
 
