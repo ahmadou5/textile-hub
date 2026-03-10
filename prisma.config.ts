@@ -10,8 +10,7 @@ export default defineConfig({
   },
   engine: "classic",
   datasource: {
-    url: "postgresql://neondb_owner:npg_oPOpqvfy8a9h@ep-lively-term-abwi3v6b.eu-west-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require",
-    directUrl:
-      "postgresql://neondb_owner:npg_oPOpqvfy8a9h@ep-lively-term-abwi3v6b.eu-west-2.aws.neon.tech/neondb?sslmode=require",
+    url: env("DATABASE_URL"),
+    directUrl: env("DATABASE_DIRECT_URL"),
   },
 });
