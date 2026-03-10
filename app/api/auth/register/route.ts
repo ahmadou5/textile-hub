@@ -6,7 +6,7 @@ import { db } from "@/lib/db";
 export async function POST(req: Request) {
   try {
     const { name, email, password } = await req.json();
-
+    console.log("[REGISTER]", { name, email });
     if (!name || !email || !password) {
       return NextResponse.json(
         { error: "All fields are required" },
@@ -41,7 +41,9 @@ export async function POST(req: Request) {
       { status: 201 },
     );
   } catch (error) {
-    console.error("[REGISTER_ERROR]", error);
+    if (error instanceof Error) {
+      console.error("[REGISTER_ERROR]", error.message);
+    }
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },

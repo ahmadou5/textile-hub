@@ -43,21 +43,27 @@ export default function LoginPage() {
     setLoading(true);
     setError(null);
 
-    const result = await signIn("credentials", {
-      email: values.email,
-      password: values.password,
-      redirect: false,
-    });
+    try {
+      const result = await signIn("credentials", {
+        email: values.email,
+        password: values.password,
+        redirect: false,
+      });
 
-    setLoading(false);
-
-    if (result?.error) {
+      setLoading(false);
+      if (result?.error) {
+        //setError("Invalid email or password");
+        return;
+      }
+      router.push("/");
+      router.refresh();
+    } catch (error) {
+      setLoading(false);
+      if (error instanceof Error) {
+        setError("An unexpected error occurred: " + error.message);
+      }
       setError("Invalid email or password");
-      return;
     }
-
-    router.push("/");
-    router.refresh();
   }
 
   return (
