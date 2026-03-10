@@ -47,8 +47,7 @@ export default function LoginPage() {
       const result = await signIn("credentials", {
         email: values.email,
         password: values.password,
-        redirect: true,
-        callbackUrl: "/",
+        redirect: false,
       });
 
       console.log("[LOGIN_RESULT]", result);
