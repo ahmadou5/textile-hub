@@ -16,7 +16,7 @@ export async function DELETE(
 
     const { id } = await params;
 
-    await db.product.delete({ where: { id } });
+    await db.products.delete({ where: { id } });
 
     return NextResponse.json({ success: true });
   } catch {
