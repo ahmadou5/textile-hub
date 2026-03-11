@@ -19,42 +19,15 @@ import {
   Scissors,
 } from "lucide-react";
 import { db } from "@/lib/db";
-const openInquiries = await db.inquiries.count({ where: { status: "OPEN" } });
-const navItems = [
-  {
-    label: "Dashboard",
-    href: "/admin",
-    icon: LayoutDashboard,
-    exact: true,
-  },
-  {
-    label: "Products",
-    href: "/admin/products",
-    icon: Package,
-    exact: false,
-  },
-  {
-    label: "Inquiries",
-    href: "/admin/inquiries",
-    icon: MessageSquare,
-    badge: openInquiries.toString(),
-    exact: false,
-  },
-  {
-    label: "Low Stock Alerts",
-    href: "/admin/low-stock",
-    icon: AlertTriangle,
-    exact: false,
-  },
-];
+export interface navItem {
+  label: string;
+  href: string;
+  icon: React.ComponentType<{ size: number; className?: string }>;
+  badge?: string;
+  exact: boolean;
+}
 
-function NavLink({
-  item,
-  onClick,
-}: {
-  item: (typeof navItems)[0];
-  onClick?: () => void;
-}) {
+function NavLink({ item, onClick }: { item: navItem; onClick?: () => void }) {
   const pathname = usePathname();
   const isActive = item.exact
     ? pathname === item.href
@@ -95,9 +68,11 @@ function NavLink({
 function SidebarContent({
   adminName,
   onNavClick,
+  navItems,
 }: {
   adminName: string;
   onNavClick?: () => void;
+  navItems?: navItem[];
 }) {
   const initials = adminName
     .split(" ")
@@ -132,7 +107,7 @@ function SidebarContent({
 
       {/* Navigation */}
       <nav className="flex-1 px-3 py-4 space-y-1">
-        {navItems.map((item) => (
+        {navItems?.map((item) => (
           <NavLink key={item.href} item={item} onClick={onNavClick} />
         ))}
       </nav>
@@ -174,7 +149,13 @@ function SidebarContent({
   );
 }
 
-export default function AdminSidebar({ adminName }: { adminName: string }) {
+export default function AdminSidebar({
+  adminName,
+  navbarItems,
+}: {
+  adminName: string;
+  navbarItems?: navItem[];
+}) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
@@ -235,6 +216,7 @@ export default function AdminSidebar({ adminName }: { adminName: string }) {
           >
             <SidebarContent
               adminName={adminName}
+              navItems={navbarItems}
               onNavClick={() => setMobileOpen(false)}
             />
           </SheetContent>
