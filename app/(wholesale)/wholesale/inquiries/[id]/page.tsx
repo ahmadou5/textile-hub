@@ -108,7 +108,7 @@ export default async function WholesaleInquiryThreadPage({
         style={{
           background: "rgba(255,255,255,0.025)",
           border: "1px solid rgba(255,255,255,0.07)",
-          boxShadow: "0 2px_8px rgba(0,0,0,0.2)",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
         }}
       >
         <div className="space-y-2 flex-1 min-w-0">
@@ -171,7 +171,6 @@ export default async function WholesaleInquiryThreadPage({
             boxShadow: "0 0 20px rgba(16,185,129,0.05)",
           }}
         >
-          {/* Pulse dot */}
           <span className="relative flex h-2.5 w-2.5 flex-shrink-0">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
             <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400" />
@@ -189,35 +188,30 @@ export default async function WholesaleInquiryThreadPage({
       {/* Messages thread */}
       <ScrollArea className="flex-1 min-h-0">
         <div className="space-y-1 pb-4 pr-2">
-          {inquiry.messages.map((msg: unknown, index: number) => {
-            const isAdminMsg =
-              (msg as { users: { role: string } }).users.role === "ADMIN";
-            const isOwnMsg =
-              (msg as { users: { id: string } }).users.id === session?.user.id;
+          {inquiry.messages.map((msg, index) => {
+            // ✅ use `users` not `sender` — matches Prisma relation name
+            const isAdminMsg = msg.users?.role === "ADMIN";
+            const isOwnMsg = msg.users?.id === session?.user.id;
             const prevMsg = index > 0 ? inquiry.messages[index - 1] : null;
+
             const showDateSep =
               !prevMsg ||
-              new Date(
-                (msg as { createdAt: Date }).createdAt,
-              ).toDateString() !==
-                new Date(
-                  (prevMsg as { createdAt: Date }).createdAt,
-                ).toDateString();
+              new Date(msg.createdAt).toDateString() !==
+                new Date(prevMsg.createdAt).toDateString();
 
-            const initials =
-              (msg as { users: { name: string } }).users.name ??
-              "?"
-                .split(" ")
-                .map((n) => n[0])
-                .join("")
-                .toUpperCase()
-                .slice(0, 2);
+            // ✅ safe initials — split after null check
+            const senderName = msg.users?.name ?? "?";
+            const initials = senderName
+              .split(" ")
+              .map((n) => n[0] ?? "")
+              .join("")
+              .toUpperCase()
+              .slice(0, 2);
 
-            // Own messages (wholesaler) on right, admin on left
             const alignRight = isOwnMsg;
 
             return (
-              <div key={(msg as { id: string }).id}>
+              <div key={msg.id}>
                 {showDateSep && (
                   <div className="flex items-center gap-3 py-4">
                     <Separator className="flex-1 bg-white/[0.06]" />
@@ -225,9 +219,7 @@ export default async function WholesaleInquiryThreadPage({
                       className="text-[10px] font-medium text-slate-600 uppercase tracking-wider px-2 flex-shrink-0"
                       style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
                     >
-                      {new Date(
-                        (msg as { createdAt: Date }).createdAt,
-                      ).toLocaleDateString("en-NG", {
+                      {new Date(msg.createdAt).toLocaleDateString("en-NG", {
                         weekday: "short",
                         day: "numeric",
                         month: "short",
@@ -276,7 +268,7 @@ export default async function WholesaleInquiryThreadPage({
                         </span>
                       )}
                       <span className="text-slate-600">
-                        {formatDate((msg as { createdAt: Date }).createdAt)}
+                        {formatDate(msg.createdAt)}
                       </span>
                     </div>
 
@@ -301,7 +293,7 @@ export default async function WholesaleInquiryThreadPage({
                           : "0 1px 4px rgba(0,0,0,0.15)",
                       }}
                     >
-                      {(msg as { body: string }).body}
+                      {msg.body}
                     </div>
                   </div>
                 </div>
@@ -344,7 +336,7 @@ export default async function WholesaleInquiryThreadPage({
             <Link
               href={`/wholesale/products/${inquiry.products.id}`}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold
-                text-emerald-400 border border-emerald-500/20 bg-emerald-500/8
+                text-emerald-400 border border-emerald-500/20 bg-emerald-500/[0.08]
                 hover:bg-emerald-500/15 hover:border-emerald-500/30
                 transition-[background,border-color] duration-150
                 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500"
