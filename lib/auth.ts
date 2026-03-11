@@ -3,7 +3,6 @@ import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { db } from "@/lib/db";
 import { authConfig } from "@/auth.config";
-
 import { Role } from "@prisma/client";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
@@ -23,38 +22,67 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         if (!email || !password) return null;
 
-        const users = await db.users.findMany({});
-        console.log("[AUTH] Checking credentials for:", users);
-        const user = users.find((u) => u.email === email);
+        try {
+          // ✅ use findUnique not findMany
+          const user = await db.users.findUnique({
+            where: { email },
+          });
 
-        console.log("[AUTH] User found:", user?.email || "NOT FOUND");
+          console.log("[AUTH] User found:", user?.email ?? "NOT FOUND");
 
-        if (!user || !user.password) return null;
+          if (!user?.password) return null;
 
-        const isValid = await bcrypt.compare(password, user?.password);
-        console.log("[AUTH] Password valid:", isValid);
+          const isValid = await bcrypt.compare(password, user.password);
+          console.log("[AUTH] Password valid:", isValid);
 
-        if (!isValid) return null;
+          if (!isValid) return null;
 
-        return {
-          id: user?.id,
-          email: user?.email,
-          name: user?.name,
-          role: user?.role as Role,
-        };
+          // ✅ explicitly return all fields including role
+          return {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            role: user.role, // Role enum value e.g. "WHOLESALER"
+          };
+        } catch (error) {
+          console.error("[AUTH_AUTHORIZE_ERROR]", error);
+          return null;
+        }
       },
     }),
   ],
+  callbacks: {
+    // ✅ override callbacks here to ensure role is in JWT
+    async jwt({ token, user }) {
+      if (user && user.id) {
+        token.id = user.id;
+        token.role = user.role; // ✅ put role in token
+      }
+      console.log("[JWT CALLBACK] token:", token);
+      return token;
+    },
+    async session({ session, token }) {
+      if (token && session.user) {
+        session.user.id = token.id as string;
+        session.user.role = token.role as string; // ✅ pull role from token
+      }
+      console.log("[SESSION CALLBACK] session:", session);
+      return session;
+    },
+  },
 });
 
-// ─── requireRole as a separate export ─────────────────────────────────────
-export async function requireRole(role: Role | Role[]) {
-  const { redirect } = await import("next/navigation"); // ✅ dynamic import
+// ─── requireRole ──────────────────────────────────────────────────────────
+export async function requireRole(role: string | string[]) {
+  const { redirect } = await import("next/navigation");
   const session = await auth();
+
+  console.log("[REQUIRE_ROLE] session:", session?.user);
+
   if (!session?.user) redirect("/login");
 
   const roles = Array.isArray(role) ? role : [role];
-  if (!roles.includes(session?.user.role as Role)) {
+  if (!roles.includes(session?.user.role as string)) {
     redirect("/unauthorized");
   }
 

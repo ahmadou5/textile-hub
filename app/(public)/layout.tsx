@@ -78,25 +78,6 @@ export default function PublicLayout({
       </header>
 
       <main>{children}</main>
-
-      {/* Footer */}
-      <footer className="border-t border-[#EDE8DF] mt-20 py-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p
-            className="text-sm text-[#1C1410]/40"
-            style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
-          >
-            © {new Date().getFullYear()} TextileHub. Premium fabrics &
-            wholesale.
-          </p>
-          <Link
-            href="/register"
-            className="text-sm text-[#C9913A] hover:text-[#1C1410] transition-[color] duration-150 font-medium"
-          >
-            Apply for Wholesale Account →
-          </Link>
-        </div>
-      </footer>
     </div>
   );
 }
