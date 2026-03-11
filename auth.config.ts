@@ -1,6 +1,5 @@
-import { Role } from "@prisma/client";
 import type { NextAuthConfig } from "next-auth";
-import CredentialsProvider from "next-auth/providers/credentials";
+// ✅ no @prisma/client import — breaks Edge runtime
 
 export const authConfig: NextAuthConfig = {
   pages: {
@@ -39,17 +38,10 @@ export const authConfig: NextAuthConfig = {
     session({ session, token }) {
       if (token && session.user) {
         session.user.id = token.id as string;
-        session.user.role = token.role as Role; // ✅ plain string, no Prisma import
+        session.user.role = token.role as string; // ✅ plain string
       }
       return session;
     },
   },
-  providers: [
-    CredentialsProvider({
-      credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" },
-      },
-    }),
-  ],
+  providers: [], // ✅ empty — providers added in lib/auth.ts only
 };

@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/card";
 import Link from "next/link";
 import { toast } from "sonner";
+import { getSession } from "next-auth/react";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -50,18 +51,27 @@ export default function LoginPage() {
       redirect: false,
     });
 
-    if (result.error) {
-      setError(result.error);
-      toast.error("Login failed: " + result.error);
-      setLoading(false);
-    }
-
-    console.log("[LOGIN_RESULT]", result);
-
     setLoading(false);
 
+    if (result?.error) {
+      setError("Invalid email or password");
+      toast.error("Login failed: Invalid email or password");
+      return;
+    }
+
     toast.success("Login successful!");
-    router.push("/wholesale");
+
+    // ✅ fetch session to get role then redirect accordingly
+    const session = await getSession();
+
+    if (session?.user?.role === "ADMIN") {
+      router.push("/admin");
+    } else if (session?.user?.role === "WHOLESALER") {
+      router.push("/wholesale");
+    } else {
+      router.push("/"); // fallback for any other role
+    }
+
     router.refresh();
   }
 
