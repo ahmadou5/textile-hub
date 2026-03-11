@@ -40,7 +40,7 @@ export default function ProductsTableWithFilter({
     : products;
 
   return (
-    <div className="space-y-4">
+    <div className="w-[90%] mx-auto">
       {/* Filter bar */}
       <div className="flex items-center justify-between gap-4">
         <p
