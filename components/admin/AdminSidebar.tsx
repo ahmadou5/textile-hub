@@ -18,7 +18,8 @@ import {
   LayoutDashboard,
   Scissors,
 } from "lucide-react";
-
+import { db } from "@/lib/db";
+const openInquiries = db.inquiries.count({ where: { status: "OPEN" } });
 const navItems = [
   {
     label: "Dashboard",
@@ -36,7 +37,7 @@ const navItems = [
     label: "Inquiries",
     href: "/admin/inquiries",
     icon: MessageSquare,
-    badge: "3",
+    badge: openInquiries.toString(),
     exact: false,
   },
   {
