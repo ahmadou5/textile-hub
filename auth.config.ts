@@ -1,4 +1,5 @@
 import type { NextAuthConfig } from "next-auth";
+// ✅ no @prisma/client import — breaks Edge runtime
 
 export const authConfig: NextAuthConfig = {
   pages: {
@@ -6,6 +7,27 @@ export const authConfig: NextAuthConfig = {
     error: "/login",
   },
   callbacks: {
+    authorized({ auth, request: { nextUrl } }) {
+      const isLoggedIn = !!auth?.user;
+      const isOnWholesale = nextUrl.pathname.startsWith("/wholesale");
+      const isOnAdmin = nextUrl.pathname.startsWith("/admin");
+
+      if (isOnAdmin) {
+        if (isLoggedIn && auth?.user?.role === "ADMIN") return true;
+        return false;
+      }
+
+      if (isOnWholesale) {
+        if (
+          isLoggedIn &&
+          (auth?.user?.role === "WHOLESALER" || auth?.user?.role === "ADMIN")
+        )
+          return true;
+        return Response.redirect(new URL("/login", nextUrl));
+      }
+
+      return true;
+    },
     jwt({ token, user }) {
       if (user) {
         token.id = user.id;
@@ -16,10 +38,10 @@ export const authConfig: NextAuthConfig = {
     session({ session, token }) {
       if (token && session.user) {
         session.user.id = token.id as string;
-        session.user.role = token.role as string;
+        session.user.role = token.role as string; // ✅ plain string
       }
       return session;
     },
   },
-  providers: [],
+  providers: [], // ✅ empty — providers added in lib/auth.ts only
 };
