@@ -191,10 +191,9 @@ export default async function WholesaleInquiryThreadPage({
         <div className="space-y-1 pb-4 pr-2">
           {inquiry.messages.map((msg: unknown, index: number) => {
             const isAdminMsg =
-              (msg as { sender: { role: string } }).sender.role === "ADMIN";
+              (msg as { users: { role: string } }).users.role === "ADMIN";
             const isOwnMsg =
-              (msg as { sender: { id: string } }).sender.id ===
-              session?.user.id;
+              (msg as { users: { id: string } }).users.id === session?.user.id;
             const prevMsg = index > 0 ? inquiry.messages[index - 1] : null;
             const showDateSep =
               !prevMsg ||
@@ -206,7 +205,7 @@ export default async function WholesaleInquiryThreadPage({
                 ).toDateString();
 
             const initials =
-              (msg as { sender: { name: string } }).sender.name ??
+              (msg as { users: { name: string } }).users.name ??
               "?"
                 .split(" ")
                 .map((n) => n[0])
