@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { signIn } from "next-auth/react";
+import { useState, useEffect } from "react";
+import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -19,7 +19,6 @@ import {
 } from "@/components/ui/card";
 import Link from "next/link";
 import { toast } from "sonner";
-import { getSession } from "next-auth/react";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -30,8 +29,22 @@ type LoginValues = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
   const router = useRouter();
+  const { data: session, status } = useSession();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  // ✅ watches session and redirects based on role
+  useEffect(() => {
+    if (status === "authenticated" && session?.user?.role) {
+      if (session.user.role === "ADMIN") {
+        router.push("/admin");
+      } else if (session.user.role === "WHOLESALER") {
+        router.push("/wholesale");
+      } else {
+        router.push("/");
+      }
+    }
+  }, [status, session, router]);
 
   const {
     register,
@@ -55,24 +68,12 @@ export default function LoginPage() {
 
     if (result?.error) {
       setError("Invalid email or password");
-      toast.error("Login failed: Invalid email or password");
+      toast.error("Invalid email or password");
       return;
     }
 
     toast.success("Login successful!");
-
-    // ✅ fetch session to get role then redirect accordingly
-    const session = await getSession();
-
-    if (session?.user?.role === "ADMIN") {
-      router.push("/admin");
-    } else if (session?.user?.role === "WHOLESALER") {
-      router.push("/wholesale");
-    } else {
-      router.push("/"); // fallback for any other role
-    }
-
-    //router.refresh();
+    // ✅ no router.push here — useEffect handles redirect
   }
 
   return (
