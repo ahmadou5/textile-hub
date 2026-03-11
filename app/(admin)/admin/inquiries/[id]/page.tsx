@@ -1,6 +1,6 @@
 // app/(admin)/admin/inquiries/[id]/page.tsx
 import { notFound } from "next/navigation";
-import { requireRole, auth } from "@/lib/auth";
+import { requireRole } from "@/lib/auth";
 import { db } from "@/lib/db";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
@@ -135,7 +135,7 @@ export default async function AdminInquiryThreadPage({ params }: PageProps) {
 
             {/* Product */}
             <Link
-              href={`/admin/products`}
+              href="/admin/products"
               className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-[#D4A853] transition-[color] duration-150"
               style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
             >
@@ -157,31 +157,27 @@ export default async function AdminInquiryThreadPage({ params }: PageProps) {
       {/* Messages thread — scrollable */}
       <ScrollArea className="flex-1 min-h-0">
         <div className="space-y-1 pb-4 pr-2">
-          {inquiry.messages.map((msg: unknown, index: number) => {
-            const isAdmin =
-              (msg as { sender: { role: string } }).sender.role === "ADMIN";
-            const isFirst = index === 0;
+          {inquiry.messages.map((msg, index) => {
+            // ✅ use `users` not `sender` — matches Prisma relation name
+            const isAdmin = msg.users?.role === "ADMIN";
             const prevMsg = index > 0 ? inquiry.messages[index - 1] : null;
+
             const showDateSep =
               !prevMsg ||
-              new Date(
-                (msg as { createdAt: Date }).createdAt,
-              ).toDateString() !==
-                new Date(
-                  (prevMsg as { createdAt: Date }).createdAt,
-                ).toDateString();
+              new Date(msg.createdAt).toDateString() !==
+                new Date(prevMsg.createdAt).toDateString();
 
-            const initials =
-              (msg as { sender: { name: string } }).sender.name ??
-              "?"
-                .split(" ")
-                .map((n) => n[0])
-                .join("")
-                .toUpperCase()
-                .slice(0, 2);
+            // ✅ safe initials
+            const senderName = msg.users?.name ?? "?";
+            const initials = senderName
+              .split(" ")
+              .map((n) => n[0] ?? "")
+              .join("")
+              .toUpperCase()
+              .slice(0, 2);
 
             return (
-              <div key={(msg as { id: string }).id}>
+              <div key={msg.id}>
                 {/* Date separator */}
                 {showDateSep && (
                   <div className="flex items-center gap-3 py-4">
@@ -190,9 +186,7 @@ export default async function AdminInquiryThreadPage({ params }: PageProps) {
                       className="text-[10px] font-medium text-slate-400 uppercase tracking-wider px-2 flex-shrink-0"
                       style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
                     >
-                      {new Date(
-                        (msg as { createdAt: Date }).createdAt,
-                      ).toLocaleDateString("en-NG", {
+                      {new Date(msg.createdAt).toLocaleDateString("en-NG", {
                         weekday: "short",
                         day: "numeric",
                         month: "short",
@@ -227,18 +221,16 @@ export default async function AdminInquiryThreadPage({ params }: PageProps) {
                       className={`flex items-center gap-2 text-[11px] text-slate-400 ${isAdmin ? "flex-row-reverse" : "flex-row"}`}
                       style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
                     >
+                      {/* ✅ use msg.users.name not msg.sender.name */}
                       <span className="font-medium text-slate-500">
-                        {(msg as { sender: { name: string } }).sender.name ??
-                          "Unknown"}
+                        {msg.users?.name ?? "Unknown"}
                       </span>
                       {isAdmin && (
                         <span className="text-[#D4A853] font-semibold text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded-md bg-[#D4A853]/10">
                           Admin
                         </span>
                       )}
-                      <span>
-                        {formatDate((msg as { createdAt: Date }).createdAt)}
-                      </span>
+                      <span>{formatDate(msg.createdAt)}</span>
                     </div>
 
                     {/* Message body */}
@@ -253,7 +245,7 @@ export default async function AdminInquiryThreadPage({ params }: PageProps) {
                         lineHeight: "1.7",
                       }}
                     >
-                      {(msg as { body: string }).body}
+                      {msg.body}
                     </div>
                   </div>
                 </div>
