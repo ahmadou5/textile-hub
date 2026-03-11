@@ -123,6 +123,29 @@ export default function LoginPage() {
           </Button>
         </form>
       </CardContent>
+      {status === "authenticated" && (
+        <CardContent>
+          {session.user.role === "ADMIN" ? (
+            <Button
+              onClick={() => router.push("/admin")}
+              type="submit"
+              className="w-full"
+              disabled={loading}
+            >
+              {"Open Admin Dashboard..."}
+            </Button>
+          ) : (
+            <Button
+              onClick={() => router.push("/wholesale")}
+              type="submit"
+              className="w-full"
+              disabled={loading}
+            >
+              {"Open Wholesale Portal..."}
+            </Button>
+          )}
+        </CardContent>
+      )}
 
       <CardFooter className="flex justify-center">
         <p className="text-sm text-muted-foreground">
