@@ -6,28 +6,26 @@ export async function middleware(request: NextRequest) {
   const token = await getToken({
     req: request,
     secret: process.env.AUTH_SECRET,
+    // ✅ Auth.js v5 uses different cookie names
+    cookieName:
+      process.env.NODE_ENV === "production"
+        ? "__Secure-authjs.session-token"
+        : "authjs.session-token",
   });
+
+  console.log("[MIDDLEWARE] token:", JSON.stringify(token));
+  console.log("[MIDDLEWARE] role:", token?.role);
 
   const { pathname } = request.nextUrl;
 
-  const isWholesalePath = pathname.startsWith("/wholesale");
-  const isAdminPath = pathname.startsWith("/admin");
-
-  // ── Admin routes: ADMIN only ──────────────────────────────
-  if (isAdminPath) {
-    if (!token) {
-      return NextResponse.redirect(new URL("/login", request.url));
-    }
-    if (token.role !== "ADMIN") {
+  if (pathname.startsWith("/admin")) {
+    if (!token) return NextResponse.redirect(new URL("/login", request.url));
+    if (token.role !== "ADMIN")
       return NextResponse.redirect(new URL("/unauthorized", request.url));
-    }
   }
 
-  // ── Wholesale routes: WHOLESALER or ADMIN ─────────────────
-  if (isWholesalePath) {
-    if (!token) {
-      return NextResponse.redirect(new URL("/login", request.url));
-    }
+  if (pathname.startsWith("/wholesale")) {
+    if (!token) return NextResponse.redirect(new URL("/login", request.url));
     if (token.role !== "WHOLESALER" && token.role !== "ADMIN") {
       return NextResponse.redirect(new URL("/unauthorized", request.url));
     }

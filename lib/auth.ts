@@ -79,7 +79,7 @@ export async function requireRole(role: string | string[]) {
 
   console.log("[REQUIRE_ROLE] session:", session?.user);
 
-  //if (!session?.user) redirect("/login");
+  if (!session?.user) redirect("/login");
 
   const roles = Array.isArray(role) ? role : [role];
   if (!roles.includes(session?.user.role as string)) {
