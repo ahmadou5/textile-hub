@@ -75,6 +75,7 @@ export default function LoginPage() {
     toast.success("Login successful!");
     // ✅ no router.push here — useEffect handles redirect
   }
+  console.log("[SESSION STATUS]", status, session?.user?.role);
 
   return (
     <Card className="w-full max-w-md shadow-lg">
