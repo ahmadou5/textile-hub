@@ -1,4 +1,5 @@
-"use client";
+// components/wholesale/StatCard.tsx
+// ✅ remove "use client" — no need for it, no browser events needed
 
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
@@ -28,14 +29,6 @@ export function StatCard({
       style={{
         background: "rgba(255,255,255,0.025)",
         borderColor: "rgba(255,255,255,0.07)",
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.borderColor = `${color}30`;
-        e.currentTarget.style.boxShadow = `0 4px 20px ${color}10`;
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)";
-        e.currentTarget.style.boxShadow = "none";
       }}
     >
       <div className="flex items-start justify-between mb-3">
