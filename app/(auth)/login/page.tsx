@@ -72,7 +72,7 @@ export default function LoginPage() {
       router.push("/"); // fallback for any other role
     }
 
-    router.refresh();
+    //router.refresh();
   }
 
   return (
