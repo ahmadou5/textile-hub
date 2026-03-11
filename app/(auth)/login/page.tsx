@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { signIn, useSession } from "next-auth/react";
-///import { useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -19,7 +19,6 @@ import {
 } from "@/components/ui/card";
 import Link from "next/link";
 import { toast } from "sonner";
-import { useRouter } from "next/router";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -38,11 +37,11 @@ export default function LoginPage() {
   useEffect(() => {
     if (status === "authenticated" && session?.user?.role) {
       if (session.user.role === "ADMIN") {
-        router.push("/admin");
+        router.replace("/admin");
       } else if (session.user.role === "WHOLESALER") {
-        router.push("/wholesale");
+        router.replace("/wholesale");
       } else {
-        router.push("/");
+        router.replace("/");
       }
     }
   }, [status, session, router]);
@@ -130,7 +129,7 @@ export default function LoginPage() {
           <p>Email: {session?.user?.email}</p>
           <Button
             onClick={() =>
-              router.push(
+              router.replace(
                 session.user.role === "ADMIN" ? "/admin" : "/wholesale",
               )
             }
