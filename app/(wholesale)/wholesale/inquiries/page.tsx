@@ -145,32 +145,16 @@ export default async function WholesaleInquiriesPage() {
               <Link
                 key={inquiry.id}
                 href={`/wholesale/inquiries/${inquiry.id}`}
-                className="group flex items-center gap-4 p-4 rounded-2xl border
-                  hover:-translate-y-0.5
-                  transition-[transform,border-color,box-shadow] duration-200
-                  focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500"
-                style={{
-                  background: isReplied
-                    ? "rgba(16,185,129,0.04)"
-                    : "rgba(255,255,255,0.025)",
-                  borderColor: isReplied
-                    ? "rgba(16,185,129,0.18)"
-                    : "rgba(255,255,255,0.07)",
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLAnchorElement).style.borderColor =
-                    isReplied ? "rgba(16,185,129,0.3)" : "rgba(16,185,129,0.2)";
-                  (e.currentTarget as HTMLAnchorElement).style.boxShadow =
-                    "0 4px 20px rgba(16,185,129,0.06)";
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLAnchorElement).style.borderColor =
-                    isReplied
-                      ? "rgba(16,185,129,0.18)"
-                      : "rgba(255,255,255,0.07)";
-                  (e.currentTarget as HTMLAnchorElement).style.boxShadow =
-                    "none";
-                }}
+                className={`group flex items-center gap-4 p-4 rounded-2xl border
+    hover:-translate-y-0.5
+    hover:shadow-[0_4px_20px_rgba(16,185,129,0.06)]
+    transition-[transform,border-color,box-shadow] duration-200
+    focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500
+    ${
+      isReplied
+        ? "bg-emerald-500/[0.04] border-emerald-500/[0.18] hover:border-emerald-500/30"
+        : "bg-white/[0.025] border-white/[0.07] hover:border-emerald-500/20"
+    }`}
               >
                 {/* Status dot */}
                 <div className="flex-shrink-0">
