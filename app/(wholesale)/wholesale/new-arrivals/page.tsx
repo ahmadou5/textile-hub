@@ -1,3 +1,4 @@
+"use client"; // ✅ add this
 // app/(wholesale)/wholesale/new-arrivals/page.tsx
 import { Suspense } from "react";
 import { requireRole } from "@/lib/auth";
