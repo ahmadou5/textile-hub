@@ -11,6 +11,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import type { Metadata } from "next";
+import { StatCard } from "@/components/wholesale/StatCard";
 
 export const metadata: Metadata = {
   title: "Dashboard — TextileHub Wholesale",
@@ -71,7 +72,6 @@ export default async function WholesaleDashboardPage() {
           zIndex: 999,
         }}
       />
-
       {/* Greeting */}
       <div className="space-y-1">
         <p
@@ -96,7 +96,6 @@ export default async function WholesaleDashboardPage() {
           Your wholesale portal — track inquiries and discover new stock.
         </p>
       </div>
-
       {/* Replied notification banner */}
       {repliedCount > 0 && (
         <div
@@ -149,7 +148,6 @@ export default async function WholesaleDashboardPage() {
         </div>
       )}
 
-      {/* Stat cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         {[
           {
@@ -177,69 +175,9 @@ export default async function WholesaleDashboardPage() {
             href: "/wholesale/inquiries",
           },
         ].map((stat) => (
-          <Link
-            key={stat.label}
-            href={stat.href}
-            className="group p-4 rounded-2xl border
-              hover:-translate-y-0.5
-              transition-[transform,border-color,box-shadow] duration-200
-              focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500"
-            style={{
-              background: "rgba(255,255,255,0.025)",
-              borderColor: "rgba(255,255,255,0.07)",
-            }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLAnchorElement).style.borderColor =
-                `${stat.color}30`;
-              (e.currentTarget as HTMLAnchorElement).style.boxShadow =
-                `0 4px 20px ${stat.color}10`;
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLAnchorElement).style.borderColor =
-                "rgba(255,255,255,0.07)";
-              (e.currentTarget as HTMLAnchorElement).style.boxShadow = "none";
-            }}
-          >
-            <div className="flex items-start justify-between mb-3">
-              <div
-                className="w-8 h-8 rounded-lg flex items-center justify-center"
-                style={{
-                  background: `${stat.color}15`,
-                  border: `1px solid ${stat.color}25`,
-                }}
-              >
-                <stat.icon size={15} style={{ color: stat.color }} />
-              </div>
-              <ArrowUpRight
-                size={13}
-                className="text-slate-600 group-hover:text-slate-400 transition-[color] duration-150"
-              />
-            </div>
-            <p
-              className="text-2xl font-bold text-white"
-              style={{ fontFamily: "var(--font-syne, sans-serif)" }}
-            >
-              {stat.value}
-            </p>
-            <p
-              className="text-xs text-slate-500 mt-0.5"
-              style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
-            >
-              {stat.label}
-            </p>
-            <p
-              className="text-[11px] mt-0.5"
-              style={{
-                color: stat.color,
-                fontFamily: "var(--font-dm-sans, sans-serif)",
-              }}
-            >
-              {stat.sub}
-            </p>
-          </Link>
+          <StatCard key={stat.label} {...stat} />
         ))}
       </div>
-
       {/* Quick links */}
       <div className="space-y-3">
         <p
