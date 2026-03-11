@@ -175,7 +175,15 @@ export default async function WholesaleDashboardPage() {
             href: "/wholesale/inquiries",
           },
         ].map((stat) => (
-          <StatCard key={stat.label} {...stat} />
+          <StatCard
+            key={stat.label}
+            label={stat.label}
+            value={stat.value}
+            sub={stat.sub}
+            icon={stat.icon}
+            color={stat.color}
+            href={stat.href}
+          />
         ))}
       </div>
       {/* Quick links */}
