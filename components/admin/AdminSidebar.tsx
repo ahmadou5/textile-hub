@@ -19,7 +19,7 @@ import {
   Scissors,
 } from "lucide-react";
 import { db } from "@/lib/db";
-const openInquiries = db.inquiries.count({ where: { status: "OPEN" } });
+const openInquiries = await db.inquiries.count({ where: { status: "OPEN" } });
 const navItems = [
   {
     label: "Dashboard",
