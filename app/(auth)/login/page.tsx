@@ -126,25 +126,17 @@ export default function LoginPage() {
       </CardContent>
       {status === "authenticated" && (
         <CardContent>
-          {session.user.role === "ADMIN" ? (
-            <Button
-              onClick={() => router.push("/admin")}
-              type="submit"
-              className="w-full"
-              disabled={loading}
-            >
-              {"Open Admin Dashboard..."}
-            </Button>
-          ) : (
-            <Button
-              onClick={() => router.push("/wholesale")}
-              type="submit"
-              className="w-full"
-              disabled={loading}
-            >
-              {"Open Wholesale Portal..."}
-            </Button>
-          )}
+          <p>Role: {session?.user?.role}</p>
+          <p>Email: {session?.user?.email}</p>
+          <Button
+            onClick={() =>
+              router.push(
+                session.user.role === "ADMIN" ? "/admin" : "/wholesale",
+              )
+            }
+          >
+            Go to Dashboard
+          </Button>
         </CardContent>
       )}
 
