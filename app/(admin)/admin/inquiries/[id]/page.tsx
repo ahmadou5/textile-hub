@@ -6,8 +6,9 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, Package, User } from "lucide-react";
+import { ArrowLeft, Package, User, Clock } from "lucide-react";
 import type { Metadata } from "next";
+import { unstable_noStore as noStore } from "next/cache";
 import InquiryReplyBox from "@/components/admin/InquiryReplyBox";
 import InquiryStatusToggle from "@/components/admin/InquiryStatusToggle";
 
@@ -16,9 +17,9 @@ interface PageProps {
 }
 
 const STATUS_STYLES = {
-  OPEN: "bg-amber-500/12 text-amber-400 border-amber-500/25",
-  REPLIED: "bg-sky-500/12 text-sky-400 border-sky-500/25",
-  CLOSED: "bg-slate-500/12 text-slate-500 border-slate-600/25",
+  OPEN: "bg-amber-500/10 text-amber-600 border-amber-500/25",
+  REPLIED: "bg-sky-500/10 text-sky-600 border-sky-500/25",
+  CLOSED: "bg-slate-100 text-slate-500 border-slate-200",
 };
 
 export async function generateMetadata({
@@ -47,6 +48,9 @@ function formatDate(date: Date): string {
 }
 
 export default async function AdminInquiryThreadPage({ params }: PageProps) {
+  // ✅ always fresh — no stale cache
+  noStore();
+
   const session = await requireRole("ADMIN");
   const { id } = await params;
 
@@ -82,8 +86,7 @@ export default async function AdminInquiryThreadPage({ params }: PageProps) {
       <Link
         href="/admin/inquiries"
         className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-800
-          transition-[color] duration-150 group flex-shrink-0
-          focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D4A853]"
+          transition-[color] duration-150 group flex-shrink-0"
         style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
       >
         <ArrowLeft
@@ -94,10 +97,7 @@ export default async function AdminInquiryThreadPage({ params }: PageProps) {
       </Link>
 
       {/* Thread header */}
-      <div
-        className="flex items-start justify-between gap-4 p-5 rounded-2xl bg-white border border-slate-200/80 flex-shrink-0
-          shadow-[0_2px_8px_rgba(0,0,0,0.05)]"
-      >
+      <div className="flex items-start justify-between gap-4 p-5 rounded-2xl bg-white border border-slate-200/80 flex-shrink-0 shadow-[0_2px_8px_rgba(0,0,0,0.05)]">
         <div className="space-y-2 flex-1 min-w-0">
           <div className="flex items-center gap-3 flex-wrap">
             <h1
@@ -134,31 +134,43 @@ export default async function AdminInquiryThreadPage({ params }: PageProps) {
             <Separator orientation="vertical" className="h-3 hidden sm:block" />
 
             {/* Product */}
-            <Link
-              href="/admin/products"
-              className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-[#D4A853] transition-[color] duration-150"
+            <div
+              className="flex items-center gap-1.5 text-xs text-slate-500"
               style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
             >
               <Package size={12} />
-              <span className="font-medium">{inquiry.products.name}</span>
+              <span className="font-medium text-slate-600">
+                {inquiry.products.name}
+              </span>
               <span className="text-slate-400 hidden sm:block">
                 — {inquiry.products.category}
               </span>
-            </Link>
+            </div>
+
+            <Separator orientation="vertical" className="h-3 hidden sm:block" />
+
+            <span
+              className="flex items-center gap-1 text-xs text-slate-400 hidden sm:flex"
+              style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+            >
+              <Clock size={10} />
+              {inquiry.messages.length} message
+              {inquiry.messages.length !== 1 ? "s" : ""}
+            </span>
           </div>
         </div>
 
+        {/* Status toggle */}
         <InquiryStatusToggle
           inquiryId={inquiry.id}
           currentStatus={inquiry.status}
         />
       </div>
 
-      {/* Messages thread — scrollable */}
+      {/* Messages thread */}
       <ScrollArea className="flex-1 min-h-0">
         <div className="space-y-1 pb-4 pr-2">
           {inquiry.messages.map((msg, index) => {
-            // ✅ use `users` not `sender` — matches Prisma relation name
             const isAdmin = msg.users?.role === "ADMIN";
             const prevMsg = index > 0 ? inquiry.messages[index - 1] : null;
 
@@ -167,7 +179,6 @@ export default async function AdminInquiryThreadPage({ params }: PageProps) {
               new Date(msg.createdAt).toDateString() !==
                 new Date(prevMsg.createdAt).toDateString();
 
-            // ✅ safe initials
             const senderName = msg.users?.name ?? "?";
             const initials = senderName
               .split(" ")
@@ -178,10 +189,9 @@ export default async function AdminInquiryThreadPage({ params }: PageProps) {
 
             return (
               <div key={msg.id}>
-                {/* Date separator */}
                 {showDateSep && (
                   <div className="flex items-center gap-3 py-4">
-                    <Separator className="flex-1" />
+                    <Separator className="flex-1 bg-slate-100" />
                     <span
                       className="text-[10px] font-medium text-slate-400 uppercase tracking-wider px-2 flex-shrink-0"
                       style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
@@ -192,11 +202,10 @@ export default async function AdminInquiryThreadPage({ params }: PageProps) {
                         month: "short",
                       })}
                     </span>
-                    <Separator className="flex-1" />
+                    <Separator className="flex-1 bg-slate-100" />
                   </div>
                 )}
 
-                {/* Message bubble */}
                 <div
                   className={`flex gap-3 mb-3 ${isAdmin ? "flex-row-reverse" : "flex-row"}`}
                 >
@@ -214,14 +223,12 @@ export default async function AdminInquiryThreadPage({ params }: PageProps) {
 
                   {/* Bubble */}
                   <div
-                    className={`max-w-[72%] space-y-1 ${isAdmin ? "items-end" : "items-start"} flex flex-col`}
+                    className={`max-w-[72%] space-y-1 flex flex-col ${isAdmin ? "items-end" : "items-start"}`}
                   >
-                    {/* Sender name + time */}
                     <div
                       className={`flex items-center gap-2 text-[11px] text-slate-400 ${isAdmin ? "flex-row-reverse" : "flex-row"}`}
                       style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
                     >
-                      {/* ✅ use msg.users.name not msg.sender.name */}
                       <span className="font-medium text-slate-500">
                         {msg.users?.name ?? "Unknown"}
                       </span>
@@ -233,7 +240,6 @@ export default async function AdminInquiryThreadPage({ params }: PageProps) {
                       <span>{formatDate(msg.createdAt)}</span>
                     </div>
 
-                    {/* Message body */}
                     <div
                       className={`px-4 py-3 rounded-2xl text-sm ${
                         isAdmin
@@ -255,9 +261,10 @@ export default async function AdminInquiryThreadPage({ params }: PageProps) {
         </div>
       </ScrollArea>
 
-      {/* Reply box — pinned bottom */}
+      {/* Reply box */}
       <div className="flex-shrink-0 space-y-3">
-        <div className="flex items-center gap-2">
+        <Separator className="bg-slate-100" />
+        <div className="flex items-center gap-2 mb-2">
           <div className="w-6 h-6 rounded-lg bg-[#D4A853]/15 flex items-center justify-center">
             <span
               className="text-[9px] font-bold text-[#D4A853]"

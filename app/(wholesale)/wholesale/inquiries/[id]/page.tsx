@@ -10,11 +10,14 @@ import {
   ArrowLeft,
   Package,
   CheckCircle2,
-  Lock,
-  MessageSquarePlus,
   Clock,
+  MessageSquarePlus,
+  Lock,
+  RefreshCw,
 } from "lucide-react";
 import type { Metadata } from "next";
+import { unstable_noStore as noStore } from "next/cache";
+import ThreadRefreshButton from "@/components/ThreadRefreshButton";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -53,6 +56,9 @@ function formatDate(date: Date): string {
 export default async function WholesaleInquiryThreadPage({
   params,
 }: PageProps) {
+  // ✅ noStore ensures latest messages always fetched — no stale cache
+  noStore();
+
   const session = await requireRole(["WHOLESALER", "ADMIN"] as never);
   const { id } = await params;
 
@@ -84,23 +90,53 @@ export default async function WholesaleInquiryThreadPage({
 
   const isReplied = inquiry.status === "REPLIED";
   const isClosed = inquiry.status === "CLOSED";
+  const adminReplies = inquiry.messages.filter(
+    (m) => m.users?.role === "ADMIN",
+  );
 
   return (
     <div className="flex flex-col h-screen max-h-screen overflow-hidden p-6 lg:p-8 space-y-4">
+      {/* Grain */}
+      <svg style={{ position: "fixed", width: 0, height: 0 }}>
+        <filter id="grain">
+          <feTurbulence
+            type="fractalNoise"
+            baseFrequency="0.65"
+            numOctaves="3"
+            stitchTiles="stitch"
+          />
+          <feColorMatrix type="saturate" values="0" />
+        </filter>
+      </svg>
+      <div
+        style={{
+          position: "fixed",
+          inset: 0,
+          filter: "url(#grain)",
+          opacity: 0.025,
+          pointerEvents: "none",
+          zIndex: 999,
+        }}
+      />
+
       {/* Back */}
-      <Link
-        href="/wholesale/inquiries"
-        className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-200
-          transition-[color] duration-150 group flex-shrink-0
-          focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500"
-        style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
-      >
-        <ArrowLeft
-          size={14}
-          className="group-hover:-translate-x-0.5 transition-[transform] duration-150"
-        />
-        My Inquiries
-      </Link>
+      <div className="flex items-center justify-between flex-shrink-0">
+        <Link
+          href="/wholesale/inquiries"
+          className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-200
+            transition-[color] duration-150 group
+            focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500"
+          style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+        >
+          <ArrowLeft
+            size={14}
+            className="group-hover:-translate-x-0.5 transition-[transform] duration-150"
+          />
+          My Inquiries
+        </Link>
+        {/* Refresh button — client component */}
+        <ThreadRefreshButton />
+      </div>
 
       {/* Thread header */}
       <div
@@ -115,7 +151,10 @@ export default async function WholesaleInquiryThreadPage({
           <div className="flex items-center gap-3 flex-wrap">
             <h1
               className="text-xl font-bold text-white leading-snug"
-              style={{ fontFamily: "var(--font-syne, sans-serif)" }}
+              style={{
+                fontFamily: "var(--font-syne, sans-serif)",
+                letterSpacing: "-0.02em",
+              }}
             >
               {inquiry.subject}
             </h1>
@@ -129,7 +168,7 @@ export default async function WholesaleInquiryThreadPage({
             </Badge>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-wrap">
             <div
               className="flex items-center gap-1.5 text-xs text-slate-500"
               style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
@@ -157,12 +196,23 @@ export default async function WholesaleInquiryThreadPage({
                 year: "numeric",
               })}
             </span>
+            <Separator
+              orientation="vertical"
+              className="h-3 bg-white/10 hidden sm:block"
+            />
+            <span
+              className="text-xs text-slate-600 hidden sm:block"
+              style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+            >
+              {inquiry.messages.length} message
+              {inquiry.messages.length !== 1 ? "s" : ""}
+            </span>
           </div>
         </div>
       </div>
 
       {/* Admin replied banner */}
-      {isReplied && (
+      {isReplied && adminReplies.length > 0 && (
         <div
           className="flex items-center gap-3 px-4 py-3 rounded-2xl flex-shrink-0"
           style={{
@@ -180,130 +230,144 @@ export default async function WholesaleInquiryThreadPage({
             className="text-sm font-semibold text-emerald-300"
             style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
           >
-            Admin has responded to your inquiry
+            Admin has responded — {adminReplies.length} reply
+            {adminReplies.length !== 1 ? "ies" : ""} in this thread
           </p>
         </div>
       )}
 
-      {/* Messages thread */}
+      {/* Messages thread — full history */}
       <ScrollArea className="flex-1 min-h-0">
         <div className="space-y-1 pb-4 pr-2">
-          {inquiry.messages.map((msg, index) => {
-            // ✅ use `users` not `sender` — matches Prisma relation name
-            const isAdminMsg = msg.users?.role === "ADMIN";
-            const isOwnMsg = msg.users?.id === session?.user.id;
-            const prevMsg = index > 0 ? inquiry.messages[index - 1] : null;
+          {inquiry.messages.length === 0 ? (
+            <div className="flex flex-col items-center py-12 text-center">
+              <p
+                className="text-slate-600 text-sm"
+                style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+              >
+                No messages yet
+              </p>
+            </div>
+          ) : (
+            inquiry.messages.map((msg, index) => {
+              const isAdminMsg = msg.users?.role === "ADMIN";
+              const isOwnMsg = msg.users?.id === session?.user.id;
+              const prevMsg = index > 0 ? inquiry.messages[index - 1] : null;
 
-            const showDateSep =
-              !prevMsg ||
-              new Date(msg.createdAt).toDateString() !==
-                new Date(prevMsg.createdAt).toDateString();
+              const showDateSep =
+                !prevMsg ||
+                new Date(msg.createdAt).toDateString() !==
+                  new Date(prevMsg.createdAt).toDateString();
 
-            // ✅ safe initials — split after null check
-            const senderName = msg.users?.name ?? "?";
-            const initials = senderName
-              .split(" ")
-              .map((n) => n[0] ?? "")
-              .join("")
-              .toUpperCase()
-              .slice(0, 2);
+              const senderName = msg.users?.name ?? "?";
+              const initials = senderName
+                .split(" ")
+                .map((n) => n[0] ?? "")
+                .join("")
+                .toUpperCase()
+                .slice(0, 2);
 
-            const alignRight = isOwnMsg;
+              const alignRight = isOwnMsg;
 
-            return (
-              <div key={msg.id}>
-                {showDateSep && (
-                  <div className="flex items-center gap-3 py-4">
-                    <Separator className="flex-1 bg-white/[0.06]" />
-                    <span
-                      className="text-[10px] font-medium text-slate-600 uppercase tracking-wider px-2 flex-shrink-0"
-                      style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
-                    >
-                      {new Date(msg.createdAt).toLocaleDateString("en-NG", {
-                        weekday: "short",
-                        day: "numeric",
-                        month: "short",
-                      })}
-                    </span>
-                    <Separator className="flex-1 bg-white/[0.06]" />
-                  </div>
-                )}
+              return (
+                <div key={msg.id}>
+                  {showDateSep && (
+                    <div className="flex items-center gap-3 py-4">
+                      <Separator className="flex-1 bg-white/[0.06]" />
+                      <span
+                        className="text-[10px] font-medium text-slate-600 uppercase tracking-wider px-2 flex-shrink-0"
+                        style={{
+                          fontFamily: "var(--font-dm-sans, sans-serif)",
+                        }}
+                      >
+                        {new Date(msg.createdAt).toLocaleDateString("en-NG", {
+                          weekday: "short",
+                          day: "numeric",
+                          month: "short",
+                        })}
+                      </span>
+                      <Separator className="flex-1 bg-white/[0.06]" />
+                    </div>
+                  )}
 
-                <div
-                  className={`flex gap-3 mb-3 ${alignRight ? "flex-row-reverse" : "flex-row"}`}
-                >
-                  {/* Avatar */}
                   <div
-                    className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs font-bold flex-shrink-0 self-end ${
-                      isAdminMsg
-                        ? "bg-[#D4A853]/20 text-[#D4A853]"
-                        : "bg-emerald-500/15 text-emerald-400"
-                    }`}
-                    style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+                    className={`flex gap-3 mb-3 ${alignRight ? "flex-row-reverse" : "flex-row"}`}
                   >
-                    {initials}
-                  </div>
-
-                  {/* Bubble */}
-                  <div
-                    className={`max-w-[75%] space-y-1 flex flex-col ${alignRight ? "items-end" : "items-start"}`}
-                  >
-                    {/* Sender + time */}
+                    {/* Avatar */}
                     <div
-                      className={`flex items-center gap-2 text-[11px] text-slate-500 ${alignRight ? "flex-row-reverse" : "flex-row"}`}
+                      className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs font-bold flex-shrink-0 self-end ${
+                        isAdminMsg
+                          ? "bg-[#D4A853]/20 text-[#D4A853]"
+                          : "bg-emerald-500/15 text-emerald-400"
+                      }`}
                       style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
                     >
-                      <span className="font-medium text-slate-400">
-                        {isAdminMsg ? "TextileHub Admin" : "You"}
-                      </span>
-                      {isAdminMsg && (
-                        <span
-                          className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-md"
-                          style={{
-                            background: "rgba(212,168,83,0.12)",
-                            color: "#D4A853",
-                          }}
-                        >
-                          Admin
-                        </span>
-                      )}
-                      <span className="text-slate-600">
-                        {formatDate(msg.createdAt)}
-                      </span>
+                      {initials}
                     </div>
 
-                    {/* Message body */}
+                    {/* Bubble */}
                     <div
-                      className={`px-4 py-3 rounded-2xl text-sm ${
-                        isAdminMsg
-                          ? "rounded-tl-sm text-slate-200"
-                          : "rounded-tr-sm text-slate-300"
-                      }`}
-                      style={{
-                        fontFamily: "var(--font-dm-sans, sans-serif)",
-                        lineHeight: "1.75",
-                        background: isAdminMsg
-                          ? "rgba(212,168,83,0.08)"
-                          : "rgba(255,255,255,0.05)",
-                        border: isAdminMsg
-                          ? "1px solid rgba(212,168,83,0.15)"
-                          : "1px solid rgba(255,255,255,0.07)",
-                        boxShadow: isAdminMsg
-                          ? "0 2px 8px rgba(212,168,83,0.06)"
-                          : "0 1px 4px rgba(0,0,0,0.15)",
-                      }}
+                      className={`max-w-[75%] space-y-1 flex flex-col ${alignRight ? "items-end" : "items-start"}`}
                     >
-                      {msg.body}
+                      {/* Sender + time */}
+                      <div
+                        className={`flex items-center gap-2 text-[11px] text-slate-500 ${alignRight ? "flex-row-reverse" : "flex-row"}`}
+                        style={{
+                          fontFamily: "var(--font-dm-sans, sans-serif)",
+                        }}
+                      >
+                        <span className="font-medium text-slate-400">
+                          {isAdminMsg ? "TextileHub Admin" : "You"}
+                        </span>
+                        {isAdminMsg && (
+                          <span
+                            className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-md"
+                            style={{
+                              background: "rgba(212,168,83,0.12)",
+                              color: "#D4A853",
+                            }}
+                          >
+                            Admin
+                          </span>
+                        )}
+                        <span className="text-slate-600">
+                          {formatDate(msg.createdAt)}
+                        </span>
+                      </div>
+
+                      {/* Message body */}
+                      <div
+                        className={`px-4 py-3 rounded-2xl text-sm ${
+                          isAdminMsg
+                            ? "rounded-tl-sm text-slate-200"
+                            : "rounded-tr-sm text-slate-300"
+                        }`}
+                        style={{
+                          fontFamily: "var(--font-dm-sans, sans-serif)",
+                          lineHeight: "1.75",
+                          background: isAdminMsg
+                            ? "rgba(212,168,83,0.08)"
+                            : "rgba(255,255,255,0.05)",
+                          border: isAdminMsg
+                            ? "1px solid rgba(212,168,83,0.15)"
+                            : "1px solid rgba(255,255,255,0.07)",
+                          boxShadow: isAdminMsg
+                            ? "0 2px 8px rgba(212,168,83,0.06)"
+                            : "0 1px 4px rgba(0,0,0,0.15)",
+                        }}
+                      >
+                        {msg.body}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })
+          )}
         </div>
       </ScrollArea>
 
-      {/* Read-only footer */}
+      {/* Footer */}
       <div className="flex-shrink-0 space-y-3">
         <Separator className="bg-white/[0.06]" />
 
@@ -330,8 +394,7 @@ export default async function WholesaleInquiryThreadPage({
             >
               {isClosed
                 ? "This inquiry is closed."
-                : "Replies are read-only in v1."}{" "}
-              To follow up, please submit a new inquiry.
+                : "This thread is read-only. To send a follow-up, start a new inquiry."}
             </p>
             <Link
               href={`/wholesale/products/${inquiry.products.id}`}
