@@ -26,15 +26,16 @@ const updateSchema = z
 
 export async function PUT(
   req: Request,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const { id } = await params;
     const session = await auth();
     if (!session?.user || session.user.role !== "ADMIN") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const product = await db.products.findUnique({ where: { id: params.id } });
+    const product = await db.products.findUnique({ where: { id: id } });
     if (!product) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
@@ -51,7 +52,7 @@ export async function PUT(
     const data = parsed.data;
 
     const updated = await db.products.update({
-      where: { id: params.id },
+      where: { id: id },
       data: {
         ...(data.name !== undefined && { name: data.name }),
         ...(data.description !== undefined && {
@@ -84,15 +85,16 @@ export async function PUT(
 
 export async function DELETE(
   _req: Request,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const { id } = await params;
     const session = await auth();
     if (!session?.user || session.user.role !== "ADMIN") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    await db.products.delete({ where: { id: params.id } });
+    await db.products.delete({ where: { id: id } });
     return NextResponse.json({ message: "Product deleted" });
   } catch (error) {
     console.error("[PRODUCT_DELETE_ERROR]", error);

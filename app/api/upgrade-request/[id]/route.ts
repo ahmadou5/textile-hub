@@ -10,9 +10,10 @@ const actionSchema = z.object({
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const { id } = await params;
     const session = await auth();
     if (!session?.user || session.user.role !== "ADMIN") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
@@ -30,7 +31,7 @@ export async function PATCH(
     const { action } = parsed.data;
 
     const upgradeRequest = await db.upgradeRequest.findUnique({
-      where: { id: params.id },
+      where: { id: id },
       include: { users: { select: { id: true } } },
     });
 
@@ -48,7 +49,7 @@ export async function PATCH(
     // Run both updates in a transaction
     await db.$transaction(async (tx) => {
       await tx.upgradeRequest.update({
-        where: { id: params.id },
+        where: { id: id },
         data: {
           status: action === "APPROVE" ? "APPROVED" : "REJECTED",
           updatedAt: new Date(),
