@@ -1,0 +1,176 @@
+// app/(admin)/admin/upgrade-requests/page.tsx
+import { requireRole } from "@/lib/auth";
+import { db } from "@/lib/db";
+import { unstable_noStore as noStore } from "next/cache";
+import type { Metadata } from "next";
+import { Badge } from "@/components/ui/badge";
+import { UserCheck, Clock, Mail } from "lucide-react";
+import UpgradeRequestActions from "@/components/admin/UpgradeRequestActions";
+
+export const metadata: Metadata = {
+  title: "Upgrade Requests — Admin | TextileHub",
+};
+
+export default async function UpgradeRequestsPage() {
+  noStore();
+  await requireRole("ADMIN");
+
+  const requests = await db.upgradeRequest.findMany({
+    orderBy: { createdAt: "desc" },
+    include: {
+      users: { select: { id: true, name: true, email: true, createdAt: true } },
+    },
+  });
+
+  const pending = requests.filter((r) => r.status === "PENDING");
+  const processed = requests.filter((r) => r.status !== "PENDING");
+
+  const STATUS_STYLES: Record<string, string> = {
+    PENDING: "bg-amber-500/10 text-amber-600 border-amber-500/25",
+    APPROVED: "bg-emerald-500/10 text-emerald-600 border-emerald-500/25",
+    REJECTED: "bg-red-500/10 text-red-500 border-red-500/25",
+  };
+
+  return (
+    <div className="max-w-4xl mx-auto p-6 lg:p-8 space-y-8">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <p
+            className="text-xs font-semibold tracking-[0.15em] uppercase text-[#D4A853] mb-1"
+            style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+          >
+            Account Management
+          </p>
+          <h1
+            className="text-3xl font-bold text-slate-800"
+            style={{ fontFamily: "var(--font-playfair, serif)" }}
+          >
+            Upgrade Requests
+          </h1>
+        </div>
+        {pending.length > 0 && (
+          <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold bg-amber-500/10 text-amber-600 border border-amber-500/20">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500" />
+            </span>
+            {pending.length} pending
+          </span>
+        )}
+      </div>
+
+      {/* Pending requests */}
+      {pending.length === 0 ? (
+        <div className="flex flex-col items-center py-16 text-center rounded-2xl border border-slate-200 bg-slate-50">
+          <UserCheck size={32} className="text-slate-300 mb-3" />
+          <p
+            className="text-slate-500 text-sm"
+            style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+          >
+            No pending upgrade requests
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          <p
+            className="text-xs font-semibold uppercase tracking-wider text-slate-400"
+            style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+          >
+            Awaiting Review
+          </p>
+          {pending.map((req) => (
+            <div
+              key={req.id}
+              className="flex items-center gap-4 p-5 rounded-2xl bg-white border border-slate-200 shadow-[0_2px_8px_rgba(0,0,0,0.04)]"
+            >
+              {/* Avatar */}
+              <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center flex-shrink-0">
+                <span
+                  className="text-sm font-bold text-amber-600"
+                  style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+                >
+                  {(req.users.name ?? req.users.email)[0].toUpperCase()}
+                </span>
+              </div>
+
+              {/* Info */}
+              <div className="flex-1 min-w-0">
+                <p
+                  className="text-sm font-semibold text-slate-800"
+                  style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+                >
+                  {req.users.name ?? "Unnamed User"}
+                </p>
+                <div className="flex items-center gap-3 mt-0.5">
+                  <span className="flex items-center gap-1 text-xs text-slate-500">
+                    <Mail size={10} />
+                    {req.users.email}
+                  </span>
+                  <span className="flex items-center gap-1 text-xs text-slate-400">
+                    <Clock size={10} />
+                    {new Date(req.createdAt).toLocaleDateString("en-NG", {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                    })}
+                  </span>
+                </div>
+                {req.message && (
+                  <p
+                    className="text-xs text-slate-500 mt-1.5 italic"
+                    style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+                  >
+                    {req.message}
+                  </p>
+                )}
+              </div>
+
+              {/* Actions */}
+              <UpgradeRequestActions requestId={req.id} />
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Processed requests */}
+      {processed.length > 0 && (
+        <div className="space-y-3">
+          <p
+            className="text-xs font-semibold uppercase tracking-wider text-slate-400"
+            style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+          >
+            Processed
+          </p>
+          {processed.map((req) => (
+            <div
+              key={req.id}
+              className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100"
+            >
+              <div className="w-9 h-9 rounded-xl bg-slate-200 flex items-center justify-center flex-shrink-0">
+                <span className="text-xs font-bold text-slate-500">
+                  {(req.users.name ?? req.users.email)[0].toUpperCase()}
+                </span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p
+                  className="text-sm font-medium text-slate-600"
+                  style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+                >
+                  {req.users.name ?? req.users.email}
+                </p>
+                <p className="text-xs text-slate-400">{req.users.email}</p>
+              </div>
+              <Badge
+                variant="outline"
+                className={`text-[10px] font-bold ${STATUS_STYLES[req.status]}`}
+              >
+                {req.status}
+              </Badge>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}

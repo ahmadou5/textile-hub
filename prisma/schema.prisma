@@ -101,18 +101,20 @@ model sessions {
 }
 
 model users {
-  id        String      @id
-  email     String      @unique
-  password  String?
-  name      String?
-  role      Role        @default(GUEST)
-  createdAt DateTime    @default(now())
-  updatedAt DateTime
-  accounts  accounts[]
-  inquiries inquiries[]
-  messages  messages[]
-  orders    orders[]
-  sessions  sessions[]
+  id             String          @id
+  email          String          @unique
+  password       String?
+  name           String?
+  imageUrl       String?
+  role           Role            @default(GUEST)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime
+  upgradeRequest UpgradeRequest?
+  accounts       accounts[]
+  inquiries      inquiries[]
+  messages       messages[]
+  orders         orders[]
+  sessions       sessions[]
 
   @@index([createdAt])
 }
@@ -143,4 +145,23 @@ enum Role {
   GUEST
   WHOLESALER
   ADMIN
+}
+
+model UpgradeRequest {
+  id        String        @id @default(uuid())
+  userId    String        @unique // one pending request per user
+  status    UpgradeStatus @default(PENDING)
+  message   String? // optional note from the user
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  users users @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("upgrade_requests")
+}
+
+enum UpgradeStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }
