@@ -25,7 +25,7 @@ export default async function Navbar() {
         borderBottom: "1px solid var(--border)",
       }}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
+      <div className="w-[90%] mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
         {/* Logo */}
         <Link
           href="/"
