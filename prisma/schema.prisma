@@ -48,6 +48,7 @@ model messages {
   id        String    @id
   body      String
   createdAt DateTime  @default(now())
+  updatedAt DateTime  @default(now())
   inquiryId String
   senderId  String
   inquiries inquiries @relation(fields: [inquiryId], references: [id], onDelete: Cascade)
@@ -58,18 +59,23 @@ model messages {
 }
 
 model orders {
-  id                 String      @id
+  id                 String        @id
   yardsOrdered       Int
   totalAmountInCents Int
-  status             OrderStatus @default(PENDING)
-  createdAt          DateTime    @default(now())
+  status             OrderStatus   @default(PENDING)
+  paymentMethod      PaymentMethod @default(BANK_TRANSFER)
+  paymentRef         String?
+  notes              String?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @default(now())
   userId             String
   productId          String
-  products           products    @relation(fields: [productId], references: [id], onDelete: Cascade)
-  users              users       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  products           products      @relation(fields: [productId], references: [id], onDelete: Cascade)
+  users              users         @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([createdAt])
   @@index([productId])
+  @@index([paymentMethod])
   @@index([status])
   @@index([userId])
 }
@@ -127,6 +133,26 @@ model verification_tokens {
   @@unique([identifier, token])
 }
 
+model admin_bank_details {
+  id            String   @id
+  bankName      String
+  accountNumber String
+  accountName   String
+  updatedAt     DateTime @updatedAt
+}
+
+model UpgradeRequest {
+  id        String        @id @default(uuid())
+  userId    String        @unique
+  status    UpgradeStatus @default(PENDING)
+  message   String?
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  users     users         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("upgrade_requests")
+}
+
 enum InquiryStatus {
   OPEN
   REPLIED
@@ -141,23 +167,16 @@ enum OrderStatus {
   CANCELLED
 }
 
+enum PaymentMethod {
+  PAYSTACK
+  BANK_TRANSFER
+  CASH_ON_DELIVERY
+}
+
 enum Role {
   GUEST
   WHOLESALER
   ADMIN
-}
-
-model UpgradeRequest {
-  id        String        @id @default(uuid())
-  userId    String        @unique // one pending request per user
-  status    UpgradeStatus @default(PENDING)
-  message   String? // optional note from the user
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
-
-  users users @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("upgrade_requests")
 }
 
 enum UpgradeStatus {

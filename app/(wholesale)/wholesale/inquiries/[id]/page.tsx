@@ -12,12 +12,12 @@ import {
   CheckCircle2,
   Clock,
   MessageSquarePlus,
-  Lock,
   RefreshCw,
 } from "lucide-react";
 import type { Metadata } from "next";
 import { unstable_noStore as noStore } from "next/cache";
 import ThreadRefreshButton from "@/components/ThreadRefreshButton";
+import WholesalerReplyBox from "@/components/wholesale/WholeSalerReplyBox";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -367,48 +367,69 @@ export default async function WholesaleInquiryThreadPage({
         </div>
       </ScrollArea>
 
-      {/* Footer */}
+      {/* Footer — wholesaler reply box */}
       <div className="flex-shrink-0 space-y-3">
         <Separator className="bg-white/[0.06]" />
 
-        <div
-          className="flex items-start gap-4 px-5 py-4 rounded-2xl"
-          style={{
-            background: "rgba(255,255,255,0.02)",
-            border: "1px solid rgba(255,255,255,0.06)",
-          }}
-        >
-          <div
-            className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5"
-            style={{
-              background: "rgba(255,255,255,0.05)",
-              border: "1px solid rgba(255,255,255,0.08)",
-            }}
-          >
-            <Lock size={13} className="text-slate-500" />
-          </div>
-          <div className="flex-1 space-y-2">
-            <p
-              className="text-sm font-medium text-slate-400"
-              style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+        {/* Reply box — active when not closed */}
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <div
+              className="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0"
+              style={{
+                background: "var(--brand-glow)",
+                border: "1px solid var(--border-strong)",
+              }}
             >
-              {isClosed
-                ? "This inquiry is closed."
-                : "This thread is read-only. To send a follow-up, start a new inquiry."}
-            </p>
+              <span
+                className="text-[9px] font-bold"
+                style={{
+                  color: "var(--brand-bright)",
+                  fontFamily: "var(--font-dm-sans, sans-serif)",
+                }}
+              >
+                {session?.user.name?.charAt(0).toUpperCase() ?? "W"}
+              </span>
+            </div>
+            <span
+              className="text-xs font-medium"
+              style={{
+                color: "var(--text-muted)",
+                fontFamily: "var(--font-dm-sans, sans-serif)",
+              }}
+            >
+              Reply to thread
+            </span>
+            <span style={{ color: "var(--border)" }}>·</span>
+            <span
+              className="text-xs"
+              style={{
+                color: "var(--text-faint)",
+                fontFamily: "var(--font-dm-sans, sans-serif)",
+              }}
+            >
+              {inquiry.messages.length} message
+              {inquiry.messages.length !== 1 ? "s" : ""}
+            </span>
+          </div>
+
+          <WholesalerReplyBox inquiryId={inquiry.id} isClosed={isClosed} />
+
+          {/* New inquiry link — always shown as secondary option */}
+          {!isClosed && (
             <Link
               href={`/wholesale/products/${inquiry.products.id}`}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold
-                text-emerald-400 border border-emerald-500/20 bg-emerald-500/[0.08]
-                hover:bg-emerald-500/15 hover:border-emerald-500/30
-                transition-[background,border-color] duration-150
-                focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500"
-              style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+              className="inline-flex items-center gap-2 text-xs
+                transition-[color] duration-150"
+              style={{
+                color: "var(--text-faint)",
+                fontFamily: "var(--font-dm-sans, sans-serif)",
+              }}
             >
-              <MessageSquarePlus size={13} />
-              Start New Inquiry for {inquiry.products.name}
+              <MessageSquarePlus size={12} />
+              Or start a new inquiry for {inquiry.products.name}
             </Link>
-          </div>
+          )}
         </div>
       </div>
     </div>

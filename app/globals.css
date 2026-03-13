@@ -3,18 +3,17 @@
 @import "shadcn/tailwind.css";
 
 @custom-variant dark (&:is(.dark *));
- 
-/* Hide scrollbar for Chrome, Safari and Opera */
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
+
+/* ── Scrollbar hiding util ── */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ── Brand ring for focus-visible ── */
+.ring-brand {
+  outline: 2px solid var(--brand-hex);
+  outline-offset: 2px;
 }
- 
-/* Hide scrollbar for IE, Edge and Firefox */
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
- 
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -58,7 +57,12 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/* ─────────────────────────────────────────────────────────────────────────────
+   LIGHT MODE
+   Shadcn tokens stay intact. Brand tokens added alongside — no conflicts.
+   ───────────────────────────────────────────────────────────────────────────── */
 :root {
+  /* ── Shadcn tokens (untouched) ── */
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
@@ -72,7 +76,6 @@
   --accent: oklch(0.97 0 0);
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.58 0.22 27);
-  --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
   --chart-1: oklch(0.809 0.105 251.813);
@@ -91,9 +94,49 @@
   --sidebar-ring: oklch(0.708 0 0);
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
+
+  /* ── NOTE: --border is defined here AND in brand tokens below.
+     We set it once as the shadcn value; brand components use --border-strong etc.
+     This avoids a conflict where shadcn border (gray) vs brand border (emerald). ── */
+  --border: oklch(0.922 0 0);
+
+  /* ── Brand / custom tokens (new — no shadcn conflict) ── */
+  --brand-hex:       #059669;
+  --brand-dim:       #047857;
+  --brand-bright:    #34d399;
+  --brand-glow:      rgba(5, 150, 105, 0.12);
+
+  --bg:              #f9fafb;
+  --bg-card:         #ffffff;
+  --bg-subtle:       #f0fdf4;
+  --bg-hover:        rgba(5, 150, 105, 0.05);
+
+  --border-brand:    rgba(5, 150, 105, 0.14);
+  --border-strong:   rgba(5, 150, 105, 0.28);
+  --border-subtle:   rgba(0, 0, 0, 0.06);
+
+  --text-primary:    #0f172a;
+  --text-secondary:  #374151;
+  --text-muted:      #6b7280;
+  --text-faint:      #9ca3af;
+  --text-inverse:    #ffffff;
+
+  --status-pending:  #d97706;
+  --status-confirmed:#059669;
+  --status-shipped:  #2563eb;
+  --status-delivered:#16a34a;
+  --status-cancelled:#dc2626;
+
+  --shadow-card:     0 2px 8px rgba(0,0,0,0.06), 0 0 0 1px rgba(5,150,105,0.06);
+  --shadow-brand:    0 4px 16px rgba(5,150,105,0.25);
+  --shadow-lg:       0 8px 32px rgba(0,0,0,0.10);
 }
 
+/* ─────────────────────────────────────────────────────────────────────────────
+   DARK MODE
+   ───────────────────────────────────────────────────────────────────────────── */
 .dark {
+  /* ── Shadcn tokens (untouched) ── */
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
@@ -125,14 +168,51 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+
+  /* ── Brand / custom tokens ── */
+  --brand-hex:       #059669;
+  --brand-dim:       #047857;
+  --brand-bright:    #34d399;
+  --brand-glow:      rgba(52, 211, 153, 0.10);
+
+  --bg:              #080e09;
+  --bg-card:         #0f1a10;
+  --bg-subtle:       #111f12;
+  --bg-hover:        rgba(52, 211, 153, 0.05);
+
+  --border-brand:    rgba(52, 211, 153, 0.10);
+  --border-strong:   rgba(52, 211, 153, 0.22);
+  --border-subtle:   rgba(255, 255, 255, 0.05);
+
+  --text-primary:    #f0fdf4;
+  --text-secondary:  #d1fae5;
+  --text-muted:      #6b7280;
+  --text-faint:      #4b5563;
+  --text-inverse:    #080e09;
+
+  --status-pending:  #fbbf24;
+  --status-confirmed:#34d399;
+  --status-shipped:  #60a5fa;
+  --status-delivered:#4ade80;
+  --status-cancelled:#f87171;
+
+  --shadow-card:     0 2px 8px rgba(0,0,0,0.4), 0 0 0 1px rgba(52,211,153,0.08);
+  --shadow-brand:    0 4px 20px rgba(52,211,153,0.20);
+  --shadow-lg:       0 8px 40px rgba(0,0,0,0.5);
 }
 
+/* ─────────────────────────────────────────────────────────────────────────────
+   BASE LAYER
+   Keep shadcn's base resets. Add font-smoothing for custom pages.
+   ───────────────────────────────────────────────────────────────────────────── */
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
   body {
     @apply bg-background text-foreground;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
   html {
     @apply font-sans;

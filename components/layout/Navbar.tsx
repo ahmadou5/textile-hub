@@ -5,11 +5,11 @@ import {
   Sparkles,
   MessageSquare,
   LayoutDashboard,
-  Package,
+  ShoppingBag,
   LogOut,
   LogIn,
   UserPlus,
-  User,
+  Package,
 } from "lucide-react";
 
 export default async function Navbar() {
@@ -18,11 +18,11 @@ export default async function Navbar() {
 
   return (
     <nav
-      className="sticky top-0 z-50 w-full border-b"
+      className="sticky top-0 z-50 w-full"
       style={{
-        background: "rgba(255,255,255,0.92)",
+        background: "color-mix(in srgb, var(--bg-card) 90%, transparent)",
         backdropFilter: "blur(12px)",
-        borderColor: "rgba(0,0,0,0.06)",
+        borderBottom: "1px solid var(--border)",
       }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
@@ -30,86 +30,84 @@ export default async function Navbar() {
         <Link
           href="/"
           className="flex items-center gap-2 flex-shrink-0"
-          style={{ fontFamily: "var(--font-playfair, serif)" }}
+          style={{ fontFamily: "var(--font-syne, sans-serif)" }}
         >
           <div
             className="w-7 h-7 rounded-lg flex items-center justify-center text-white text-xs font-bold"
             style={{
-              background: "linear-gradient(135deg, #D4A853 0%, #b8893a 100%)",
+              background: `linear-gradient(135deg, var(--brand-hex) 0%, var(--brand-dim) 100%)`,
             }}
           >
             T
           </div>
-          <span className="text-sm font-bold text-slate-800 hidden sm:block">
+          <span
+            className="text-sm font-bold hidden sm:block"
+            style={{ color: "var(--text-primary)" }}
+          >
             TextileHub
           </span>
         </Link>
 
-        {/* Center nav links */}
+        {/* Center nav */}
         <div className="flex items-center gap-1">
-          {/* Public always */}
-          <Link
-            href="/"
-            className="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600
-              hover:text-slate-900 hover:bg-slate-100
-              transition-[color,background] duration-150"
-            style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
-          >
-            Browse
-          </Link>
+          {/* Always visible */}
+          <NavLink href="/">Browse</NavLink>
 
-          {/* Wholesaler nav */}
+          {/* Wholesaler + Admin */}
           {(role === "WHOLESALER" || role === "ADMIN") && (
             <>
-              <Link
-                href="/wholesale/new-arrivals"
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600
-                  hover:text-emerald-600 hover:bg-emerald-50
-                  transition-[color,background] duration-150"
-                style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
-              >
-                <Sparkles size={12} />
-                New Arrivals
-              </Link>
-              <Link
+              <NavLink href="/wholesale/products" icon={<Package size={12} />}>
+                Products
+              </NavLink>
+              <NavLink
                 href="/wholesale/inquiries"
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600
-                  hover:text-emerald-600 hover:bg-emerald-50
-                  transition-[color,background] duration-150"
-                style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+                icon={<MessageSquare size={12} />}
               >
-                <MessageSquare size={12} />
                 Inquiries
-              </Link>
+              </NavLink>
+              <NavLink
+                href="/wholesale/orders"
+                icon={<ShoppingBag size={12} />}
+              >
+                My Orders
+              </NavLink>
             </>
           )}
 
-          {/* Admin nav */}
+          {/* Admin only */}
           {role === "ADMIN" && (
-            <Link
-              href="/admin"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600
-                hover:text-[#D4A853] hover:bg-amber-50
-                transition-[color,background] duration-150"
-              style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
-            >
-              <LayoutDashboard size={12} />
-              Dashboard
-            </Link>
+            <>
+              <NavLink
+                href="/admin"
+                icon={<LayoutDashboard size={12} />}
+                highlight
+              >
+                Dashboard
+              </NavLink>
+              <NavLink
+                href="/admin/orders"
+                icon={<ShoppingBag size={12} />}
+                highlight
+              >
+                Orders
+              </NavLink>
+            </>
           )}
         </div>
 
-        {/* Right — auth actions */}
+        {/* Right — auth */}
         <div className="flex items-center gap-2 flex-shrink-0">
           {session?.user ? (
             <>
-              {/* Profile link */}
+              {/* Avatar / profile link */}
               <Link
                 href="/profile"
-                className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600
-                  hover:text-slate-900 hover:bg-slate-100
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium
                   transition-[color,background] duration-150"
-                style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+                style={{
+                  color: "var(--text-muted)",
+                  fontFamily: "var(--font-dm-sans, sans-serif)",
+                }}
               >
                 {session.user.image ? (
                   <img
@@ -119,10 +117,9 @@ export default async function Navbar() {
                   />
                 ) : (
                   <div
-                    className="w-5 h-5 rounded-full flex items-center justify-center text-white text-[9px] font-bold"
+                    className="w-5 h-5 rounded-full flex items-center justify-center text-white text-[9px] font-bold flex-shrink-0"
                     style={{
-                      background:
-                        "linear-gradient(135deg, #D4A853 0%, #b8893a 100%)",
+                      background: `linear-gradient(135deg, var(--brand-hex) 0%, var(--brand-dim) 100%)`,
                     }}
                   >
                     {(session.user.name ??
@@ -145,9 +142,11 @@ export default async function Navbar() {
                 <button
                   type="submit"
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium
-                    text-slate-500 hover:text-red-500 hover:bg-red-50
                     transition-[color,background] duration-150"
-                  style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+                  style={{
+                    color: "var(--text-faint)",
+                    fontFamily: "var(--font-dm-sans, sans-serif)",
+                  }}
                 >
                   <LogOut size={12} />
                   <span className="hidden sm:block">Sign Out</span>
@@ -159,9 +158,11 @@ export default async function Navbar() {
               <Link
                 href="/login"
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium
-                  text-slate-600 hover:text-slate-900 hover:bg-slate-100
                   transition-[color,background] duration-150"
-                style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+                style={{
+                  color: "var(--text-muted)",
+                  fontFamily: "var(--font-dm-sans, sans-serif)",
+                }}
               >
                 <LogIn size={12} />
                 Sign In
@@ -172,9 +173,8 @@ export default async function Navbar() {
                   hover:-translate-y-0.5 active:translate-y-0
                   transition-[transform] duration-150"
                 style={{
-                  background:
-                    "linear-gradient(135deg, #D4A853 0%, #b8893a 100%)",
-                  boxShadow: "0 2px 6px rgba(212,168,83,0.3)",
+                  background: `linear-gradient(135deg, var(--brand-hex) 0%, var(--brand-dim) 100%)`,
+                  boxShadow: "var(--shadow-brand)",
                   fontFamily: "var(--font-dm-sans, sans-serif)",
                 }}
               >
@@ -186,5 +186,33 @@ export default async function Navbar() {
         </div>
       </div>
     </nav>
+  );
+}
+
+// ── Small helper to keep nav links DRY ───────────────────────────────────────
+function NavLink({
+  href,
+  icon,
+  highlight = false,
+  children,
+}: {
+  href: string;
+  icon?: React.ReactNode;
+  highlight?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <Link
+      href={href}
+      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium
+        transition-[color,background] duration-150"
+      style={{
+        color: highlight ? "var(--brand-hex)" : "var(--text-muted)",
+        fontFamily: "var(--font-dm-sans, sans-serif)",
+      }}
+    >
+      {icon}
+      {children}
+    </Link>
   );
 }

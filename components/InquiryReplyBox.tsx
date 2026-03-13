@@ -75,7 +75,7 @@ export default function InquiryReplyBox({
           placeholder="Write your reply to the wholesaler…"
           rows={3}
           disabled={loading}
-          className="w-full px-4 py-3 rounded-xl text-sm text-slate-800 resize-none
+          className="w-full px-4 py-3 rounded-xl text-sm text-black/70 resize-none
             bg-white border border-slate-200 placeholder:text-slate-400
             focus:outline-none focus:border-[#D4A853] focus:ring-1 focus:ring-[#D4A853]/20
             disabled:opacity-60
