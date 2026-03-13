@@ -2,6 +2,7 @@
 import { requireRole } from "@/lib/auth";
 import WholesaleSidebar from "@/components/wholesale/WholeSaleSidebar";
 import { Role } from "@prisma/client";
+import Navbar from "@/components/layout/Navbar";
 
 export default async function WholesaleLayout({
   children,
@@ -15,7 +16,7 @@ export default async function WholesaleLayout({
       className="min-h-screen flex"
       style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
     >
-      <WholesaleSidebar userName={session?.user.name ?? "Wholesaler"} />
+      <Navbar />
       <main
         className="flex-1 min-h-screen"
         style={{

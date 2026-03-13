@@ -1,6 +1,7 @@
 // app/(admin)/admin/layout.tsx
 import { requireRole } from "@/lib/auth";
 import AdminSidebar from "@/components/admin/AdminSidebar";
+import Navbar from "@/components/layout/Navbar";
 
 export default async function AdminLayout({
   children,
@@ -15,7 +16,7 @@ export default async function AdminLayout({
       className="min-h-screen flex"
       style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
     >
-      <AdminSidebar adminName={session?.user.name ?? "Admin"} />
+      <Navbar />
 
       {/* Main content */}
       <main className="flex-1 flex flex-col min-h-screen bg-[#F7F4EF]">
