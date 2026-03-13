@@ -74,7 +74,7 @@ export default function RegisterPage() {
   const inputErr = `border-red-300 focus:border-red-400 focus:ring-red-400/15`;
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4 py-10">
+    <div className="min-h-screen flex items-center justify-center px-4 py-10">
       <div className="w-full max-w-sm space-y-6">
         {/* Logo */}
         <div className="text-center space-y-2">
