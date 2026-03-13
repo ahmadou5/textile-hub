@@ -12,8 +12,7 @@ export default function PublicLayout({
     <div
       className="min-h-screen"
       style={{
-        background:
-          "radial-gradient(ellipse at 0% 0%, rgba(201,145,58,0.06) 0%, transparent 50%), radial-gradient(ellipse at 100% 100%, rgba(201,145,58,0.04) 0%, transparent 50%), #FAF7F2",
+  
         fontFamily: "var(--font-dm-sans, sans-serif)",
       }}
     >
