@@ -8,6 +8,7 @@ import UpgradeRequestSection from "@/components/UpgradeRequestSection";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import BankDetailsForm from "@/components/admin/BankDetailsForm";
 import { ShieldCheck, Calendar, Mail } from "lucide-react";
+import Navbar from "@/components/layout/Navbar";
 
 export const metadata: Metadata = { title: "My Profile — TextileHub" };
 
@@ -66,7 +67,7 @@ export default async function ProfilePage() {
 
   return (
     <div className="min-h-screen" style={{ background: "var(--bg)" }}>
-      <div className="max-w-2xl mx-auto px-4 py-10 space-y-8">
+      <div className="w-[90%] mx-auto px-4 py-10 space-y-8">
         {/* ── Profile header ── */}
         <div
           className="rounded-2xl p-6"
