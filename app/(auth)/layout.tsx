@@ -1,17 +1,20 @@
+// app/(auth)/layout.tsx
 import Navbar from "@/components/layout/Navbar";
 
-// app/(auth)/layout.tsx
 export default function AuthLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <>
-      <div className="min-h-screen " style={{ background: "var(--bg)" }}>
-        <Navbar />
+    <div
+      className="min-h-screen flex flex-col"
+      style={{ background: "var(--bg)" }}
+    >
+      <Navbar />
+      <main className="flex-1 flex items-center justify-center px-4 py-10">
         {children}
-      </div>
-    </>
+      </main>
+    </div>
   );
 }
