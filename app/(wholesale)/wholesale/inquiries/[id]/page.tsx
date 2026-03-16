@@ -102,9 +102,9 @@ export default async function WholesaleInquiryThreadPage({
   );
 
   return (
-    <div className="flex flex-col h-screen max-h-screen max-w-7xl w-[90%] overflow-hidden p-6 lg:p-8 space-y-4">
+    <div className="flex flex-col h-screen max-h-screen max-w-7xl w-[99%] ml-auto mr-auto overflow-hidden p-6 lg:p-8 space-y-4">
       {/* Back + Refresh */}
-      <div className="flex items-center justify-between flex-shrink-0">
+      <div className="flex items-center justify-between shrink-0">
         <Link
           href="/wholesale/inquiries"
           className="inline-flex items-center gap-2 text-sm group
@@ -127,7 +127,7 @@ export default async function WholesaleInquiryThreadPage({
 
       {/* Thread header */}
       <div
-        className="flex items-start justify-between gap-4 p-5 rounded-2xl flex-shrink-0"
+        className="flex items-start justify-between gap-4 p-5 rounded-2xl shrink-0"
         style={{
           background: "var(--bg-card)",
           border: "1px solid var(--border-brand)",
@@ -148,7 +148,7 @@ export default async function WholesaleInquiryThreadPage({
             </h1>
             {/* Status badge */}
             <span
-              className="text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0"
+              className="text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0"
               style={{
                 ...(STATUS_STYLES[inquiry.status] ?? STATUS_STYLES.CLOSED),
                 fontFamily: "var(--font-dm-sans, sans-serif)",
@@ -189,7 +189,7 @@ export default async function WholesaleInquiryThreadPage({
             </span>
 
             <span
-              className="flex items-center gap-1 text-xs hidden sm:flex"
+              className=" items-center gap-1 text-xs lg:hidden flex"
               style={{
                 color: "var(--text-faint)",
                 fontFamily: "var(--font-dm-sans, sans-serif)",
@@ -227,13 +227,13 @@ export default async function WholesaleInquiryThreadPage({
       {/* Admin replied banner */}
       {isReplied && adminReplies.length > 0 && (
         <div
-          className="flex items-center gap-3 px-4 py-3 rounded-2xl flex-shrink-0"
+          className="flex items-center gap-3 px-4 py-3 rounded-2xl shrink-0"
           style={{
             background: "rgba(5,150,105,0.08)",
             border: "1px solid rgba(5,150,105,0.2)",
           }}
         >
-          <span className="relative flex h-2.5 w-2.5 flex-shrink-0">
+          <span className="relative flex h-2.5 w-2.5 shrink-0">
             <span
               className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"
               style={{ background: "var(--status-confirmed)" }}
@@ -246,7 +246,7 @@ export default async function WholesaleInquiryThreadPage({
           <CheckCircle2
             size={14}
             style={{ color: "var(--status-confirmed)" }}
-            className="flex-shrink-0"
+            className="shrink-0"
           />
           <p
             className="text-sm font-semibold"
@@ -307,7 +307,7 @@ export default async function WholesaleInquiryThreadPage({
                         style={{ background: "var(--border)" }}
                       />
                       <span
-                        className="text-[10px] font-medium uppercase tracking-wider px-2 flex-shrink-0"
+                        className="text-[10px] font-medium uppercase tracking-wider px-2 shrink-0"
                         style={{
                           color: "var(--text-faint)",
                           fontFamily: "var(--font-dm-sans, sans-serif)",
@@ -331,7 +331,7 @@ export default async function WholesaleInquiryThreadPage({
                   >
                     {/* Avatar */}
                     <div
-                      className="w-8 h-8 rounded-xl flex items-center justify-center text-xs font-bold flex-shrink-0 self-end"
+                      className="w-8 h-8 rounded-xl flex items-center justify-center text-xs font-bold shrink-0 self-end"
                       style={{
                         background: isAdminMsg
                           ? "var(--brand-glow)"
@@ -411,13 +411,13 @@ export default async function WholesaleInquiryThreadPage({
       </ScrollArea>
 
       {/* Footer reply area */}
-      <div className="flex-shrink-0 space-y-3">
+      <div className="shrink-0 space-y-3">
         <div className="h-px" style={{ background: "var(--border)" }} />
 
         <div className="space-y-3">
           <div className="flex items-center gap-2">
             <div
-              className="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0"
+              className="w-6 h-6 rounded-lg flex items-center justify-center shrink-0"
               style={{
                 background: "var(--brand-glow)",
                 border: "1px solid var(--border-brand)",
