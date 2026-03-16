@@ -18,8 +18,16 @@ import { signOutAction } from "@/actions/auth";
 import CartButton from "@/components/cartButton";
 import CartDrawer from "@/components/cartDrawer";
 import type { Session } from "next-auth";
+import Image from "next/image";
+import { db } from "@/lib/db";
 
-export default function NavbarClient({ session }: { session: Session | null }) {
+export default function NavbarClient({
+  session,
+  imageUrl,
+}: {
+  session: Session | null;
+  imageUrl?: string;
+}) {
   const role = session?.user?.role as string | undefined;
   const [mobileOpen, setMobileOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -138,15 +146,15 @@ export default function NavbarClient({ session }: { session: Session | null }) {
           fontFamily: "var(--font-dm-sans, sans-serif)",
         }}
       >
-        {session.user.image && session.user.image !== "" ? (
-          <img
-            src={session.user.image}
+        {session.user && imageUrl !== "" ? (
+          <Image
+            src={imageUrl || ""}
             alt=""
-            className="w-5 h-5 rounded-full object-cover"
+            className="w-6 h-6 rounded-full object-cover"
           />
         ) : (
           <div
-            className="w-5 h-5 rounded-full flex items-center justify-center text-white text-[9px] font-bold flex-shrink-0"
+            className="w-6 h-6 rounded-full flex items-center justify-center text-white text-[9px] font-bold flex-shrink-0"
             style={{
               background: `linear-gradient(135deg, var(--brand-hex) 0%, var(--brand-dim) 100%)`,
             }}
