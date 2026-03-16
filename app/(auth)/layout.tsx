@@ -8,10 +8,7 @@ export default function AuthLayout({
 }) {
   return (
     <>
-      <div
-        className="min-h-screen flex flex-col items-center justify-center"
-        style={{ background: "var(--bg)" }}
-      >
+      <div className="min-h-screen " style={{ background: "var(--bg)" }}>
         <Navbar />
         {children}
       </div>
