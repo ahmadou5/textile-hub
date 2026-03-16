@@ -13,6 +13,7 @@ export default function PublicLayout({
       className="min-h-screen "
       style={{
         fontFamily: "var(--font-dm-sans, sans-serif)",
+        backgroundColor: "var(--bg)",
       }}
     >
       {/* Grain overlay */}
