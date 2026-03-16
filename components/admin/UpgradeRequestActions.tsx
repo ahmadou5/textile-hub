@@ -37,15 +37,27 @@ export default function UpgradeRequestActions({
 
   return (
     <div className="flex items-center gap-2 flex-shrink-0">
+      {/* Approve */}
       <button
         onClick={() => handleAction("APPROVE")}
         disabled={!!loading}
         className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold
-          text-emerald-600 border border-emerald-500/25 bg-emerald-500/8
-          hover:bg-emerald-500/15 hover:border-emerald-500/35
           disabled:opacity-50 disabled:cursor-not-allowed
           transition-[background,border-color] duration-150"
-        style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+        style={{
+          color: "var(--status-confirmed)",
+          border: "1px solid rgba(5,150,105,0.25)",
+          background: "rgba(5,150,105,0.08)",
+          fontFamily: "var(--font-dm-sans, sans-serif)",
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = "rgba(5,150,105,0.14)";
+          e.currentTarget.style.borderColor = "rgba(5,150,105,0.35)";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = "rgba(5,150,105,0.08)";
+          e.currentTarget.style.borderColor = "rgba(5,150,105,0.25)";
+        }}
       >
         {loading === "APPROVE" ? (
           <Loader2 size={12} className="animate-spin" />
@@ -54,15 +66,28 @@ export default function UpgradeRequestActions({
         )}
         Approve
       </button>
+
+      {/* Reject */}
       <button
         onClick={() => handleAction("REJECT")}
         disabled={!!loading}
         className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold
-          text-red-500 border border-red-500/25 bg-red-500/[0.06]
-          hover:bg-red-500/12 hover:border-red-500/35
           disabled:opacity-50 disabled:cursor-not-allowed
           transition-[background,border-color] duration-150"
-        style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+        style={{
+          color: "var(--status-cancelled)",
+          border: "1px solid rgba(220,38,38,0.25)",
+          background: "rgba(220,38,38,0.06)",
+          fontFamily: "var(--font-dm-sans, sans-serif)",
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = "rgba(220,38,38,0.12)";
+          e.currentTarget.style.borderColor = "rgba(220,38,38,0.35)";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = "rgba(220,38,38,0.06)";
+          e.currentTarget.style.borderColor = "rgba(220,38,38,0.25)";
+        }}
       >
         {loading === "REJECT" ? (
           <Loader2 size={12} className="animate-spin" />

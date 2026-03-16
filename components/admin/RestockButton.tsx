@@ -22,12 +22,24 @@ export default function RestockButton({ productName }: RestockButtonProps) {
         })
       }
       className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold
-        border border-[#D4A853]/30 text-[#D4A853] bg-[#D4A853]/5
-        hover:bg-[#D4A853]/12 hover:border-[#D4A853]/50 hover:-translate-y-0.5
-        active:translate-y-0 active:brightness-95
+        hover:-translate-y-0.5 active:translate-y-0 active:brightness-95
         transition-[background,border-color,transform] duration-150
-        focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#D4A853]"
-      style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+        focus-visible:outline-2 focus-visible:outline-offset-1"
+      style={{
+        border: "1px solid var(--border-brand)",
+        color: "var(--brand-hex)",
+        background: "var(--brand-glow)",
+        outlineColor: "var(--brand-hex)",
+        fontFamily: "var(--font-dm-sans, sans-serif)",
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.background = "var(--border-brand)";
+        e.currentTarget.style.borderColor = "var(--border-strong)";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.background = "var(--brand-glow)";
+        e.currentTarget.style.borderColor = "var(--border-brand)";
+      }}
     >
       <Truck size={11} />
       Restock

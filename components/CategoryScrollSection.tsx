@@ -40,14 +40,12 @@ export default function CategoryScrollSection({
 
   function scroll(dir: "left" | "right") {
     if (!scrollRef.current) return;
-    const amount = 320;
     scrollRef.current.scrollBy({
-      left: dir === "left" ? -amount : amount,
+      left: dir === "left" ? -320 : 320,
       behavior: "smooth",
     });
   }
 
-  // Only show sections with 2+ products
   if (products.length < 2) return null;
 
   return (
@@ -56,15 +54,19 @@ export default function CategoryScrollSection({
       <div className="flex items-end justify-between">
         <div>
           <p
-            className="text-[10px] font-semibold tracking-[0.15em] uppercase text-[#C9913A] mb-1"
-            style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+            className="text-[10px] font-semibold tracking-[0.15em] uppercase mb-1"
+            style={{
+              color: "var(--brand-hex)",
+              fontFamily: "var(--font-dm-sans, sans-serif)",
+            }}
           >
             Category
           </p>
           <h2
-            className="text-2xl font-light text-[#1C1410]"
+            className="text-2xl font-light"
             style={{
-              fontFamily: "var(--font-cormorant, serif)",
+              color: "var(--text-primary)",
+              fontFamily: "var(--font-syne, sans-serif)",
               letterSpacing: "-0.02em",
             }}
           >
@@ -74,46 +76,72 @@ export default function CategoryScrollSection({
 
         <div className="flex items-center gap-2">
           <span
-            className="text-xs text-[#8B7355] mr-2 hidden sm:block"
-            style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+            className="text-xs mr-2 hidden sm:block"
+            style={{
+              color: "var(--text-muted)",
+              fontFamily: "var(--font-dm-sans, sans-serif)",
+            }}
           >
             {products.length} fabric{products.length !== 1 ? "s" : ""}
           </span>
+
           {/* Scroll buttons */}
-          <button
-            onClick={() => scroll("left")}
-            className="w-8 h-8 rounded-full border border-[#C9913A]/20 bg-white flex items-center justify-center
-              text-[#8B7355] hover:text-[#C9913A] hover:border-[#C9913A]/40
-              transition-[color,border-color] duration-150
-              focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C9913A]"
-          >
-            <ChevronLeft size={14} />
-          </button>
-          <button
-            onClick={() => scroll("right")}
-            className="w-8 h-8 rounded-full border border-[#C9913A]/20 bg-white flex items-center justify-center
-              text-[#8B7355] hover:text-[#C9913A] hover:border-[#C9913A]/40
-              transition-[color,border-color] duration-150
-              focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C9913A]"
-          >
-            <ChevronRight size={14} />
-          </button>
+          {(["left", "right"] as const).map((dir) => (
+            <button
+              key={dir}
+              onClick={() => scroll(dir)}
+              className="w-8 h-8 rounded-full flex items-center justify-center
+                transition-[color,border-color,background] duration-150
+                focus-visible:outline-2 focus-visible:outline-offset-2"
+              style={{
+                border: "1px solid var(--border-brand)",
+                background: "var(--bg-card)",
+                color: "var(--text-muted)",
+                outlineColor: "var(--brand-hex)",
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.color =
+                  "var(--brand-hex)";
+                (e.currentTarget as HTMLButtonElement).style.borderColor =
+                  "var(--brand-hex)";
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.color =
+                  "var(--text-muted)";
+                (e.currentTarget as HTMLButtonElement).style.borderColor =
+                  "var(--border-brand)";
+              }}
+            >
+              {dir === "left" ? (
+                <ChevronLeft size={14} />
+              ) : (
+                <ChevronRight size={14} />
+              )}
+            </button>
+          ))}
         </div>
       </div>
 
       {/* Scroll track */}
       <div className="relative">
         {/* Fade edges */}
-        <div className="absolute left-0 top-0 bottom-0 w-6 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
-        <div className="absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
+        <div
+          className="absolute left-0 top-0 bottom-0 w-6 z-10 pointer-events-none"
+          style={{
+            background: "linear-gradient(to right, var(--bg), transparent)",
+          }}
+        />
+        <div
+          className="absolute right-0 top-0 bottom-0 w-6 z-10 pointer-events-none"
+          style={{
+            background: "linear-gradient(to left, var(--bg), transparent)",
+          }}
+        />
 
         <div
           ref={scrollRef}
           className="flex gap-4 overflow-x-auto pb-2 scroll-smooth"
-          style={{
-            scrollbarWidth: "none",
-            msOverflowStyle: "none",
-          }}
+          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
           {products.map((product) => {
             const fresh = isNew(product.createdAt);
@@ -123,17 +151,22 @@ export default function CategoryScrollSection({
               <Link
                 key={product.id}
                 href={`/products/${product.id}`}
-                className="group flex-shrink-0 w-52 rounded-2xl border overflow-hidden
-                  hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(201,145,58,0.12)]
+                className="group flex-shrink-0 w-52 rounded-2xl overflow-hidden
+                  hover:-translate-y-1
                   transition-[transform,box-shadow,border-color] duration-200
-                  focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C9913A]"
+                  focus-visible:outline-2 focus-visible:outline-offset-2"
                 style={{
-                  background: "#fff",
-                  borderColor: "rgba(201,145,58,0.12)",
+                  background: "var(--bg-card)",
+                  border: "1px solid var(--border-brand)",
+                  boxShadow: "var(--shadow-card)",
+                  outlineColor: "var(--brand-hex)",
                 }}
               >
                 {/* Image */}
-                <div className="relative w-full aspect-[3/4] bg-[#F9F5F0] overflow-hidden">
+                <div
+                  className="relative w-full aspect-[3/4] overflow-hidden"
+                  style={{ background: "var(--bg-subtle)" }}
+                >
                   {product.imageUrl ? (
                     <>
                       <Image
@@ -154,7 +187,10 @@ export default function CategoryScrollSection({
                   {/* Badges */}
                   <div className="absolute top-2 left-2 flex flex-col gap-1">
                     {fresh && (
-                      <span className="flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[9px] font-bold tracking-wider bg-[#C9913A] text-white uppercase">
+                      <span
+                        className="flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[9px] font-bold tracking-wider uppercase text-white"
+                        style={{ background: "var(--brand-hex)" }}
+                      >
                         <span className="relative flex h-1.5 w-1.5">
                           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" />
                           <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-white" />
@@ -163,7 +199,10 @@ export default function CategoryScrollSection({
                       </span>
                     )}
                     {lowStock && (
-                      <span className="px-1.5 py-0.5 rounded-md text-[9px] font-bold bg-amber-500/90 text-white uppercase">
+                      <span
+                        className="px-1.5 py-0.5 rounded-md text-[9px] font-bold uppercase text-white"
+                        style={{ background: "var(--status-pending)" }}
+                      >
                         Low Stock
                       </span>
                     )}
@@ -173,9 +212,11 @@ export default function CategoryScrollSection({
                 {/* Content */}
                 <div className="p-3 space-y-1.5">
                   <h3
-                    className="text-sm font-semibold text-[#1C1410] leading-snug line-clamp-2
-                      group-hover:text-[#C9913A] transition-[color] duration-200"
-                    style={{ fontFamily: "var(--font-cormorant, serif)" }}
+                    className="text-sm font-semibold leading-snug line-clamp-2 transition-[color] duration-200"
+                    style={{
+                      color: "var(--text-primary)",
+                      fontFamily: "var(--font-syne, sans-serif)",
+                    }}
                   >
                     {product.name}
                   </h3>
@@ -183,16 +224,18 @@ export default function CategoryScrollSection({
                   <div className="flex items-center justify-between">
                     <div>
                       <p
-                        className="text-base font-bold text-[#C9913A]"
+                        className="text-base font-bold"
                         style={{
+                          color: "var(--brand-hex)",
                           fontFamily: "var(--font-dm-sans, sans-serif)",
                         }}
                       >
                         {formatPrice(product.retailPricePerYard)}
                       </p>
                       <p
-                        className="text-[10px] text-[#8B7355]"
+                        className="text-[10px]"
                         style={{
+                          color: "var(--text-muted)",
                           fontFamily: "var(--font-dm-sans, sans-serif)",
                         }}
                       >
@@ -201,15 +244,20 @@ export default function CategoryScrollSection({
                     </div>
                     <ArrowUpRight
                       size={14}
-                      className="text-[#C9913A]/40 group-hover:text-[#C9913A] transition-[color] duration-200"
+                      className="transition-[color] duration-200"
+                      style={{ color: "var(--border-strong)" }}
                     />
                   </div>
 
                   {/* Login nudge for guests */}
                   {!isLoggedIn && (
                     <p
-                      className="text-[10px] text-[#8B7355]/60 border-t border-[#C9913A]/10 pt-1.5 mt-1"
-                      style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+                      className="text-[10px] pt-1.5 mt-1"
+                      style={{
+                        color: "var(--text-faint)",
+                        borderTop: "1px solid var(--border-brand)",
+                        fontFamily: "var(--font-dm-sans, sans-serif)",
+                      }}
                     >
                       Sign in for wholesale pricing
                     </p>

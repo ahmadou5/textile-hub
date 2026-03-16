@@ -31,6 +31,36 @@ const CATEGORIES = [
   "Other",
 ];
 
+const inputStyle: React.CSSProperties = {
+  background: "var(--bg-subtle)",
+  border: "1px solid var(--border)",
+  color: "var(--text-primary)",
+  fontFamily: "var(--font-dm-sans, sans-serif)",
+};
+
+const labelStyle: React.CSSProperties = {
+  color: "var(--text-muted)",
+  fontFamily: "var(--font-dm-sans, sans-serif)",
+};
+
+function focusIn(
+  e: React.FocusEvent<
+    HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+  >,
+) {
+  e.target.style.borderColor = "var(--brand-hex)";
+  e.target.style.boxShadow = "0 0 0 3px var(--brand-glow)";
+}
+
+function focusOut(
+  e: React.FocusEvent<
+    HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+  >,
+) {
+  e.target.style.borderColor = "var(--border)";
+  e.target.style.boxShadow = "none";
+}
+
 export default function ProductEditForm({ product }: ProductEditFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -95,23 +125,24 @@ export default function ProductEditForm({ product }: ProductEditFormProps) {
     }
   }
 
-  const inputClass = `w-full px-3 py-2.5 rounded-xl text-sm text-slate-800
-    bg-white border border-slate-200 placeholder:text-slate-400
-    focus:outline-none focus:border-[#D4A853] focus:ring-1 focus:ring-[#D4A853]/20
-    transition-[border-color,box-shadow] duration-200`;
-
-  const labelClass = `block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5`;
+  const fieldClass =
+    "w-full px-3 py-2.5 rounded-xl text-sm outline-none transition-[border-color,box-shadow] duration-200";
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-5 bg-white rounded-2xl border border-slate-200 p-6 shadow-[0_2px_8px_rgba(0,0,0,0.04)]"
+      className="space-y-5 rounded-2xl p-6"
+      style={{
+        background: "var(--bg-card)",
+        border: "1px solid var(--border-brand)",
+        boxShadow: "var(--shadow-card)",
+      }}
     >
       {/* Name */}
       <div>
         <label
-          className={labelClass}
-          style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+          className="block text-xs font-semibold uppercase tracking-wider mb-1.5"
+          style={labelStyle}
         >
           Product Name
         </label>
@@ -120,27 +151,38 @@ export default function ProductEditForm({ product }: ProductEditFormProps) {
           value={form.name}
           onChange={(e) => set("name", e.target.value)}
           required
-          className={inputClass}
-          style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+          className={fieldClass}
+          style={inputStyle}
+          onFocus={focusIn}
+          onBlur={focusOut}
         />
       </div>
 
       {/* Category */}
       <div>
         <label
-          className={labelClass}
-          style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+          className="block text-xs font-semibold uppercase tracking-wider mb-1.5"
+          style={labelStyle}
         >
           Category
         </label>
         <select
           value={form.category}
           onChange={(e) => set("category", e.target.value)}
-          className={inputClass}
-          style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+          className={fieldClass}
+          style={inputStyle}
+          onFocus={focusIn}
+          onBlur={focusOut}
         >
           {CATEGORIES.map((c) => (
-            <option key={c} value={c}>
+            <option
+              key={c}
+              value={c}
+              style={{
+                background: "var(--bg-card)",
+                color: "var(--text-primary)",
+              }}
+            >
               {c}
             </option>
           ))}
@@ -150,8 +192,8 @@ export default function ProductEditForm({ product }: ProductEditFormProps) {
       {/* Description */}
       <div>
         <label
-          className={labelClass}
-          style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+          className="block text-xs font-semibold uppercase tracking-wider mb-1.5"
+          style={labelStyle}
         >
           Description
         </label>
@@ -159,16 +201,18 @@ export default function ProductEditForm({ product }: ProductEditFormProps) {
           value={form.description}
           onChange={(e) => set("description", e.target.value)}
           rows={3}
-          className={`${inputClass} resize-none`}
-          style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+          className={`${fieldClass} resize-none`}
+          style={inputStyle}
+          onFocus={focusIn}
+          onBlur={focusOut}
         />
       </div>
 
       {/* Image URL */}
       <div>
         <label
-          className={labelClass}
-          style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+          className="block text-xs font-semibold uppercase tracking-wider mb-1.5"
+          style={labelStyle}
         >
           Image URL
         </label>
@@ -177,8 +221,10 @@ export default function ProductEditForm({ product }: ProductEditFormProps) {
           value={form.imageUrl}
           onChange={(e) => set("imageUrl", e.target.value)}
           placeholder="https://..."
-          className={inputClass}
-          style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+          className={fieldClass}
+          style={inputStyle}
+          onFocus={focusIn}
+          onBlur={focusOut}
         />
       </div>
 
@@ -186,8 +232,8 @@ export default function ProductEditForm({ product }: ProductEditFormProps) {
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label
-            className={labelClass}
-            style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+            className="block text-xs font-semibold uppercase tracking-wider mb-1.5"
+            style={labelStyle}
           >
             Retail Price / Yard (₦)
           </label>
@@ -198,14 +244,16 @@ export default function ProductEditForm({ product }: ProductEditFormProps) {
             value={form.retailPricePerYard}
             onChange={(e) => set("retailPricePerYard", e.target.value)}
             required
-            className={inputClass}
-            style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+            className={fieldClass}
+            style={inputStyle}
+            onFocus={focusIn}
+            onBlur={focusOut}
           />
         </div>
         <div>
           <label
-            className={labelClass}
-            style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+            className="block text-xs font-semibold uppercase tracking-wider mb-1.5"
+            style={labelStyle}
           >
             Wholesale Price / Yard (₦)
           </label>
@@ -216,8 +264,10 @@ export default function ProductEditForm({ product }: ProductEditFormProps) {
             value={form.wholesalePricePerYard}
             onChange={(e) => set("wholesalePricePerYard", e.target.value)}
             required
-            className={inputClass}
-            style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+            className={fieldClass}
+            style={inputStyle}
+            onFocus={focusIn}
+            onBlur={focusOut}
           />
         </div>
       </div>
@@ -225,8 +275,8 @@ export default function ProductEditForm({ product }: ProductEditFormProps) {
       {/* Stock */}
       <div>
         <label
-          className={labelClass}
-          style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+          className="block text-xs font-semibold uppercase tracking-wider mb-1.5"
+          style={labelStyle}
         >
           Total Yards in Stock
         </label>
@@ -237,8 +287,10 @@ export default function ProductEditForm({ product }: ProductEditFormProps) {
           value={form.totalYardsInStock}
           onChange={(e) => set("totalYardsInStock", e.target.value)}
           required
-          className={inputClass}
-          style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+          className={fieldClass}
+          style={inputStyle}
+          onFocus={focusIn}
+          onBlur={focusOut}
         />
       </div>
 
@@ -250,10 +302,10 @@ export default function ProductEditForm({ product }: ProductEditFormProps) {
           className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold text-white
             disabled:opacity-50 disabled:cursor-not-allowed
             hover:-translate-y-0.5 active:translate-y-0
-            transition-[transform,background] duration-150"
+            transition-[transform] duration-150"
           style={{
-            background: "linear-gradient(135deg, #D4A853 0%, #b8893a 100%)",
-            boxShadow: "0 2px 8px rgba(212,168,83,0.3)",
+            background: `linear-gradient(135deg, var(--brand-hex) 0%, var(--brand-dim) 100%)`,
+            boxShadow: "var(--shadow-brand)",
             fontFamily: "var(--font-dm-sans, sans-serif)",
           }}
         >

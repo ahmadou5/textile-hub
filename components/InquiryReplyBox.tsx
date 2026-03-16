@@ -38,7 +38,7 @@ export default function InquiryReplyBox({
 
       toast.success("Reply sent!");
       setBody("");
-      router.refresh(); // ✅ re-fetches server component — shows new message instantly
+      router.refresh();
     } catch {
       toast.error("Something went wrong");
     } finally {
@@ -49,16 +49,23 @@ export default function InquiryReplyBox({
   if (isClosed) {
     return (
       <div
-        className="flex items-center gap-3 px-4 py-3 rounded-xl border"
+        className="flex items-center gap-3 px-4 py-3 rounded-xl"
         style={{
-          background: "rgba(0,0,0,0.02)",
-          borderColor: "rgba(0,0,0,0.06)",
+          background: "var(--bg-subtle)",
+          border: "1px solid var(--border)",
         }}
       >
-        <Lock size={13} className="text-slate-400 flex-shrink-0" />
+        <Lock
+          size={13}
+          className="flex-shrink-0"
+          style={{ color: "var(--text-faint)" }}
+        />
         <p
-          className="text-sm text-slate-400"
-          style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+          className="text-sm"
+          style={{
+            color: "var(--text-faint)",
+            fontFamily: "var(--font-dm-sans, sans-serif)",
+          }}
         >
           This inquiry is closed and cannot receive new replies.
         </p>
@@ -75,16 +82,30 @@ export default function InquiryReplyBox({
           placeholder="Write your reply to the wholesaler…"
           rows={3}
           disabled={loading}
-          className="w-full px-4 py-3 rounded-xl text-sm text-black/70 resize-none
-            bg-white border border-slate-200 placeholder:text-slate-400
-            focus:outline-none focus:border-[#D4A853] focus:ring-1 focus:ring-[#D4A853]/20
+          className="w-full px-4 py-3 rounded-xl text-sm resize-none outline-none
             disabled:opacity-60
             transition-[border-color,box-shadow] duration-200"
-          style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+          style={{
+            background: "var(--bg-subtle)",
+            border: "1px solid var(--border)",
+            color: "var(--text-primary)",
+            fontFamily: "var(--font-dm-sans, sans-serif)",
+          }}
+          onFocus={(e) => {
+            e.target.style.borderColor = "var(--brand-hex)";
+            e.target.style.boxShadow = "0 0 0 3px var(--brand-glow)";
+          }}
+          onBlur={(e) => {
+            e.target.style.borderColor = "var(--border)";
+            e.target.style.boxShadow = "none";
+          }}
         />
         <span
-          className="absolute bottom-3 right-3 text-[11px] text-slate-400"
-          style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+          className="absolute bottom-3 right-3 text-[11px]"
+          style={{
+            color: "var(--text-faint)",
+            fontFamily: "var(--font-dm-sans, sans-serif)",
+          }}
         >
           {body.length}/2000
         </span>
@@ -92,11 +113,19 @@ export default function InquiryReplyBox({
 
       <div className="flex items-center justify-between">
         <p
-          className="text-xs text-slate-400"
-          style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+          className="text-xs"
+          style={{
+            color: "var(--text-faint)",
+            fontFamily: "var(--font-dm-sans, sans-serif)",
+          }}
         >
           Replying marks inquiry as{" "}
-          <span className="font-semibold text-sky-500">REPLIED</span>
+          <span
+            className="font-semibold"
+            style={{ color: "var(--status-shipped)" }}
+          >
+            REPLIED
+          </span>
         </p>
         <button
           type="submit"
@@ -104,10 +133,10 @@ export default function InquiryReplyBox({
           className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white
             disabled:opacity-40 disabled:cursor-not-allowed
             hover:-translate-y-0.5 active:translate-y-0
-            transition-[transform,background] duration-150"
+            transition-[transform] duration-150"
           style={{
-            background: "linear-gradient(135deg, #D4A853 0%, #b8893a 100%)",
-            boxShadow: "0 2px 8px rgba(212,168,83,0.25)",
+            background: `linear-gradient(135deg, var(--brand-hex) 0%, var(--brand-dim) 100%)`,
+            boxShadow: "var(--shadow-brand)",
             fontFamily: "var(--font-dm-sans, sans-serif)",
           }}
         >

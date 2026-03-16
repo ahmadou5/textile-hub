@@ -3,20 +3,38 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export default function ProductCardSkeleton() {
   return (
-    <div className="rounded-2xl overflow-hidden bg-white border border-[#EDE8DF] shadow-[0_2px_8px_rgba(28,20,16,0.06)]">
+    <div
+      className="rounded-2xl overflow-hidden"
+      style={{
+        background: "var(--bg-card)",
+        border: "1px solid var(--border-brand)",
+        boxShadow: "var(--shadow-card)",
+      }}
+    >
       {/* Image placeholder */}
-      <Skeleton className="w-full aspect-[3/4] rounded-none bg-[#EDE8DF]" />
+      <Skeleton
+        className="w-full aspect-[3/4] rounded-none"
+        style={{ background: "var(--bg-subtle)" }}
+      />
 
       {/* Content */}
       <div className="p-4 space-y-3">
-        {/* Category tag */}
-        <Skeleton className="h-4 w-20 rounded-full bg-[#EDE8DF]" />
-        {/* Product name */}
-        <Skeleton className="h-5 w-3/4 bg-[#EDE8DF]" />
-        {/* Price */}
-        <Skeleton className="h-5 w-1/3 bg-[#EDE8DF]" />
-        {/* Button */}
-        <Skeleton className="h-10 w-full rounded-xl bg-[#EDE8DF] mt-1" />
+        <Skeleton
+          className="h-4 w-20 rounded-full"
+          style={{ background: "var(--bg-subtle)" }}
+        />
+        <Skeleton
+          className="h-5 w-3/4"
+          style={{ background: "var(--bg-subtle)" }}
+        />
+        <Skeleton
+          className="h-5 w-1/3"
+          style={{ background: "var(--bg-subtle)" }}
+        />
+        <Skeleton
+          className="h-10 w-full rounded-xl mt-1"
+          style={{ background: "var(--bg-subtle)" }}
+        />
       </div>
     </div>
   );

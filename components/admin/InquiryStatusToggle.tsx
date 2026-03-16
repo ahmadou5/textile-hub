@@ -33,18 +33,34 @@ export default function InquiryStatusToggle({
     <button
       onClick={toggle}
       disabled={loading}
-      className={`
-        flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold
+      className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold
         border transition-[background,border-color,color] duration-150
         disabled:opacity-50 disabled:cursor-not-allowed
-        focus-visible:outline-2 focus-visible:outline-offset-1
-        ${
-          isClosed
-            ? "border-emerald-500/25 text-emerald-400 bg-emerald-500/8 hover:bg-emerald-500/15 focus-visible:outline-emerald-500"
-            : "border-slate-600/50 text-slate-400 bg-white/[0.03] hover:border-red-500/25 hover:text-red-400 hover:bg-red-500/8 focus-visible:outline-slate-500"
+        focus-visible:outline-2 focus-visible:outline-offset-1"
+      style={{
+        fontFamily: "var(--font-dm-sans, sans-serif)",
+        // Reopen = confirmed/green, Close = faint/neutral → red on hover (handled via onMouseEnter)
+        color: isClosed ? "var(--status-confirmed)" : "var(--text-faint)",
+        background: isClosed ? "rgba(5,150,105,0.08)" : "var(--bg-subtle)",
+        borderColor: isClosed ? "rgba(5,150,105,0.25)" : "var(--border)",
+        outlineColor: isClosed ? "var(--status-confirmed)" : "var(--border)",
+      }}
+      onMouseEnter={(e) => {
+        if (!isClosed) {
+          const btn = e.currentTarget;
+          btn.style.color = "var(--status-cancelled)";
+          btn.style.background = "rgba(220,38,38,0.08)";
+          btn.style.borderColor = "rgba(220,38,38,0.25)";
         }
-      `}
-      style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+      }}
+      onMouseLeave={(e) => {
+        if (!isClosed) {
+          const btn = e.currentTarget;
+          btn.style.color = "var(--text-faint)";
+          btn.style.background = "var(--bg-subtle)";
+          btn.style.borderColor = "var(--border)";
+        }
+      }}
     >
       {loading ? (
         <Loader2 size={12} className="animate-spin" />

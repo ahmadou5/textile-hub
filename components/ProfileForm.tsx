@@ -66,29 +66,50 @@ export default function ProfileForm({ user }: ProfileFormProps) {
     }
   }
 
-  const inputClass = `w-full px-3 py-2.5 rounded-xl text-sm text-slate-800
-    bg-white border border-slate-200 placeholder:text-slate-400
-    focus:outline-none focus:border-[#D4A853] focus:ring-1 focus:ring-[#D4A853]/20
-    transition-[border-color,box-shadow] duration-200`;
+  function focusInput(e: React.FocusEvent<HTMLInputElement>) {
+    e.target.style.borderColor = "var(--brand-hex)";
+    e.target.style.boxShadow = "0 0 0 3px var(--brand-glow)";
+  }
 
-  const labelClass = `block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5`;
+  function blurInput(e: React.FocusEvent<HTMLInputElement>) {
+    e.target.style.borderColor = "var(--border)";
+    e.target.style.boxShadow = "none";
+  }
+
+  const inputStyle: React.CSSProperties = {
+    background: "var(--bg-subtle)",
+    border: "1px solid var(--border)",
+    color: "var(--text-primary)",
+    fontFamily: "var(--font-dm-sans, sans-serif)",
+  };
+
+  const labelStyle: React.CSSProperties = {
+    color: "var(--text-muted)",
+    fontFamily: "var(--font-dm-sans, sans-serif)",
+  };
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-white rounded-2xl border border-slate-200 p-6 shadow-[0_2px_8px_rgba(0,0,0,0.04)] space-y-5"
+      className="rounded-2xl p-6 space-y-5"
+      style={{
+        background: "var(--bg-card)",
+        border: "1px solid var(--border-brand)",
+        boxShadow: "var(--shadow-card)",
+      }}
     >
+      {/* Header */}
       <div>
         <h2
-          className="text-base font-bold text-slate-800"
-          style={{ fontFamily: "var(--font-playfair, serif)" }}
+          className="text-base font-bold"
+          style={{
+            color: "var(--text-primary)",
+            fontFamily: "var(--font-syne, sans-serif)",
+          }}
         >
           Edit Profile
         </h2>
-        <p
-          className="text-xs text-slate-400 mt-0.5"
-          style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
-        >
+        <p className="text-xs mt-0.5" style={labelStyle}>
           Leave password fields empty to keep your current password.
         </p>
       </div>
@@ -96,8 +117,8 @@ export default function ProfileForm({ user }: ProfileFormProps) {
       {/* Name */}
       <div>
         <label
-          className={labelClass}
-          style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+          className="block text-xs font-semibold uppercase tracking-wider mb-1.5"
+          style={labelStyle}
         >
           Full Name
         </label>
@@ -106,16 +127,18 @@ export default function ProfileForm({ user }: ProfileFormProps) {
           value={form.name}
           onChange={(e) => set("name", e.target.value)}
           required
-          className={inputClass}
-          style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+          className="w-full px-3 py-2.5 rounded-xl text-sm outline-none transition-[border-color,box-shadow] duration-200"
+          style={inputStyle}
+          onFocus={focusInput}
+          onBlur={blurInput}
         />
       </div>
 
       {/* Email */}
       <div>
         <label
-          className={labelClass}
-          style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+          className="block text-xs font-semibold uppercase tracking-wider mb-1.5"
+          style={labelStyle}
         >
           Email
         </label>
@@ -124,16 +147,18 @@ export default function ProfileForm({ user }: ProfileFormProps) {
           value={form.email}
           onChange={(e) => set("email", e.target.value)}
           required
-          className={inputClass}
-          style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+          className="w-full px-3 py-2.5 rounded-xl text-sm outline-none transition-[border-color,box-shadow] duration-200"
+          style={inputStyle}
+          onFocus={focusInput}
+          onBlur={blurInput}
         />
       </div>
 
       {/* Photo URL */}
       <div>
         <label
-          className={labelClass}
-          style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+          className="block text-xs font-semibold uppercase tracking-wider mb-1.5"
+          style={labelStyle}
         >
           Profile Photo URL
         </label>
@@ -142,23 +167,35 @@ export default function ProfileForm({ user }: ProfileFormProps) {
           value={form.imageUrl}
           onChange={(e) => set("imageUrl", e.target.value)}
           placeholder="https://..."
-          className={inputClass}
-          style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+          className="w-full px-3 py-2.5 rounded-xl text-sm outline-none transition-[border-color,box-shadow] duration-200"
+          style={{
+            ...inputStyle,
+            color: form.imageUrl ? "var(--text-primary)" : undefined,
+          }}
+          onFocus={focusInput}
+          onBlur={blurInput}
         />
         {form.imageUrl && (
           <img
             src={form.imageUrl}
             alt="Preview"
-            className="mt-2 w-12 h-12 rounded-xl object-cover border border-slate-200"
+            className="mt-2 w-12 h-12 rounded-xl object-cover"
+            style={{ border: "1px solid var(--border-brand)" }}
           />
         )}
       </div>
 
       {/* Password section */}
-      <div className="pt-2 border-t border-slate-100 space-y-4">
+      <div
+        className="pt-4 space-y-4"
+        style={{ borderTop: "1px solid var(--border)" }}
+      >
         <p
-          className="text-xs font-semibold uppercase tracking-wider text-slate-400"
-          style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+          className="text-xs font-semibold uppercase tracking-wider"
+          style={{
+            color: "var(--text-faint)",
+            fontFamily: "var(--font-dm-sans, sans-serif)",
+          }}
         >
           Change Password (optional)
         </p>
@@ -166,8 +203,8 @@ export default function ProfileForm({ user }: ProfileFormProps) {
         {/* Current password */}
         <div>
           <label
-            className={labelClass}
-            style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+            className="block text-xs font-semibold uppercase tracking-wider mb-1.5"
+            style={labelStyle}
           >
             Current Password
           </label>
@@ -177,13 +214,16 @@ export default function ProfileForm({ user }: ProfileFormProps) {
               value={form.currentPassword}
               onChange={(e) => set("currentPassword", e.target.value)}
               placeholder="Enter current password"
-              className={`${inputClass} pr-10`}
-              style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+              className="w-full px-3 py-2.5 pr-10 rounded-xl text-sm outline-none transition-[border-color,box-shadow] duration-200"
+              style={inputStyle}
+              onFocus={focusInput}
+              onBlur={blurInput}
             />
             <button
               type="button"
               onClick={() => setShowCurrentPw((v) => !v)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+              className="absolute right-3 top-1/2 -translate-y-1/2 transition-colors duration-150"
+              style={{ color: "var(--text-faint)" }}
             >
               {showCurrentPw ? <EyeOff size={14} /> : <Eye size={14} />}
             </button>
@@ -193,8 +233,8 @@ export default function ProfileForm({ user }: ProfileFormProps) {
         {/* New password */}
         <div>
           <label
-            className={labelClass}
-            style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+            className="block text-xs font-semibold uppercase tracking-wider mb-1.5"
+            style={labelStyle}
           >
             New Password
           </label>
@@ -204,13 +244,16 @@ export default function ProfileForm({ user }: ProfileFormProps) {
               value={form.newPassword}
               onChange={(e) => set("newPassword", e.target.value)}
               placeholder="Min 6 characters"
-              className={`${inputClass} pr-10`}
-              style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+              className="w-full px-3 py-2.5 pr-10 rounded-xl text-sm outline-none transition-[border-color,box-shadow] duration-200"
+              style={inputStyle}
+              onFocus={focusInput}
+              onBlur={blurInput}
             />
             <button
               type="button"
               onClick={() => setShowNewPw((v) => !v)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+              className="absolute right-3 top-1/2 -translate-y-1/2 transition-colors duration-150"
+              style={{ color: "var(--text-faint)" }}
             >
               {showNewPw ? <EyeOff size={14} /> : <Eye size={14} />}
             </button>
@@ -218,6 +261,7 @@ export default function ProfileForm({ user }: ProfileFormProps) {
         </div>
       </div>
 
+      {/* Submit */}
       <button
         type="submit"
         disabled={loading}
@@ -226,8 +270,8 @@ export default function ProfileForm({ user }: ProfileFormProps) {
           hover:-translate-y-0.5 active:translate-y-0
           transition-[transform] duration-150"
         style={{
-          background: "linear-gradient(135deg, #D4A853 0%, #b8893a 100%)",
-          boxShadow: "0 2px 8px rgba(212,168,83,0.3)",
+          background: `linear-gradient(135deg, var(--brand-hex) 0%, var(--brand-dim) 100%)`,
+          boxShadow: "var(--shadow-brand)",
           fontFamily: "var(--font-dm-sans, sans-serif)",
         }}
       >

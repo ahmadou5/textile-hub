@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Send, Loader2, CheckCircle2, Lock } from "lucide-react";
 import { toast } from "sonner";
+
 interface InquiryReplyBoxProps {
   inquiryId: string;
   isClosed: boolean;
@@ -63,14 +64,21 @@ export default function InquiryReplyBox({
       <div
         className="flex items-center gap-3 px-5 py-4 rounded-2xl"
         style={{
-          background: "rgba(255,255,255,0.03)",
-          border: "1px solid rgba(255,255,255,0.06)",
+          background: "var(--bg-subtle)",
+          border: "1px solid var(--border)",
         }}
       >
-        <Lock size={15} className="text-slate-600 flex-shrink-0" />
+        <Lock
+          size={15}
+          className="flex-shrink-0"
+          style={{ color: "var(--text-faint)" }}
+        />
         <p
-          className="text-sm text-slate-600"
-          style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+          className="text-sm"
+          style={{
+            color: "var(--text-faint)",
+            fontFamily: "var(--font-dm-sans, sans-serif)",
+          }}
         >
           This inquiry is closed. Reopen it to send more messages.
         </p>
@@ -81,7 +89,7 @@ export default function InquiryReplyBox({
   return (
     <div
       className="rounded-2xl overflow-hidden"
-      style={{ border: "1px solid rgba(255,255,255,0.08)" }}
+      style={{ border: "1px solid var(--border-brand)" }}
     >
       <textarea
         value={message}
@@ -90,44 +98,51 @@ export default function InquiryReplyBox({
         rows={4}
         placeholder="Type your reply… (Ctrl+Enter to send)"
         disabled={loading}
-        className="
-          w-full px-5 py-4 text-sm text-white resize-none
-          bg-white/[0.03] border-0 outline-none
-          placeholder:text-slate-600
-          disabled:opacity-50
-        "
+        className="w-full px-5 py-4 text-sm resize-none outline-none disabled:opacity-50"
         style={{
+          background: "var(--bg-subtle)",
+          color: "var(--text-primary)",
           fontFamily: "var(--font-dm-sans, sans-serif)",
           lineHeight: "1.7",
+          border: 0,
         }}
       />
 
       <div
         className="flex items-center justify-between px-4 py-3"
         style={{
-          borderTop: "1px solid rgba(255,255,255,0.06)",
-          background: "rgba(255,255,255,0.02)",
+          borderTop: "1px solid var(--border)",
+          background: "var(--bg-card)",
         }}
       >
         <div className="flex items-center gap-3">
           {error && (
             <p
-              className="text-xs text-red-400"
-              style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+              className="text-xs"
+              style={{
+                color: "var(--status-cancelled)",
+                fontFamily: "var(--font-dm-sans, sans-serif)",
+              }}
             >
               {error}
             </p>
           )}
           {success && (
-            <span className="flex items-center gap-1.5 text-xs text-emerald-400">
+            <span
+              className="flex items-center gap-1.5 text-xs"
+              style={{ color: "var(--status-confirmed)" }}
+            >
               <CheckCircle2 size={12} />
               Sent!
             </span>
           )}
           {!error && !success && (
             <p
-              className="text-xs text-slate-600"
-              style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+              className="text-xs"
+              style={{
+                color: "var(--text-faint)",
+                fontFamily: "var(--font-dm-sans, sans-serif)",
+              }}
             >
               {message.length > 0
                 ? `${message.length} chars`
@@ -139,17 +154,18 @@ export default function InquiryReplyBox({
         <button
           onClick={handleSend}
           disabled={loading || !message.trim()}
-          className="
-            flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-semibold
-            bg-[#D4A853] text-slate-900
-            shadow-[0_2px_8px_rgba(212,168,83,0.25)]
+          className="flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-semibold text-white
             hover:brightness-105 hover:-translate-y-0.5
             active:translate-y-0 active:brightness-95
-            transition-[filter,transform,box-shadow] duration-150
+            transition-[filter,transform] duration-150
             disabled:opacity-40 disabled:cursor-not-allowed disabled:translate-y-0
-            focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D4A853]
-          "
-          style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+            focus-visible:outline-2 focus-visible:outline-offset-2"
+          style={{
+            background: `linear-gradient(135deg, var(--brand-hex) 0%, var(--brand-dim) 100%)`,
+            boxShadow: "var(--shadow-brand)",
+            fontFamily: "var(--font-dm-sans, sans-serif)",
+            outlineColor: "var(--brand-hex)",
+          }}
         >
           {loading ? (
             <>

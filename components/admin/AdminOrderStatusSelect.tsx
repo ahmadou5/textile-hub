@@ -15,34 +15,32 @@ const STATUSES = [
 ] as const;
 type OrderStatus = (typeof STATUSES)[number];
 
-const STATUS_STYLES: Record<
-  OrderStatus,
-  { bg: string; color: string; border: string }
-> = {
+// Maps each status to its --status-* CSS variable and a translucent bg/border
+const STATUS_STYLES: Record<OrderStatus, React.CSSProperties> = {
   PENDING: {
-    bg: "rgba(251,191,36,0.1)",
-    color: "#fbbf24",
-    border: "rgba(251,191,36,0.3)",
+    color: "var(--status-pending)",
+    background: "rgba(217,119,6,0.08)",
+    borderColor: "rgba(217,119,6,0.25)",
   },
   CONFIRMED: {
-    bg: "rgba(5,150,105,0.1)",
-    color: "#34d399",
-    border: "rgba(52,211,153,0.3)",
+    color: "var(--status-confirmed)",
+    background: "rgba(5,150,105,0.08)",
+    borderColor: "rgba(5,150,105,0.25)",
   },
   SHIPPED: {
-    bg: "rgba(96,165,250,0.1)",
-    color: "#60a5fa",
-    border: "rgba(96,165,250,0.3)",
+    color: "var(--status-shipped)",
+    background: "rgba(37,99,235,0.08)",
+    borderColor: "rgba(37,99,235,0.25)",
   },
   DELIVERED: {
-    bg: "rgba(74,222,128,0.1)",
-    color: "#4ade80",
-    border: "rgba(74,222,128,0.3)",
+    color: "var(--status-delivered)",
+    background: "rgba(22,163,74,0.08)",
+    borderColor: "rgba(22,163,74,0.25)",
   },
   CANCELLED: {
-    bg: "rgba(248,113,113,0.1)",
-    color: "#f87171",
-    border: "rgba(248,113,113,0.3)",
+    color: "var(--status-cancelled)",
+    background: "rgba(220,38,38,0.08)",
+    borderColor: "rgba(220,38,38,0.25)",
   },
 };
 
@@ -94,14 +92,17 @@ export default function AdminOrderStatusSelect({
         onChange={(e) => handleChange(e.target.value as OrderStatus)}
         disabled={loading}
         className="appearance-none pl-3 pr-7 py-1.5 rounded-xl text-xs font-bold
-          cursor-pointer disabled:opacity-60 focus:outline-none
-          transition-[background,border-color] duration-150"
+          cursor-pointer disabled:opacity-60 outline-none
+          transition-[background,border-color,box-shadow] duration-150"
         style={{
-          background: style.bg,
-          border: `1px solid ${style.border}`,
-          color: style.color,
+          ...style,
+          border: `1px solid ${style.borderColor}`,
           fontFamily: "var(--font-dm-sans, sans-serif)",
         }}
+        onFocus={(e) =>
+          (e.target.style.boxShadow = "0 0 0 3px var(--brand-glow)")
+        }
+        onBlur={(e) => (e.target.style.boxShadow = "none")}
       >
         {STATUSES.map((s) => (
           <option
@@ -116,6 +117,7 @@ export default function AdminOrderStatusSelect({
           </option>
         ))}
       </select>
+
       <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none">
         {loading ? (
           <Loader2
