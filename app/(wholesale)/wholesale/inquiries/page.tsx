@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import Link from "next/link";
 import { MessageSquare, ChevronRight, Clock, CheckCircle2 } from "lucide-react";
 import type { Metadata } from "next";
+import Image from "next/image";
 
 export const metadata: Metadata = {
   title: "My Inquiries — TextileHub Wholesale",
@@ -54,7 +55,9 @@ export default async function WholesaleInquiriesPage() {
     where: { wholesalerId: session?.user.id },
     orderBy: { updatedAt: "desc" },
     include: {
-      products: { select: { id: true, name: true, category: true } },
+      products: {
+        select: { id: true, name: true, category: true, imageUrl: true },
+      },
       messages: {
         orderBy: { createdAt: "desc" },
         take: 1,
@@ -205,19 +208,29 @@ export default async function WholesaleInquiriesPage() {
                 }}
               >
                 {/* Status dot */}
-                <div className="flex-shrink-0">
+                <div className="shrink-0">
                   <div className="w-2.5 h-2.5 rounded-full" style={statusDot} />
                 </div>
 
                 {/* Product icon */}
                 <div
-                  className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+                  className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
                   style={{
                     background: "var(--bg-subtle)",
                     border: "1px solid var(--border)",
                   }}
                 >
-                  <span className="text-sm">🧵</span>
+                  {inquiry.products.imageUrl ? (
+                    <Image
+                      src={inquiry.products.imageUrl}
+                      alt={inquiry.products.name}
+                      className="w-full h-full object-cover rounded-xl"
+                      width={36}
+                      height={36}
+                    />
+                  ) : (
+                    <span className="text-sm">🧵</span>
+                  )}
                 </div>
 
                 {/* Content */}

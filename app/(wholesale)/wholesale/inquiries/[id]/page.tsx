@@ -15,6 +15,7 @@ import type { Metadata } from "next";
 import { unstable_noStore as noStore } from "next/cache";
 import ThreadRefreshButton from "@/components/ThreadRefreshButton";
 import WholesalerReplyBox from "@/components/wholesale/WholeSalerReplyBox";
+import Image from "next/image";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -80,7 +81,9 @@ export default async function WholesaleInquiryThreadPage({
       messages: {
         orderBy: { createdAt: "asc" },
         include: {
-          users: { select: { id: true, name: true, role: true } },
+          users: {
+            select: { id: true, name: true, role: true, imageUrl: true },
+          },
         },
       },
     },
@@ -288,6 +291,7 @@ export default async function WholesaleInquiryThreadPage({
                   new Date(prevMsg.createdAt).toDateString();
 
               const senderName = msg.users?.name ?? "?";
+              const senderImageUrl = msg.users?.imageUrl ?? "";
               const initials = senderName
                 .split(" ")
                 .map((n) => n[0] ?? "")
@@ -345,7 +349,17 @@ export default async function WholesaleInquiryThreadPage({
                         fontFamily: "var(--font-dm-sans, sans-serif)",
                       }}
                     >
-                      {initials}
+                      {senderImageUrl ? (
+                        <Image
+                          src={senderImageUrl}
+                          alt={senderName}
+                          width={32}
+                          height={32}
+                          className="rounded-xl h-full w-full  object-cover"
+                        />
+                      ) : (
+                        <p>{initials}</p>
+                      )}
                     </div>
 
                     {/* Bubble */}
