@@ -255,11 +255,21 @@ export default function NavbarClient({ session }: { session: Session | null }) {
         </div>
       </div>
 
-      {/* ── Mobile drawer ── */}
+      {/* ── Mobile drawer — absolutely positioned so it overlays content ── */}
       {mobileOpen && (
         <div
           className="md:hidden w-full px-4 pb-4 flex flex-col gap-1"
-          style={{ borderTop: "1px solid var(--border)" }}
+          style={{
+            position: "absolute",
+            top: "100%",
+            left: 0,
+            right: 0,
+            zIndex: 49,
+            borderTop: "1px solid var(--border)",
+            background: "color-mix(in srgb, var(--bg-card) 97%, transparent)",
+            backdropFilter: "blur(12px)",
+            boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
+          }}
         >
           <div className="flex flex-col gap-0.5 pt-2">{navLinks}</div>
           <div
