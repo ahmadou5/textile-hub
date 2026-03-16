@@ -1,6 +1,6 @@
 "use client";
 
-// components/NavbarClient.tsx  ← Client Component
+// components/NavbarClient.tsx
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import {
@@ -15,6 +15,8 @@ import {
   X,
 } from "lucide-react";
 import { signOutAction } from "@/actions/auth";
+import CartButton from "@/components/cartButton";
+import CartDrawer from "@/components/cartDrawer";
 import type { Session } from "next-auth";
 
 export default function NavbarClient({ session }: { session: Session | null }) {
@@ -22,7 +24,6 @@ export default function NavbarClient({ session }: { session: Session | null }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // Close on outside click
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
@@ -33,7 +34,6 @@ export default function NavbarClient({ session }: { session: Session | null }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [mobileOpen]);
 
-  // Close on resize to desktop
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= 768) setMobileOpen(false);
@@ -157,7 +157,6 @@ export default function NavbarClient({ session }: { session: Session | null }) {
         <span>{session.user.name?.split(" ")[0] ?? "Profile"}</span>
       </Link>
 
-      {/* Sign out — uses the exported server action, no inline "use server" */}
       <form action={signOutAction}>
         <button
           type="submit"
@@ -203,83 +202,92 @@ export default function NavbarClient({ session }: { session: Session | null }) {
   );
 
   return (
-    <nav
-      ref={menuRef}
-      className="sticky top-0 z-50 w-full"
-      style={{
-        background: "color-mix(in srgb, var(--bg-card) 90%, transparent)",
-        backdropFilter: "blur(12px)",
-        borderBottom: "1px solid var(--border)",
-      }}
-    >
-      {/* ── Top bar ── */}
-      <div className="w-[90%] mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
-        {/* Logo */}
-        <Link
-          href="/"
-          className="flex items-center gap-2 flex-shrink-0"
-          style={{ fontFamily: "var(--font-syne, sans-serif)" }}
-        >
+    <>
+      <nav
+        ref={menuRef}
+        className="sticky top-0 z-50 w-full"
+        style={{
+          background: "color-mix(in srgb, var(--bg-card) 90%, transparent)",
+          backdropFilter: "blur(12px)",
+          borderBottom: "1px solid var(--border)",
+        }}
+      >
+        {/* ── Top bar ── */}
+        <div className="w-[90%] mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
+          {/* Logo */}
+          <Link
+            href="/"
+            className="flex items-center gap-2 flex-shrink-0"
+            style={{ fontFamily: "var(--font-syne, sans-serif)" }}
+          >
+            <div
+              className="w-7 h-7 rounded-lg flex items-center justify-center text-white text-xs font-bold"
+              style={{
+                background: `linear-gradient(135deg, var(--brand-hex) 0%, var(--brand-dim) 100%)`,
+              }}
+            >
+              T
+            </div>
+            <span
+              className="text-sm font-bold"
+              style={{ color: "var(--text-primary)" }}
+            >
+              TextileHub
+            </span>
+          </Link>
+
+          {/* Center nav — desktop only */}
+          <div className="hidden md:flex items-center gap-1">{navLinks}</div>
+
+          {/* Right — cart + auth (desktop) + hamburger (mobile) */}
+          <div className="flex items-center gap-2 flex-shrink-0">
+            {/* Cart button — always visible */}
+            <CartButton />
+
+            {/* Auth links — desktop only */}
+            <div className="hidden md:flex items-center gap-2">{authLinks}</div>
+
+            {/* Hamburger — mobile only */}
+            <button
+              className="md:hidden flex items-center justify-center w-8 h-8 rounded-lg"
+              style={{ color: "var(--text-muted)" }}
+              onClick={() => setMobileOpen((v) => !v)}
+              aria-label={mobileOpen ? "Close menu" : "Open menu"}
+            >
+              {mobileOpen ? <X size={18} /> : <Menu size={18} />}
+            </button>
+          </div>
+        </div>
+
+        {/* ── Mobile drawer ── */}
+        {mobileOpen && (
           <div
-            className="w-7 h-7 rounded-lg flex items-center justify-center text-white text-xs font-bold"
+            className="md:hidden w-full px-4 pb-4 flex flex-col gap-1"
             style={{
-              background: `linear-gradient(135deg, var(--brand-hex) 0%, var(--brand-dim) 100%)`,
+              position: "absolute",
+              top: "100%",
+              left: 0,
+              right: 0,
+              zIndex: 49,
+              borderTop: "1px solid var(--border)",
+              background: "color-mix(in srgb, var(--bg-card) 97%, transparent)",
+              backdropFilter: "blur(12px)",
+              boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
             }}
           >
-            T
+            <div className="flex flex-col gap-0.5 pt-2">{navLinks}</div>
+            <div
+              className="my-2"
+              style={{ borderTop: "1px solid var(--border)" }}
+            />
+            <div className="flex flex-col gap-0.5">{authLinks}</div>
           </div>
-          <span
-            className="text-sm font-bold"
-            style={{ color: "var(--text-primary)" }}
-          >
-            TextileHub
-          </span>
-        </Link>
+        )}
+      </nav>
 
-        {/* Center nav — desktop only */}
-        <div className="hidden md:flex items-center gap-1">{navLinks}</div>
-
-        {/* Right — auth (desktop) + hamburger (mobile) */}
-        <div className="flex items-center gap-2 flex-shrink-0">
-          <div className="hidden md:flex items-center gap-2">{authLinks}</div>
-
-          {/* Hamburger — mobile only */}
-          <button
-            className="md:hidden flex items-center justify-center w-8 h-8 rounded-lg"
-            style={{ color: "var(--text-muted)" }}
-            onClick={() => setMobileOpen((v) => !v)}
-            aria-label={mobileOpen ? "Close menu" : "Open menu"}
-          >
-            {mobileOpen ? <X size={18} /> : <Menu size={18} />}
-          </button>
-        </div>
-      </div>
-
-      {/* ── Mobile drawer — absolutely positioned so it overlays content ── */}
-      {mobileOpen && (
-        <div
-          className="md:hidden w-full px-4 pb-4 flex flex-col gap-1"
-          style={{
-            position: "absolute",
-            top: "100%",
-            left: 0,
-            right: 0,
-            zIndex: 49,
-            borderTop: "1px solid var(--border)",
-            background: "color-mix(in srgb, var(--bg-card) 97%, transparent)",
-            backdropFilter: "blur(12px)",
-            boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
-          }}
-        >
-          <div className="flex flex-col gap-0.5 pt-2">{navLinks}</div>
-          <div
-            className="my-2"
-            style={{ borderTop: "1px solid var(--border)" }}
-          />
-          <div className="flex flex-col gap-0.5">{authLinks}</div>
-        </div>
-      )}
-    </nav>
+      {/* Cart drawer rendered outside nav so it can cover full viewport */}
+      <CartDrawer />
+    </>
   );
 }
 

@@ -13,6 +13,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { SessionProvider } from "next-auth/react";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
+import { CartProvider } from "@/context/cartContext";
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 const geistSans = Geist({
@@ -61,28 +62,30 @@ export default function RootLayout({
       >
         <ThemeProvider>
           <SessionProvider>
-            <TooltipProvider>
-              {children}
-              <Toaster
-                position="bottom-right"
-                toastOptions={{
-                  style: {
-                    background: "#1a1f2e",
-                    border: "1px solid rgba(255,255,255,0.1)",
-                    color: "#f1f5f9",
-                    fontFamily: "var(--font-dm-sans, sans-serif)",
-                    fontSize: "13px",
-                    borderRadius: "14px",
-                    boxShadow:
-                      "0 8px 32px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.2)",
-                  },
-                  classNames: {
-                    success: "!border-emerald-500/30",
-                    error: "!border-red-500/30",
-                  },
-                }}
-              />
-            </TooltipProvider>
+            <CartProvider>
+              <TooltipProvider>
+                {children}
+                <Toaster
+                  position="bottom-right"
+                  toastOptions={{
+                    style: {
+                      background: "#1a1f2e",
+                      border: "1px solid rgba(255,255,255,0.1)",
+                      color: "#f1f5f9",
+                      fontFamily: "var(--font-dm-sans, sans-serif)",
+                      fontSize: "13px",
+                      borderRadius: "14px",
+                      boxShadow:
+                        "0 8px 32px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.2)",
+                    },
+                    classNames: {
+                      success: "!border-emerald-500/30",
+                      error: "!border-red-500/30",
+                    },
+                  }}
+                />
+              </TooltipProvider>
+            </CartProvider>
           </SessionProvider>
         </ThemeProvider>
       </body>
