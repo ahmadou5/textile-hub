@@ -7,6 +7,17 @@ export default async function Navbar() {
   const session = await auth();
   const user = await db.users.findUnique({
     where: { id: session?.user.id },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      imageUrl: true,
+      createdAt: true,
+      upgradeRequest: {
+        select: { id: true, status: true, message: true, createdAt: true },
+      },
+    },
   });
   return <NavbarClient session={session} imageUrl={user?.imageUrl || ""} />;
 }
