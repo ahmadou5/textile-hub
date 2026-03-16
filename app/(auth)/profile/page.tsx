@@ -66,7 +66,10 @@ export default async function ProfilePage() {
   const badge = ROLE_BADGE[user.role] ?? ROLE_BADGE.GUEST;
 
   return (
-    <div className="min-h-screen w-[90%]" style={{ background: "var(--bg)" }}>
+    <div
+      className="min-h-screen w-[90%] lg:max-w-7xl"
+      style={{ background: "var(--bg)" }}
+    >
       <div className="w-[90%] mx-auto px-4 py-10 space-y-8">
         {/* ── Profile header ── */}
         <div

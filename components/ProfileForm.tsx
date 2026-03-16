@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { toast } from "sonner";
-import { Loader2, Save, Eye, EyeOff } from "lucide-react";
+import { Loader2, Save, Eye, EyeOff, Upload, X, Camera } from "lucide-react";
+import { useUploadThing } from "@/lib/uploadthing-client";
 
 interface ProfileFormProps {
   user: {
@@ -17,6 +18,13 @@ export default function ProfileForm({ user }: ProfileFormProps) {
   const [loading, setLoading] = useState(false);
   const [showCurrentPw, setShowCurrentPw] = useState(false);
   const [showNewPw, setShowNewPw] = useState(false);
+  const [imageUploading, setImageUploading] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string | null>(
+    user.imageUrl || null,
+  );
+  const [dragOver, setDragOver] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const [form, setForm] = useState({
     name: user.name,
     email: user.email,
@@ -25,8 +33,60 @@ export default function ProfileForm({ user }: ProfileFormProps) {
     newPassword: "",
   });
 
+  const { startUpload } = useUploadThing("profileImage", {
+    onUploadBegin: () => setImageUploading(true),
+    onClientUploadComplete: (res) => {
+      const url = res?.[0]?.url;
+      if (url) {
+        setForm((prev) => ({ ...prev, imageUrl: url }));
+        setImagePreview(url);
+        toast.success("Photo uploaded!");
+      }
+      setImageUploading(false);
+    },
+    onUploadError: (err) => {
+      toast.error(err.message ?? "Upload failed");
+      setImageUploading(false);
+    },
+  });
+
   function set(key: keyof typeof form, value: string) {
     setForm((prev) => ({ ...prev, [key]: value }));
+  }
+
+  async function handleFileSelect(files: FileList | null) {
+    if (!files || files.length === 0) return;
+    const file = files[0];
+
+    // Validate type + size client-side first
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please select an image file");
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("Image must be under 2MB");
+      return;
+    }
+
+    // Show local preview immediately
+    const reader = new FileReader();
+    reader.onload = (e) => setImagePreview(e.target?.result as string);
+    reader.readAsDataURL(file);
+
+    // Upload to UploadThing
+    await startUpload([file]);
+  }
+
+  function handleDrop(e: React.DragEvent) {
+    e.preventDefault();
+    setDragOver(false);
+    handleFileSelect(e.dataTransfer.files);
+  }
+
+  function removeImage() {
+    setImagePreview(null);
+    setForm((prev) => ({ ...prev, imageUrl: "" }));
+    if (fileInputRef.current) fileInputRef.current.value = "";
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -114,6 +174,149 @@ export default function ProfileForm({ user }: ProfileFormProps) {
         </p>
       </div>
 
+      {/* ── Profile Photo Upload ── */}
+      <div>
+        <label
+          className="block text-xs font-semibold uppercase tracking-wider mb-2"
+          style={labelStyle}
+        >
+          Profile Photo
+        </label>
+
+        <div className="flex items-start gap-4">
+          {/* Avatar preview */}
+          <div className="relative flex-shrink-0">
+            <div
+              className="w-20 h-20 rounded-2xl overflow-hidden flex items-center justify-center"
+              style={{
+                background: "var(--bg-subtle)",
+                border: "1px solid var(--border-brand)",
+              }}
+            >
+              {imagePreview ? (
+                <img
+                  src={imagePreview}
+                  alt="Profile preview"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="flex flex-col items-center gap-1 opacity-40">
+                  <Camera size={20} style={{ color: "var(--text-faint)" }} />
+                  <span
+                    className="text-[9px]"
+                    style={{
+                      color: "var(--text-faint)",
+                      fontFamily: "var(--font-dm-sans)",
+                    }}
+                  >
+                    No photo
+                  </span>
+                </div>
+              )}
+              {/* Upload loading overlay */}
+              {imageUploading && (
+                <div
+                  className="absolute inset-0 flex items-center justify-center"
+                  style={{ background: "rgba(0,0,0,0.5)" }}
+                >
+                  <Loader2 size={18} className="animate-spin text-white" />
+                </div>
+              )}
+            </div>
+
+            {/* Remove button */}
+            {imagePreview && !imageUploading && (
+              <button
+                type="button"
+                onClick={removeImage}
+                className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full flex items-center justify-center text-white"
+                style={{ background: "var(--status-cancelled)" }}
+              >
+                <X size={10} />
+              </button>
+            )}
+          </div>
+
+          {/* Drop zone */}
+          <div
+            className="flex-1 rounded-xl flex flex-col items-center justify-center gap-2 py-5 px-4 cursor-pointer
+              transition-[border-color,background] duration-150"
+            style={{
+              border: `2px dashed ${dragOver ? "var(--brand-hex)" : "var(--border)"}`,
+              background: dragOver ? "var(--brand-glow)" : "var(--bg-subtle)",
+            }}
+            onDragOver={(e) => {
+              e.preventDefault();
+              setDragOver(true);
+            }}
+            onDragLeave={() => setDragOver(false)}
+            onDrop={handleDrop}
+            onClick={() => fileInputRef.current?.click()}
+          >
+            {imageUploading ? (
+              <div className="flex items-center gap-2">
+                <Loader2
+                  size={14}
+                  className="animate-spin"
+                  style={{ color: "var(--brand-hex)" }}
+                />
+                <span
+                  className="text-xs"
+                  style={{
+                    color: "var(--brand-hex)",
+                    fontFamily: "var(--font-dm-sans, sans-serif)",
+                  }}
+                >
+                  Uploading…
+                </span>
+              </div>
+            ) : (
+              <>
+                <div
+                  className="w-8 h-8 rounded-lg flex items-center justify-center"
+                  style={{
+                    background: "var(--brand-glow)",
+                    border: "1px solid var(--border-brand)",
+                  }}
+                >
+                  <Upload size={14} style={{ color: "var(--brand-hex)" }} />
+                </div>
+                <div className="text-center">
+                  <p
+                    className="text-xs font-medium"
+                    style={{
+                      color: "var(--text-primary)",
+                      fontFamily: "var(--font-dm-sans, sans-serif)",
+                    }}
+                  >
+                    Drop image here or{" "}
+                    <span style={{ color: "var(--brand-hex)" }}>browse</span>
+                  </p>
+                  <p
+                    className="text-[11px] mt-0.5"
+                    style={{
+                      color: "var(--text-faint)",
+                      fontFamily: "var(--font-dm-sans, sans-serif)",
+                    }}
+                  >
+                    PNG, JPG, WEBP — max 2MB
+                  </p>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* Hidden file input */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={(e) => handleFileSelect(e.target.files)}
+        />
+      </div>
+
       {/* Name */}
       <div>
         <label
@@ -152,37 +355,6 @@ export default function ProfileForm({ user }: ProfileFormProps) {
           onFocus={focusInput}
           onBlur={blurInput}
         />
-      </div>
-
-      {/* Photo URL */}
-      <div>
-        <label
-          className="block text-xs font-semibold uppercase tracking-wider mb-1.5"
-          style={labelStyle}
-        >
-          Profile Photo URL
-        </label>
-        <input
-          type="url"
-          value={form.imageUrl}
-          onChange={(e) => set("imageUrl", e.target.value)}
-          placeholder="https://..."
-          className="w-full px-3 py-2.5 rounded-xl text-sm outline-none transition-[border-color,box-shadow] duration-200"
-          style={{
-            ...inputStyle,
-            color: form.imageUrl ? "var(--text-primary)" : undefined,
-          }}
-          onFocus={focusInput}
-          onBlur={blurInput}
-        />
-        {form.imageUrl && (
-          <img
-            src={form.imageUrl}
-            alt="Preview"
-            className="mt-2 w-12 h-12 rounded-xl object-cover"
-            style={{ border: "1px solid var(--border-brand)" }}
-          />
-        )}
       </div>
 
       {/* Password section */}
@@ -264,7 +436,7 @@ export default function ProfileForm({ user }: ProfileFormProps) {
       {/* Submit */}
       <button
         type="submit"
-        disabled={loading}
+        disabled={loading || imageUploading}
         className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold text-white
           disabled:opacity-50 disabled:cursor-not-allowed
           hover:-translate-y-0.5 active:translate-y-0
@@ -278,6 +450,10 @@ export default function ProfileForm({ user }: ProfileFormProps) {
         {loading ? (
           <>
             <Loader2 size={14} className="animate-spin" /> Saving…
+          </>
+        ) : imageUploading ? (
+          <>
+            <Loader2 size={14} className="animate-spin" /> Uploading photo…
           </>
         ) : (
           <>
