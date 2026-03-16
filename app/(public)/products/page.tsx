@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { db } from "@/lib/db";
 import ProductCard from "@/components/ProductCard";
 import { ProductGridSkeleton } from "@/components/ProductCardSkeleton";
+import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -28,12 +29,15 @@ async function ProductGrid() {
       <div className="col-span-full flex flex-col items-center justify-center py-24 text-center space-y-4">
         <div className="text-5xl">🧵</div>
         <h3
-          className="text-2xl font-semibold text-[#1C1410]"
-          style={{ fontFamily: "var(--font-cormorant, serif)" }}
+          className="text-2xl font-semibold"
+          style={{
+            color: "var(--text-primary)",
+            fontFamily: "var(--font-syne, sans-serif)",
+          }}
         >
           Collection coming soon
         </h3>
-        <p className="text-[#8B7355] text-sm max-w-sm">
+        <p className="text-sm max-w-sm" style={{ color: "var(--text-muted)" }}>
           Our curated fabric collection is being prepared. Check back shortly.
         </p>
       </div>
@@ -54,33 +58,47 @@ export default function ProductsPage() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-10">
       <div className="space-y-3 max-w-2xl">
         <p
-          className="text-xs font-medium tracking-[0.15em] uppercase text-[#C9913A]"
-          style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+          className="text-xs font-medium tracking-[0.15em] uppercase"
+          style={{
+            color: "var(--brand-hex)",
+            fontFamily: "var(--font-dm-sans, sans-serif)",
+          }}
         >
           Full Collection
         </p>
         <h1
-          className="text-5xl sm:text-6xl font-light text-[#1C1410] leading-none"
+          className="text-5xl sm:text-6xl font-light leading-none"
           style={{
-            fontFamily: "var(--font-cormorant, serif)",
+            color: "var(--text-primary)",
+            fontFamily: "var(--font-syne, sans-serif)",
             letterSpacing: "-0.02em",
           }}
         >
           Browse all
           <br />
-          <em className="font-semibold not-italic text-[#C9913A]">fabrics.</em>
+          <em
+            className="font-semibold not-italic"
+            style={{ color: "var(--brand-hex)" }}
+          >
+            fabrics.
+          </em>
         </h1>
         <p
-          className="text-[#8B7355] text-base max-w-md"
-          style={{ lineHeight: "1.7" }}
+          className="text-base max-w-md"
+          style={{
+            color: "var(--text-muted)",
+            lineHeight: "1.7",
+            fontFamily: "var(--font-dm-sans, sans-serif)",
+          }}
         >
           Retail pricing shown — wholesalers{" "}
-          <a
+          <Link
             href="/login"
-            className="text-[#C9913A] hover:text-[#1C1410] underline underline-offset-2 transition-[color] duration-150"
+            className="underline underline-offset-2 transition-[color] duration-150"
+            style={{ color: "var(--brand-hex)" }}
           >
             sign in
-          </a>{" "}
+          </Link>{" "}
           for exclusive bulk rates.
         </p>
       </div>
