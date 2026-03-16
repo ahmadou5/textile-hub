@@ -18,16 +18,24 @@ import { signOutAction } from "@/actions/auth";
 import CartButton from "@/components/cartButton";
 import CartDrawer from "@/components/cartDrawer";
 import type { Session } from "next-auth";
-import Image from "next/image";
-import { db } from "@/lib/db";
+
+interface Badges {
+  inquiries: number;
+  orders: number;
+  upgradeRequests: number;
+}
+
+interface NavbarClientProps {
+  session: Session | null;
+  imageUrl?: string;
+  badges?: Badges;
+}
 
 export default function NavbarClient({
   session,
   imageUrl,
-}: {
-  session: Session | null;
-  imageUrl?: string;
-}) {
+  badges = { inquiries: 0, orders: 0, upgradeRequests: 0 },
+}: NavbarClientProps) {
   const role = session?.user?.role as string | undefined;
   const [mobileOpen, setMobileOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -49,7 +57,7 @@ export default function NavbarClient({
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
-  alert(imageUrl);
+
   const close = () => setMobileOpen(false);
 
   const navLinks = (
@@ -70,6 +78,7 @@ export default function NavbarClient({
           <NavLink
             href="/wholesale/inquiries"
             icon={<MessageSquare size={12} />}
+            badge={badges.inquiries}
             onClick={close}
           >
             Inquiries
@@ -77,6 +86,7 @@ export default function NavbarClient({
           <NavLink
             href="/wholesale/orders"
             icon={<ShoppingBag size={12} />}
+            badge={badges.orders}
             onClick={close}
           >
             My Orders
@@ -104,6 +114,7 @@ export default function NavbarClient({
           <NavLink
             href="/admin/inquiries"
             icon={<MessageSquare size={12} />}
+            badge={badges.inquiries}
             onClick={close}
           >
             Inquiries
@@ -111,6 +122,7 @@ export default function NavbarClient({
           <NavLink
             href="/admin/upgrade-requests"
             icon={<MessageSquare size={12} />}
+            badge={badges.upgradeRequests}
             onClick={close}
           >
             Upgrade Requests
@@ -125,6 +137,7 @@ export default function NavbarClient({
           <NavLink
             href="/admin/orders"
             icon={<ShoppingBag size={12} />}
+            badge={badges.orders}
             highlight
             onClick={close}
           >
@@ -134,6 +147,11 @@ export default function NavbarClient({
       )}
     </>
   );
+
+  const avatarSrc = imageUrl || session?.user?.image || null;
+  const avatarInitial = (session?.user?.name ??
+    session?.user?.email ??
+    "U")[0].toUpperCase();
 
   const authLinks = session?.user ? (
     <>
@@ -146,20 +164,21 @@ export default function NavbarClient({
           fontFamily: "var(--font-dm-sans, sans-serif)",
         }}
       >
-        {session.user && imageUrl !== "" ? (
-          <Image
-            src={imageUrl || ""}
+        {avatarSrc ? (
+          <img
+            src={avatarSrc}
             alt=""
-            className="w-6 h-6 rounded-full object-cover"
+            className="w-5 h-5 rounded-full object-cover"
           />
         ) : (
           <div
-            className="w-6 h-6 rounded-full flex items-center justify-center text-white text-[9px] font-bold flex-shrink-0"
+            className="w-5 h-5 rounded-full flex items-center justify-center text-white text-[9px] font-bold flex-shrink-0"
             style={{
-              background: `linear-gradient(135deg, var(--brand-hex) 0%, var(--brand-dim) 100%)`,
+              background:
+                "linear-gradient(135deg, var(--brand-hex) 0%, var(--brand-dim) 100%)",
             }}
           >
-            {(session.user.name ?? session.user.email ?? "U")[0].toUpperCase()}
+            {avatarInitial}
           </div>
         )}
         <span>{session.user.name?.split(" ")[0] ?? "Profile"}</span>
@@ -198,7 +217,8 @@ export default function NavbarClient({
         onClick={close}
         className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-semibold text-white hover:-translate-y-0.5 active:translate-y-0 transition-[transform] duration-150"
         style={{
-          background: `linear-gradient(135deg, var(--brand-hex) 0%, var(--brand-dim) 100%)`,
+          background:
+            "linear-gradient(135deg, var(--brand-hex) 0%, var(--brand-dim) 100%)",
           boxShadow: "var(--shadow-brand)",
           fontFamily: "var(--font-dm-sans, sans-serif)",
         }}
@@ -220,7 +240,6 @@ export default function NavbarClient({
           borderBottom: "1px solid var(--border)",
         }}
       >
-        {/* ── Top bar ── */}
         <div className="w-[90%] mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
           {/* Logo */}
           <Link
@@ -231,7 +250,8 @@ export default function NavbarClient({
             <div
               className="w-7 h-7 rounded-lg flex items-center justify-center text-white text-xs font-bold"
               style={{
-                background: `linear-gradient(135deg, var(--brand-hex) 0%, var(--brand-dim) 100%)`,
+                background:
+                  "linear-gradient(135deg, var(--brand-hex) 0%, var(--brand-dim) 100%)",
               }}
             >
               T
@@ -247,15 +267,10 @@ export default function NavbarClient({
           {/* Center nav — desktop only */}
           <div className="hidden md:flex items-center gap-1">{navLinks}</div>
 
-          {/* Right — cart + auth (desktop) + hamburger (mobile) */}
+          {/* Right */}
           <div className="flex items-center gap-2 flex-shrink-0">
-            {/* Cart button — always visible */}
             <CartButton />
-
-            {/* Auth links — desktop only */}
             <div className="hidden md:flex items-center gap-2">{authLinks}</div>
-
-            {/* Hamburger — mobile only */}
             <button
               className="md:hidden flex items-center justify-center w-8 h-8 rounded-lg"
               style={{ color: "var(--text-muted)" }}
@@ -267,7 +282,7 @@ export default function NavbarClient({
           </div>
         </div>
 
-        {/* ── Mobile drawer ── */}
+        {/* Mobile drawer */}
         {mobileOpen && (
           <div
             className="md:hidden w-full px-4 pb-4 flex flex-col gap-1"
@@ -293,23 +308,24 @@ export default function NavbarClient({
         )}
       </nav>
 
-      {/* Cart drawer rendered outside nav so it can cover full viewport */}
       <CartDrawer />
     </>
   );
 }
 
-// ── NavLink helper ──────────────────────────────────────────────────────────
+// ── NavLink with optional badge ─────────────────────────────────────────────
 function NavLink({
   href,
   icon,
   highlight = false,
+  badge = 0,
   onClick,
   children,
 }: {
   href: string;
   icon?: React.ReactNode;
   highlight?: boolean;
+  badge?: number;
   onClick?: () => void;
   children: React.ReactNode;
 }) {
@@ -317,7 +333,7 @@ function NavLink({
     <Link
       href={href}
       onClick={onClick}
-      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-[color,background] duration-150"
+      className="relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-[color,background] duration-150"
       style={{
         color: highlight ? "var(--brand-hex)" : "var(--text-muted)",
         fontFamily: "var(--font-dm-sans, sans-serif)",
@@ -325,6 +341,14 @@ function NavLink({
     >
       {icon}
       {children}
+      {badge > 0 && (
+        <span
+          className="flex items-center justify-center min-w-[16px] h-4 px-1 rounded-full text-[9px] font-bold text-white"
+          style={{ background: "var(--status-cancelled)" }}
+        >
+          {badge > 99 ? "99+" : badge}
+        </span>
+      )}
     </Link>
   );
 }
