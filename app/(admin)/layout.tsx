@@ -10,7 +10,7 @@ export default async function AdminLayout({
 }) {
   return (
     <div
-      className="min-h-screen"
+      className="min-h-screen max-w-5xl mx-auto "
       style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
     >
       <Navbar />
