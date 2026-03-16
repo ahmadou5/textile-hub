@@ -211,7 +211,7 @@ export default function LoginPage() {
           className="font-medium hover:underline"
           style={{ color: "var(--brand-hex)" }}
         >
-          Register as Wholesaler
+          Register
         </Link>
       </p>
     </div>
