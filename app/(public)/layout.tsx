@@ -10,7 +10,7 @@ export default function PublicLayout({
 }) {
   return (
     <div
-      className="min-h-screen max-w-5xl mx-auto "
+      className="min-h-screen "
       style={{
         fontFamily: "var(--font-dm-sans, sans-serif)",
       }}
@@ -38,7 +38,7 @@ export default function PublicLayout({
         }}
       />
       <Navbar />
-      <main>{children}</main>
+      <main className="max-w-5xl mx-auto min-h-screen">{children}</main>
     </div>
   );
 }

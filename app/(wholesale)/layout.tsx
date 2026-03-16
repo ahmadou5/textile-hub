@@ -7,10 +7,10 @@ export default async function WholesaleLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen max-w-5xl mx-auto ">
+    <div className="min-h-screen  ">
       <Navbar />
       <main
-        className="flex-1 min-h-screen"
+        className="flex-1 min-h-screen max-w-5xl mx-auto"
         style={{ backgroundColor: "var(--bg)" }}
       >
         {children}
