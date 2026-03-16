@@ -138,7 +138,7 @@ export default function NavbarClient({ session }: { session: Session | null }) {
           fontFamily: "var(--font-dm-sans, sans-serif)",
         }}
       >
-        {session.user.image ? (
+        {session.user.image && session.user.image !== "" ? (
           <img
             src={session.user.image}
             alt=""
