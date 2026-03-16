@@ -2,38 +2,15 @@
 import { Suspense } from "react";
 import { requireRole } from "@/lib/auth";
 import { db } from "@/lib/db";
-import Image from "next/image";
 import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
 import { WholesaleFeedSkeleton } from "@/components/wholesale/WholeSaleFeedSkeleton";
-import { relativeTime } from "@/lib/relativeTime";
-import {
-  Sparkles,
-  MessageSquare,
-  AlertTriangle,
-  Clock,
-  Package,
-  TrendingDown,
-} from "lucide-react";
+import { Sparkles, Package } from "lucide-react";
 import type { Metadata } from "next";
 import { ProductList } from "@/components/wholesale/ProductList";
 
 export const metadata: Metadata = {
   title: "New Arrivals — TextileHub Wholesale",
 };
-
-const LOW_STOCK = 20;
-
-function formatPrice(cents: number): string {
-  return `₦${(cents / 100).toLocaleString("en-NG", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`;
-}
-
-function isNew(date: Date): boolean {
-  return Date.now() - date.getTime() < 24 * 60 * 60 * 1000; // < 24h
-}
 
 const now = Date.now();
 
@@ -55,32 +32,32 @@ async function NewArrivalsFeed() {
     },
   });
 
-  // ── Empty state ────────────────────────────────────────────
+  // ── Empty state ──────────────────────────────────────────────
   if (products.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-28 text-center">
-        {/* Animated border box */}
         <div
           className="relative p-10 rounded-3xl"
           style={{
-            background: "rgba(255,255,255,0.02)",
-            border: "1px solid rgba(16,185,129,0.15)",
-            boxShadow:
-              "0 0 40px rgba(16,185,129,0.04), inset 0 0 40px rgba(16,185,129,0.02)",
+            background: "var(--bg-card)",
+            border: "1px solid var(--border-brand)",
+            boxShadow: "var(--shadow-card)",
           }}
         >
           {/* Corner accents */}
-          {[
-            "top-0 left-0",
-            "top-0 right-0",
-            "bottom-0 left-0",
-            "bottom-0 right-0",
-          ].map((pos, i) => (
+          {(
+            [
+              "top-0 left-0",
+              "top-0 right-0",
+              "bottom-0 left-0",
+              "bottom-0 right-0",
+            ] as const
+          ).map((pos, i) => (
             <div
               key={i}
               className={`absolute ${pos} w-3 h-3`}
               style={{
-                borderColor: "rgba(16,185,129,0.4)",
+                borderColor: "var(--border-strong)",
                 borderStyle: "solid",
                 borderWidth:
                   i === 0
@@ -106,33 +83,51 @@ async function NewArrivalsFeed() {
             <div
               className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto"
               style={{
-                background: "rgba(16,185,129,0.08)",
-                border: "1px solid rgba(16,185,129,0.15)",
+                background: "var(--brand-glow)",
+                border: "1px solid var(--border-brand)",
               }}
             >
-              <Package size={28} className="text-emerald-500/60" />
+              <Package
+                size={28}
+                style={{ color: "var(--brand-hex)", opacity: 0.6 }}
+              />
             </div>
+
             <div className="space-y-2">
               <h3
-                className="text-xl font-bold text-white"
-                style={{ fontFamily: "var(--font-syne, sans-serif)" }}
+                className="text-xl font-bold"
+                style={{
+                  color: "var(--text-primary)",
+                  fontFamily: "var(--font-syne, sans-serif)",
+                }}
               >
                 No new arrivals this week
               </h3>
               <p
-                className="text-slate-500 text-sm max-w-xs mx-auto"
-                style={{ lineHeight: "1.7" }}
+                className="text-sm max-w-xs mx-auto"
+                style={{
+                  color: "var(--text-muted)",
+                  lineHeight: "1.7",
+                  fontFamily: "var(--font-dm-sans, sans-serif)",
+                }}
               >
                 Check back soon — new fabric stock is added regularly.
               </p>
             </div>
+
             <Link
               href="/wholesale/products"
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold
-                text-emerald-400 border border-emerald-500/20 bg-emerald-500/8
-                hover:bg-emerald-500/15 hover:border-emerald-500/30
-                transition-[background,border-color] duration-200
-                focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500"
+                hover:-translate-y-0.5 active:translate-y-0
+                transition-[background,border-color,transform] duration-200
+                focus-visible:outline-2 focus-visible:outline-offset-2"
+              style={{
+                color: "var(--brand-hex)",
+                border: "1px solid var(--border-brand)",
+                background: "var(--brand-glow)",
+                outlineColor: "var(--brand-hex)",
+                fontFamily: "var(--font-dm-sans, sans-serif)",
+              }}
             >
               Browse full catalogue
             </Link>
@@ -142,39 +137,15 @@ async function NewArrivalsFeed() {
     );
   }
 
-  // ── Feed ───────────────────────────────────────────────────
   return <ProductList products={products} />;
 }
 
-// ── Page ──────────────────────────────────────────────────────
+// ── Page ─────────────────────────────────────────────────────
 export default async function NewArrivalsPage() {
   await requireRole(["WHOLESALER", "ADMIN"] as never);
 
   return (
-    <div className="p-6 lg:p-8 space-y-7 max-w-4xl mx-auto">
-      {/* Grain overlay */}
-      <svg style={{ position: "fixed", width: 0, height: 0 }}>
-        <filter id="ws-grain">
-          <feTurbulence
-            type="fractalNoise"
-            baseFrequency="0.65"
-            numOctaves="3"
-            stitchTiles="stitch"
-          />
-          <feColorMatrix type="saturate" values="0" />
-        </filter>
-      </svg>
-      <div
-        style={{
-          position: "fixed",
-          inset: 0,
-          filter: "url(#ws-grain)",
-          opacity: 0.025,
-          pointerEvents: "none",
-          zIndex: 999,
-        }}
-      />
-
+    <div className="p-6 lg:p-8 space-y-7 lg:max-w-7xl w-[90%] mx-auto">
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-1">
@@ -182,15 +153,16 @@ export default async function NewArrivalsPage() {
             <div
               className="w-8 h-8 rounded-lg flex items-center justify-center"
               style={{
-                background: "rgba(16,185,129,0.12)",
-                border: "1px solid rgba(16,185,129,0.2)",
+                background: "var(--brand-glow)",
+                border: "1px solid var(--border-brand)",
               }}
             >
-              <Sparkles size={16} className="text-emerald-400" />
+              <Sparkles size={16} style={{ color: "var(--brand-hex)" }} />
             </div>
             <h1
-              className="text-3xl font-bold text-white"
+              className="text-3xl font-bold"
               style={{
+                color: "var(--text-primary)",
                 fontFamily: "var(--font-syne, sans-serif)",
                 letterSpacing: "-0.03em",
               }}
@@ -198,7 +170,13 @@ export default async function NewArrivalsPage() {
               New Arrivals
             </h1>
           </div>
-          <p className="text-slate-500 text-sm pl-10.5">
+          <p
+            className="text-sm pl-[42px]"
+            style={{
+              color: "var(--text-muted)",
+              fontFamily: "var(--font-dm-sans, sans-serif)",
+            }}
+          >
             Products added in the last 7 days — wholesale pricing shown
           </p>
         </div>
@@ -207,15 +185,27 @@ export default async function NewArrivalsPage() {
         <div
           className="flex items-center gap-2 px-3 py-1.5 rounded-full shrink-0"
           style={{
-            background: "rgba(16,185,129,0.08)",
-            border: "1px solid rgba(16,185,129,0.15)",
+            background: "var(--brand-glow)",
+            border: "1px solid var(--border-brand)",
           }}
         >
           <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
+            <span
+              className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"
+              style={{ background: "var(--brand-bright)" }}
+            />
+            <span
+              className="relative inline-flex rounded-full h-2 w-2"
+              style={{ background: "var(--brand-hex)" }}
+            />
           </span>
-          <span className="text-xs font-medium text-emerald-400">
+          <span
+            className="text-xs font-medium"
+            style={{
+              color: "var(--brand-hex)",
+              fontFamily: "var(--font-dm-sans, sans-serif)",
+            }}
+          >
             Live feed
           </span>
         </div>
@@ -223,29 +213,40 @@ export default async function NewArrivalsPage() {
 
       {/* Info bar */}
       <div
-        className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs text-slate-500"
+        className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs flex-wrap"
         style={{
-          background: "rgba(255,255,255,0.03)",
-          border: "1px solid rgba(255,255,255,0.06)",
+          background: "var(--bg-subtle)",
+          border: "1px solid var(--border)",
+          color: "var(--text-faint)",
+          fontFamily: "var(--font-dm-sans, sans-serif)",
         }}
       >
         <span className="flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-emerald-500/50" />
+          <span
+            className="w-2 h-2 rounded-full"
+            style={{ background: "var(--brand-hex)", opacity: 0.5 }}
+          />
           Wholesale-only pricing
         </span>
-        <span className="w-px h-3 bg-white/10" />
+        <span className="w-px h-3" style={{ background: "var(--border)" }} />
         <span className="flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-amber-500/50" />
+          <span
+            className="w-2 h-2 rounded-full"
+            style={{ background: "var(--status-pending)", opacity: 0.5 }}
+          />
           Amber = low stock (&lt;20 yds)
         </span>
-        <span className="w-px h-3 bg-white/10" />
+        <span className="w-px h-3" style={{ background: "var(--border)" }} />
         <span className="flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-emerald-300/50 animate-pulse" />
+          <span
+            className="w-2 h-2 rounded-full animate-pulse"
+            style={{ background: "var(--brand-bright)", opacity: 0.5 }}
+          />
           Pulsing = added today
         </span>
       </div>
 
-      {/* Feed with Suspense */}
+      {/* Feed */}
       <Suspense fallback={<WholesaleFeedSkeleton />}>
         <NewArrivalsFeed />
       </Suspense>

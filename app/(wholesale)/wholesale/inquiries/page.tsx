@@ -2,25 +2,38 @@
 import { requireRole } from "@/lib/auth";
 import { db } from "@/lib/db";
 import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
 import { MessageSquare, ChevronRight, Clock, CheckCircle2 } from "lucide-react";
 import type { Metadata } from "next";
-import { User } from "next-auth";
 
 export const metadata: Metadata = {
   title: "My Inquiries — TextileHub Wholesale",
 };
 
-const STATUS_STYLES = {
-  OPEN: "bg-amber-500/12 text-amber-400 border-amber-500/25",
-  REPLIED: "bg-emerald-500/12 text-emerald-400 border-emerald-500/25",
-  CLOSED: "bg-slate-500/12 text-slate-500 border-slate-600/25",
+const STATUS_STYLES: Record<string, React.CSSProperties> = {
+  OPEN: {
+    background: "rgba(217,119,6,0.08)",
+    color: "var(--status-pending)",
+    border: "1px solid rgba(217,119,6,0.25)",
+  },
+  REPLIED: {
+    background: "rgba(5,150,105,0.08)",
+    color: "var(--status-confirmed)",
+    border: "1px solid rgba(5,150,105,0.25)",
+  },
+  CLOSED: {
+    background: "var(--bg-subtle)",
+    color: "var(--text-faint)",
+    border: "1px solid var(--border)",
+  },
 };
 
-const STATUS_DOT = {
-  OPEN: "bg-amber-400",
-  REPLIED: "bg-emerald-400",
-  CLOSED: "bg-slate-600",
+const STATUS_DOT: Record<string, React.CSSProperties> = {
+  OPEN: { background: "var(--status-pending)" },
+  REPLIED: {
+    background: "var(--status-confirmed)",
+    boxShadow: "0 0 6px rgba(5,150,105,0.5)",
+  },
+  CLOSED: { background: "var(--text-faint)" },
 };
 
 function timeAgo(date: Date): string {
@@ -55,12 +68,13 @@ export default async function WholesaleInquiriesPage() {
   ).length;
 
   return (
-    <div className="p-6 lg:p-8 space-y-6 max-w-4xl mx-auto">
+    <div className="p-6 lg:p-8 space-y-6 lg:max-w-7xl w-[90%] mx-auto">
       {/* Header */}
       <div className="space-y-1">
         <h1
-          className="text-3xl font-bold text-white"
+          className="text-3xl font-bold"
           style={{
+            color: "var(--text-primary)",
             fontFamily: "var(--font-syne, sans-serif)",
             letterSpacing: "-0.03em",
           }}
@@ -68,12 +82,18 @@ export default async function WholesaleInquiriesPage() {
           My Inquiries
         </h1>
         <p
-          className="text-slate-500 text-sm"
-          style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+          className="text-sm"
+          style={{
+            color: "var(--text-muted)",
+            fontFamily: "var(--font-dm-sans, sans-serif)",
+          }}
         >
           {inquiries.length} total
           {repliedCount > 0 && (
-            <span className="ml-2 text-emerald-400 font-medium">
+            <span
+              className="ml-2 font-medium"
+              style={{ color: "var(--status-confirmed)" }}
+            >
               · {repliedCount} replied
             </span>
           )}
@@ -85,14 +105,21 @@ export default async function WholesaleInquiriesPage() {
         <div
           className="flex items-center gap-3 px-4 py-3 rounded-2xl"
           style={{
-            background: "rgba(16,185,129,0.07)",
-            border: "1px solid rgba(16,185,129,0.18)",
+            background: "rgba(5,150,105,0.07)",
+            border: "1px solid rgba(5,150,105,0.18)",
           }}
         >
-          <CheckCircle2 size={15} className="text-emerald-400 flex-shrink-0" />
+          <CheckCircle2
+            size={15}
+            className="flex-shrink-0"
+            style={{ color: "var(--status-confirmed)" }}
+          />
           <p
-            className="text-sm text-emerald-300 font-medium"
-            style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+            className="text-sm font-medium"
+            style={{
+              color: "var(--status-confirmed)",
+              fontFamily: "var(--font-dm-sans, sans-serif)",
+            }}
           >
             {repliedCount}{" "}
             {repliedCount === 1 ? "inquiry has" : "inquiries have"} been replied
@@ -106,20 +133,30 @@ export default async function WholesaleInquiriesPage() {
         <div
           className="flex flex-col items-center justify-center py-24 text-center rounded-3xl"
           style={{
-            background: "rgba(255,255,255,0.02)",
-            border: "1px solid rgba(255,255,255,0.06)",
+            background: "var(--bg-subtle)",
+            border: "1px solid var(--border)",
           }}
         >
-          <MessageSquare size={28} className="text-slate-600 mb-4" />
+          <MessageSquare
+            size={28}
+            className="mb-4"
+            style={{ color: "var(--text-faint)" }}
+          />
           <p
-            className="text-white font-bold text-lg"
-            style={{ fontFamily: "var(--font-syne, sans-serif)" }}
+            className="font-bold text-lg"
+            style={{
+              color: "var(--text-primary)",
+              fontFamily: "var(--font-syne, sans-serif)",
+            }}
           >
             No inquiries yet
           </p>
           <p
-            className="text-slate-500 text-sm mt-1 max-w-xs"
-            style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+            className="text-sm mt-1 max-w-xs"
+            style={{
+              color: "var(--text-muted)",
+              fontFamily: "var(--font-dm-sans, sans-serif)",
+            }}
           >
             Browse new arrivals and message admin about products you&apos;re
             interested in.
@@ -127,10 +164,16 @@ export default async function WholesaleInquiriesPage() {
           <Link
             href="/wholesale/new-arrivals"
             className="mt-5 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold
-              text-emerald-400 border border-emerald-500/20 bg-emerald-500/8
-              hover:bg-emerald-500/15 transition-[background] duration-150
-              focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500"
-            style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+              hover:-translate-y-0.5 active:translate-y-0
+              transition-[background,transform] duration-150
+              focus-visible:outline-2 focus-visible:outline-offset-2"
+            style={{
+              color: "var(--brand-hex)",
+              border: "1px solid var(--border-brand)",
+              background: "var(--brand-glow)",
+              outlineColor: "var(--brand-hex)",
+              fontFamily: "var(--font-dm-sans, sans-serif)",
+            }}
           >
             Browse New Arrivals
           </Link>
@@ -140,40 +183,38 @@ export default async function WholesaleInquiriesPage() {
           {inquiries.map((inquiry) => {
             const lastMsg = inquiry.messages[0];
             const isReplied = inquiry.status === "REPLIED";
+            const statusDot = STATUS_DOT[inquiry.status] ?? STATUS_DOT.CLOSED;
+            const statusStyle =
+              STATUS_STYLES[inquiry.status] ?? STATUS_STYLES.CLOSED;
 
             return (
               <Link
                 key={inquiry.id}
                 href={`/wholesale/inquiries/${inquiry.id}`}
-                className={`group flex items-center gap-4 p-4 rounded-2xl border
-    hover:-translate-y-0.5
-    hover:shadow-[0_4px_20px_rgba(16,185,129,0.06)]
-    transition-[transform,border-color,box-shadow] duration-200
-    focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500
-    ${
-      isReplied
-        ? "bg-emerald-500/[0.04] border-emerald-500/[0.18] hover:border-emerald-500/30"
-        : "bg-white/[0.025] border-white/[0.07] hover:border-emerald-500/20"
-    }`}
+                className="group flex items-center gap-4 p-4 rounded-2xl
+                  hover:-translate-y-0.5
+                  transition-[transform,border-color,box-shadow,background] duration-200
+                  focus-visible:outline-2 focus-visible:outline-offset-2"
+                style={{
+                  background: isReplied
+                    ? "rgba(5,150,105,0.04)"
+                    : "var(--bg-card)",
+                  border: `1px solid ${isReplied ? "rgba(5,150,105,0.18)" : "var(--border-brand)"}`,
+                  boxShadow: "var(--shadow-card)",
+                  outlineColor: "var(--brand-hex)",
+                }}
               >
                 {/* Status dot */}
                 <div className="flex-shrink-0">
-                  <div
-                    className={`w-2.5 h-2.5 rounded-full ${STATUS_DOT[inquiry.status as keyof typeof STATUS_DOT]}`}
-                    style={
-                      isReplied
-                        ? { boxShadow: "0 0 6px rgba(16,185,129,0.6)" }
-                        : {}
-                    }
-                  />
+                  <div className="w-2.5 h-2.5 rounded-full" style={statusDot} />
                 </div>
 
                 {/* Product icon */}
                 <div
                   className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
                   style={{
-                    background: "rgba(255,255,255,0.05)",
-                    border: "1px solid rgba(255,255,255,0.08)",
+                    background: "var(--bg-subtle)",
+                    border: "1px solid var(--border)",
                   }}
                 >
                   <span className="text-sm">🧵</span>
@@ -183,21 +224,30 @@ export default async function WholesaleInquiriesPage() {
                 <div className="flex-1 min-w-0 space-y-0.5">
                   <div className="flex items-center gap-2">
                     <span
-                      className="text-sm font-semibold text-white truncate"
-                      style={{ fontFamily: "var(--font-syne, sans-serif)" }}
+                      className="text-sm font-semibold truncate"
+                      style={{
+                        color: "var(--text-primary)",
+                        fontFamily: "var(--font-syne, sans-serif)",
+                      }}
                     >
                       {inquiry.products.name}
                     </span>
                     {isReplied && (
-                      <span className="flex items-center gap-1 text-[10px] font-semibold text-emerald-400 flex-shrink-0">
+                      <span
+                        className="flex items-center gap-1 text-[10px] font-semibold flex-shrink-0"
+                        style={{ color: "var(--status-confirmed)" }}
+                      >
                         <CheckCircle2 size={10} />
                         Replied
                       </span>
                     )}
                   </div>
                   <p
-                    className="text-xs text-slate-500 truncate"
-                    style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+                    className="text-xs truncate"
+                    style={{
+                      color: "var(--text-faint)",
+                      fontFamily: "var(--font-dm-sans, sans-serif)",
+                    }}
                   >
                     {lastMsg
                       ? `${lastMsg?.users.role === "ADMIN" ? "Admin: " : "You: "}${lastMsg.body}`
@@ -207,26 +257,32 @@ export default async function WholesaleInquiriesPage() {
 
                 {/* Right meta */}
                 <div className="flex items-center gap-3 flex-shrink-0">
-                  <Badge
-                    variant="outline"
-                    className={`text-[10px] font-semibold border h-auto py-0.5 px-2 hidden sm:flex ${
-                      STATUS_STYLES[
-                        inquiry.status as keyof typeof STATUS_STYLES
-                      ]
-                    }`}
+                  {/* Status badge */}
+                  <span
+                    className="text-[10px] font-semibold px-2 py-0.5 rounded-full hidden sm:flex"
+                    style={{
+                      ...statusStyle,
+                      fontFamily: "var(--font-dm-sans, sans-serif)",
+                    }}
                   >
                     {inquiry.status}
-                  </Badge>
+                  </span>
+
                   <span
-                    className="flex items-center gap-1 text-xs text-slate-600"
-                    style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+                    className="flex items-center gap-1 text-xs"
+                    style={{
+                      color: "var(--text-faint)",
+                      fontFamily: "var(--font-dm-sans, sans-serif)",
+                    }}
                   >
                     <Clock size={10} />
                     {timeAgo(inquiry.updatedAt)}
                   </span>
+
                   <ChevronRight
                     size={14}
-                    className="text-slate-600 group-hover:text-emerald-400 group-hover:translate-x-0.5 transition-[color,transform] duration-200"
+                    className="group-hover:translate-x-0.5 transition-[color,transform] duration-200"
+                    style={{ color: "var(--text-faint)" }}
                   />
                 </div>
               </Link>

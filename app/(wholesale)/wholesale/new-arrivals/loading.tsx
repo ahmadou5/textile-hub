@@ -1,7 +1,7 @@
 // app/(wholesale)/wholesale/new-arrivals/loading.tsx
 export default function NewArrivalsLoading() {
   return (
-    <div className="p-6 lg:p-8 space-y-6 max-w-3xl mx-auto">
+    <div className="p-6 lg:p-8 space-y-6 lg:max-w-7xl w-[90%] mx-auto">
       {/* Header skeleton */}
       <div className="space-y-2">
         <div

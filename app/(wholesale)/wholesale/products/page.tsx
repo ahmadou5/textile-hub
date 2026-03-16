@@ -62,7 +62,7 @@ export default async function WholesaleProductsPage({
   const categories = allCategories.map((p) => p.category);
 
   return (
-    <div className="p-6 lg:p-8 max-w-7xl mx-auto space-y-8">
+    <div className="p-6 lg:p-8 lg:max-w-7xl w-[90%] mx-auto space-y-8">
       {/* Grain overlay */}
       <svg style={{ position: "fixed", width: 0, height: 0 }}>
         <filter id="grain">

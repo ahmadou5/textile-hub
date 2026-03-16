@@ -1,6 +1,4 @@
 // app/(public)/layout.tsx
-import Link from "next/link";
-import { Scissors } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 
 export default function PublicLayout({
