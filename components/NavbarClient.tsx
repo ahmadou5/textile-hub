@@ -49,7 +49,7 @@ export default function NavbarClient({
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
-
+  alert(imageUrl);
   const close = () => setMobileOpen(false);
 
   const navLinks = (
