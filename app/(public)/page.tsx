@@ -125,7 +125,7 @@ export default async function HomePage() {
   const firstName = session?.user?.name?.split(" ")[0];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-14">
+    <div className="w-full max-w-2xl mx-auto space-y-6">
       {/* ── Hero ── */}
       <div className="space-y-6 max-w-2xl">
         {/* Personalised greeting */}

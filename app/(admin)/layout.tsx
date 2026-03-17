@@ -10,21 +10,17 @@ export default async function AdminLayout({
 }) {
   return (
     <div
-      className="min-h-screen  "
-      style={{
-        fontFamily: "var(--font-dm-sans, sans-serif)",
-        backgroundColor: "var(--bg)",
-      }}
+      className="min-h-screen flex flex-col"
+      style={{ background: "var(--bg)" }}
     >
       <Navbar />
-
-      {/* Main content */}
-      <main
-        className="flex-1 max-w-5xl mx-auto flex flex-col min-h-screen "
-        style={{ backgroundColor: "var(--bg)" }}
-      >
-        {children}
-      </main>
+      {/*
+           - Remove items-center justify-center — those were centering the login/register
+             cards but break full-width pages like profile
+           - Let each child page handle its own width/centering
+           - Keep px-4 so content never touches screen edges on mobile
+         */}
+      <main className="flex-1 w-full px-4 py-10">{children}</main>
     </div>
   );
 }

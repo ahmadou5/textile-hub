@@ -58,7 +58,7 @@ export default async function AdminOrdersPage() {
   };
 
   return (
-    <div className="px-6 lg:px-8 py-8 space-y-8">
+    <div className="w-full max-w-2xl mx-auto space-y-6">
       {/* Header */}
       <div className="flex items-start justify-between">
         <div className="space-y-1">

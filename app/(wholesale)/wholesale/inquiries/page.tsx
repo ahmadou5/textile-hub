@@ -71,7 +71,7 @@ export default async function WholesaleInquiriesPage() {
   ).length;
 
   return (
-    <div className="p-6 lg:p-8 space-y-6 lg:max-w-7xl w-[90%] mx-auto">
+    <div className="w-full max-w-2xl mx-auto space-y-6">
       {/* Header */}
       <div className="space-y-1">
         <h1

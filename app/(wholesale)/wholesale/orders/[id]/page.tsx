@@ -98,7 +98,7 @@ export default async function WholesaleOrderDetailPage({ params }: PageProps) {
   const showBankCard = isBankTransfer && isPending && bankDetails;
 
   return (
-    <div className="lg:max-w-7xl w-[90%] mx-auto px-4 sm:px-6 py-10 space-y-6">
+    <div className="w-full max-w-2xl mx-auto space-y-6">
       {/* Back */}
       <Link
         href="/wholesale/orders"

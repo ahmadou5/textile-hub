@@ -105,7 +105,7 @@ export default async function WholesaleInquiryThreadPage({
   );
 
   return (
-    <div className="flex flex-col h-screen max-h-screen max-w-7xl w-[99%] ml-auto mr-auto overflow-hidden p-6 lg:p-8 space-y-4">
+    <div className="flex flex-col h-screen max-h-screen  ml-auto mr-auto overflow-hidden w-full max-w-2xl mx-auto space-y-6">
       {/* Back + Refresh */}
       <div className="flex items-center justify-between shrink-0">
         <Link

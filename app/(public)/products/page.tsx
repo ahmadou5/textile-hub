@@ -55,7 +55,7 @@ async function ProductGrid() {
 
 export default function ProductsPage() {
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-10">
+    <div className="w-full max-w-2xl mx-auto space-y-6">
       <div className="space-y-3 max-w-2xl">
         <p
           className="text-xs font-medium tracking-[0.15em] uppercase"

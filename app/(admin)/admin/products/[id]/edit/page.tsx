@@ -25,7 +25,7 @@ export default async function EditProductPage({ params }: PageProps) {
   if (!product) notFound();
 
   return (
-    <div className="max-w-2xl mx-auto p-6 lg:p-8 space-y-6">
+    <div className="w-full max-w-2xl mx-auto space-y-6">
       <Link
         href="/admin/products"
         className="inline-flex items-center gap-2 text-sm group

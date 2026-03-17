@@ -110,7 +110,7 @@ export default async function AdminDashboardPage() {
   ];
 
   return (
-    <div className="p-6 lg:p-8 space-y-8 w-[90%] mx-auto">
+    <div className="w-full max-w-2xl mx-auto space-y-6">
       {/* Header */}
       <div className="space-y-1">
         <p

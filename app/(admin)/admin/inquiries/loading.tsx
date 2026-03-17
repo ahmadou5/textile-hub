@@ -1,7 +1,7 @@
 // app/(admin)/admin/inquiries/loading.tsx
 export default function InquiriesLoading() {
   return (
-    <div className="p-6 lg:p-8 space-y-6">
+    <div className="w-full max-w-2xl mx-auto space-y-6">
       {/* Header */}
       <div className="space-y-2">
         <div

@@ -93,7 +93,7 @@ export default async function AdminInquiryThreadPage({ params }: PageProps) {
   const isClosed = inquiry.status === "CLOSED";
 
   return (
-    <div className="flex flex-col h-screen max-h-screen overflow-hidden p-6 lg:p-8 space-y-4">
+    <div className="flex flex-col h-screen max-h-screen overflow-hidden w-full max-w-2xl mx-auto space-y-6">
       {/* Back */}
       <Link
         href="/admin/inquiries"
