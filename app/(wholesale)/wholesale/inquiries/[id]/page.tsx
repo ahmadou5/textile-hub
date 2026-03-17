@@ -292,7 +292,7 @@ export default async function WholesaleInquiryThreadPage({
 
               const senderName = msg.users?.name ?? "?";
               const senderImageUrl = msg.users?.imageUrl ?? "";
-              console.log(senderImageUrl);
+
               const initials = senderName
                 .split(" ")
                 .map((n) => n[0] ?? "")
