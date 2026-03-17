@@ -11,6 +11,7 @@ import type { Metadata } from "next";
 import { unstable_noStore as noStore } from "next/cache";
 import InquiryReplyBox from "@/components/admin/InquiryReplyBox";
 import InquiryStatusToggle from "@/components/admin/InquiryStatusToggle";
+import Image from "next/image";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -57,7 +58,7 @@ export default async function AdminInquiryThreadPage({ params }: PageProps) {
   const inquiry = await db.inquiries.findUnique({
     where: { id },
     include: {
-      users: { select: { id: true, name: true, email: true } },
+      users: { select: { id: true, name: true, email: true, imageUrl: true } },
       products: {
         select: {
           id: true,
@@ -70,7 +71,9 @@ export default async function AdminInquiryThreadPage({ params }: PageProps) {
       messages: {
         orderBy: { createdAt: "asc" },
         include: {
-          users: { select: { id: true, name: true, role: true } },
+          users: {
+            select: { id: true, name: true, role: true, imageUrl: true },
+          },
         },
       },
     },
@@ -180,6 +183,7 @@ export default async function AdminInquiryThreadPage({ params }: PageProps) {
                 new Date(prevMsg.createdAt).toDateString();
 
             const senderName = msg.users?.name ?? "?";
+            const senderImageUrl = msg.users?.imageUrl ?? "";
             const initials = senderName
               .split(" ")
               .map((n) => n[0] ?? "")
@@ -218,7 +222,17 @@ export default async function AdminInquiryThreadPage({ params }: PageProps) {
                     }`}
                     style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
                   >
-                    {initials}
+                    {senderImageUrl ? (
+                      <Image
+                        src={senderImageUrl}
+                        alt={senderName}
+                        width={32}
+                        height={32}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <span>{initials}</span>
+                    )}
                   </div>
 
                   {/* Bubble */}

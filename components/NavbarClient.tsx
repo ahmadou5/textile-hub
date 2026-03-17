@@ -18,6 +18,7 @@ import { signOutAction } from "@/actions/auth";
 import CartButton from "@/components/cartButton";
 import CartDrawer from "@/components/cartDrawer";
 import type { Session } from "next-auth";
+import Image from "next/image";
 
 interface Badges {
   inquiries: number;
@@ -62,12 +63,22 @@ export default function NavbarClient({
 
   const navLinks = (
     <>
-      <NavLink href="/" onClick={close}>
-        Browse
-      </NavLink>
+      {role === "GUEST" && (
+        <NavLink href="/" onClick={close}>
+          Browse
+        </NavLink>
+      )}
 
       {role === "WHOLESALER" && (
         <>
+          <NavLink
+            href="/wholesale"
+            icon={<LayoutDashboard size={12} />}
+            highlight
+            onClick={close}
+          >
+            Dashboard
+          </NavLink>
           <NavLink
             href="/wholesale/products"
             icon={<Package size={12} />}
@@ -81,7 +92,7 @@ export default function NavbarClient({
             badge={badges.inquiries}
             onClick={close}
           >
-            Inquiries
+            Chats
           </NavLink>
           <NavLink
             href="/wholesale/orders"
@@ -117,7 +128,7 @@ export default function NavbarClient({
             badge={badges.inquiries}
             onClick={close}
           >
-            Inquiries
+            Chats
           </NavLink>
           <NavLink
             href="/admin/upgrade-requests"
@@ -165,7 +176,7 @@ export default function NavbarClient({
         }}
       >
         {avatarSrc ? (
-          <img
+          <Image
             src={avatarSrc}
             alt=""
             className="w-5 h-5 rounded-full object-cover"
@@ -344,7 +355,7 @@ function NavLink({
       {badge > 0 && (
         <span
           className="flex items-center justify-center min-w-[16px] h-4 px-1 rounded-full text-[9px] font-bold text-white"
-          style={{ background: "var(--status-cancelled)" }}
+          style={{ background: "var(--brand-hex)" }}
         >
           {badge > 99 ? "99+" : badge}
         </span>
