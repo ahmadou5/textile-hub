@@ -12,9 +12,13 @@ export default function AuthLayout({
       style={{ background: "var(--bg)" }}
     >
       <Navbar />
-      <main className="flex-1 flex items-center justify-center px-4 py-10 max-w-5xl">
-        {children}
-      </main>
+      {/*
+        - Remove items-center justify-center — those were centering the login/register
+          cards but break full-width pages like profile
+        - Let each child page handle its own width/centering
+        - Keep px-4 so content never touches screen edges on mobile
+      */}
+      <main className="flex-1 w-full px-4 py-10">{children}</main>
     </div>
   );
 }

@@ -8,7 +8,6 @@ import UpgradeRequestSection from "@/components/UpgradeRequestSection";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import BankDetailsForm from "@/components/admin/BankDetailsForm";
 import { ShieldCheck, Calendar, Mail } from "lucide-react";
-import Navbar from "@/components/layout/Navbar";
 
 export const metadata: Metadata = { title: "My Profile — TextileHub" };
 
@@ -30,9 +29,9 @@ const ROLE_BADGE: Record<
   },
   ADMIN: {
     label: "Admin",
-    bg: "rgba(212,168,83,0.1)",
-    color: "#D4A853",
-    border: "rgba(212,168,83,0.25)",
+    bg: "var(--brand-glow)",
+    color: "var(--brand-hex)",
+    border: "var(--border-brand)",
   },
 };
 
@@ -55,7 +54,6 @@ export default async function ProfilePage() {
         },
       },
     }),
-    // Only fetch bank details for admin — returns null for others
     session.user.role === "ADMIN"
       ? db.admin_bank_details.findUnique({ where: { id: "singleton" } })
       : Promise.resolve(null),
@@ -66,147 +64,147 @@ export default async function ProfilePage() {
   const badge = ROLE_BADGE[user.role] ?? ROLE_BADGE.GUEST;
 
   return (
-    <div
-      className="min-h-screen w-[90%] lg:max-w-5xl"
-      style={{ background: "var(--bg)" }}
-    >
-      <div className="w-[90%] mx-auto px-4 py-10 space-y-8">
-        {/* ── Profile header ── */}
-        <div
-          className="rounded-2xl p-6"
-          style={{
-            background: "var(--bg-card)",
-            border: "1px solid var(--border)",
-            boxShadow: "var(--shadow-card)",
-          }}
-        >
-          <div className="flex items-center gap-5">
-            {/* Avatar */}
-            <div className="relative flex-shrink-0">
-              {user.imageUrl ? (
-                <img
-                  src={user.imageUrl}
-                  alt={user.name ?? ""}
-                  className="w-16 h-16 rounded-2xl object-cover"
-                  style={{ border: "2px solid var(--border-strong)" }}
-                />
-              ) : (
-                <div
-                  className="w-16 h-16 rounded-2xl flex items-center justify-center text-xl font-bold text-white"
-                  style={{
-                    background: `linear-gradient(135deg, var(--brand-hex) 0%, var(--brand-dim) 100%)`,
-                  }}
-                >
-                  {(user.name ?? user.email)[0].toUpperCase()}
-                </div>
-              )}
-            </div>
-
-            {/* Info */}
-            <div className="flex-1 min-w-0">
-              <h1
-                className="text-xl font-bold"
+    // Full width on mobile, capped + centered on desktop
+    <div className="w-full max-w-2xl mx-auto space-y-6">
+      {/* ── Profile header ── */}
+      <div
+        className="rounded-2xl p-5 sm:p-6"
+        style={{
+          background: "var(--bg-card)",
+          border: "1px solid var(--border-brand)",
+          boxShadow: "var(--shadow-card)",
+        }}
+      >
+        <div className="flex items-center gap-4">
+          {/* Avatar */}
+          <div className="relative flex-shrink-0">
+            {user.imageUrl ? (
+              <img
+                src={user.imageUrl}
+                alt={user.name ?? ""}
+                className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl object-cover"
+                style={{ border: "2px solid var(--border-strong)" }}
+              />
+            ) : (
+              <div
+                className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center text-xl font-bold text-white"
                 style={{
-                  color: "var(--text-primary)",
-                  fontFamily: "var(--font-syne, sans-serif)",
-                  letterSpacing: "-0.02em",
+                  background: `linear-gradient(135deg, var(--brand-hex) 0%, var(--brand-dim) 100%)`,
                 }}
               >
-                {user.name ?? "Unnamed User"}
-              </h1>
-              <div className="flex items-center gap-2 mt-1 flex-wrap">
-                <span
-                  className="flex items-center gap-1 text-xs"
-                  style={{
-                    color: "var(--text-muted)",
-                    fontFamily: "var(--font-dm-sans, sans-serif)",
-                  }}
-                >
-                  <Mail size={11} />
-                  {user.email}
-                </span>
-                <span style={{ color: "var(--border)" }}>·</span>
-                <span
-                  className="flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full"
-                  style={{
-                    background: badge.bg,
-                    color: badge.color,
-                    border: `1px solid ${badge.border}`,
-                    fontFamily: "var(--font-dm-sans, sans-serif)",
-                  }}
-                >
-                  <ShieldCheck size={10} />
-                  {badge.label}
-                </span>
+                {(user.name ?? user.email)[0].toUpperCase()}
               </div>
-              <p
-                className="flex items-center gap-1 text-xs mt-1"
+            )}
+          </div>
+
+          {/* Info */}
+          <div className="flex-1 min-w-0">
+            <h1
+              className="text-lg sm:text-xl font-bold truncate"
+              style={{
+                color: "var(--text-primary)",
+                fontFamily: "var(--font-syne, sans-serif)",
+                letterSpacing: "-0.02em",
+              }}
+            >
+              {user.name ?? "Unnamed User"}
+            </h1>
+
+            <div className="flex items-center gap-2 mt-1 flex-wrap">
+              <span
+                className="flex items-center gap-1 text-xs truncate"
+                style={{
+                  color: "var(--text-muted)",
+                  fontFamily: "var(--font-dm-sans, sans-serif)",
+                }}
+              >
+                <Mail size={11} className="flex-shrink-0" />
+                {user.email}
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+              <span
+                className="flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full"
+                style={{
+                  background: badge.bg,
+                  color: badge.color,
+                  border: `1px solid ${badge.border}`,
+                  fontFamily: "var(--font-dm-sans, sans-serif)",
+                }}
+              >
+                <ShieldCheck size={10} />
+                {badge.label}
+              </span>
+
+              <span
+                className="flex items-center gap-1 text-xs"
                 style={{
                   color: "var(--text-faint)",
                   fontFamily: "var(--font-dm-sans, sans-serif)",
                 }}
               >
                 <Calendar size={10} />
-                Member since{" "}
+                Since{" "}
                 {new Date(user.createdAt).toLocaleDateString("en-NG", {
-                  month: "long",
+                  month: "short",
                   year: "numeric",
                 })}
-              </p>
+              </span>
             </div>
           </div>
         </div>
+      </div>
 
-        {/* ── Upgrade request — GUEST only ── */}
-        {user.role === "GUEST" && (
-          <UpgradeRequestSection existingRequest={user.upgradeRequest} />
-        )}
+      {/* ── Upgrade request — GUEST only ── */}
+      {user.role === "GUEST" && (
+        <UpgradeRequestSection existingRequest={user.upgradeRequest} />
+      )}
 
-        {/* ── Edit profile form ── */}
-        <ProfileForm
-          user={{
-            id: user.id,
-            name: user.name ?? "",
-            email: user.email,
-            imageUrl: user.imageUrl ?? "",
-          }}
+      {/* ── Edit profile form ── */}
+      <ProfileForm
+        user={{
+          id: user.id,
+          name: user.name ?? "",
+          email: user.email,
+          imageUrl: user.imageUrl ?? "",
+        }}
+      />
+
+      {/* ── Admin: bank account settings ── */}
+      {user.role === "ADMIN" && (
+        <BankDetailsForm
+          initial={
+            bankDetails
+              ? {
+                  bankName: bankDetails.bankName,
+                  accountNumber: bankDetails.accountNumber,
+                  accountName: bankDetails.accountName,
+                }
+              : null
+          }
         />
+      )}
 
-        {/* ── Admin: bank account settings ── */}
-        {user.role === "ADMIN" && (
-          <BankDetailsForm
-            initial={
-              bankDetails
-                ? {
-                    bankName: bankDetails.bankName,
-                    accountNumber: bankDetails.accountNumber,
-                    accountName: bankDetails.accountName,
-                  }
-                : null
-            }
-          />
-        )}
-
-        {/* ── Appearance / Theme toggle — all roles ── */}
-        <div
-          className="rounded-2xl p-5"
+      {/* ── Theme toggle ── */}
+      <div
+        className="rounded-2xl p-5"
+        style={{
+          background: "var(--bg-card)",
+          border: "1px solid var(--border)",
+          boxShadow: "var(--shadow-card)",
+        }}
+      >
+        <p
+          className="text-sm font-semibold mb-4"
           style={{
-            background: "var(--bg-card)",
-            border: "1px solid var(--border)",
-            boxShadow: "var(--shadow-card)",
+            color: "var(--text-primary)",
+            fontFamily: "var(--font-dm-sans, sans-serif)",
           }}
         >
-          <p
-            className="text-sm font-semibold mb-4"
-            style={{
-              color: "var(--text-primary)",
-              fontFamily: "var(--font-dm-sans, sans-serif)",
-            }}
-          >
-            Preferences
-          </p>
-          <ThemeToggle />
-        </div>
+          Preferences
+        </p>
+        <ThemeToggle />
       </div>
     </div>
   );
