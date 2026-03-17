@@ -67,23 +67,43 @@ export default async function AdminDashboardPage() {
       value: productCount,
       icon: Package,
       sub: "in catalogue",
-      color: "#D4A853",
+      color: "var(--brand-hex)",
+      bgColor: "var(--brand-glow)",
+      borderColor: "var(--border-brand)",
       href: "/admin/products",
+      alert: false,
     },
     {
       label: "Open Inquiries",
       value: openInquiries,
       icon: MessageSquare,
       sub: openInquiries === 0 ? "all clear" : "awaiting reply",
-      color: openInquiries > 0 ? "#f59e0b" : "#10b981",
+      color:
+        openInquiries > 0 ? "var(--status-pending)" : "var(--status-confirmed)",
+      bgColor:
+        openInquiries > 0 ? "rgba(217,119,6,0.08)" : "rgba(5,150,105,0.08)",
+      borderColor:
+        openInquiries > 0 ? "rgba(217,119,6,0.2)" : "rgba(5,150,105,0.2)",
       href: "/admin/inquiries",
+      alert: false,
     },
     {
       label: "Low Stock",
       value: lowStockProducts.length,
       icon: AlertTriangle,
       sub: criticalCount > 0 ? `${criticalCount} critical` : "< 20 yards",
-      color: lowStockProducts.length > 0 ? "#ef4444" : "#10b981",
+      color:
+        lowStockProducts.length > 0
+          ? "var(--status-cancelled)"
+          : "var(--status-confirmed)",
+      bgColor:
+        lowStockProducts.length > 0
+          ? "rgba(220,38,38,0.08)"
+          : "rgba(5,150,105,0.08)",
+      borderColor:
+        lowStockProducts.length > 0
+          ? "rgba(220,38,38,0.2)"
+          : "rgba(5,150,105,0.2)",
       href: "/admin/low-stock",
       alert: lowStockProducts.length > 0,
     },
@@ -94,15 +114,19 @@ export default async function AdminDashboardPage() {
       {/* Header */}
       <div className="space-y-1">
         <p
-          className="text-xs font-semibold tracking-[0.12em] uppercase text-[#D4A853]"
-          style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+          className="text-xs font-semibold tracking-[0.12em] uppercase"
+          style={{
+            color: "var(--brand-hex)",
+            fontFamily: "var(--font-dm-sans, sans-serif)",
+          }}
         >
           Admin Console
         </p>
         <h1
-          className="text-3xl font-bold text-slate-800"
+          className="text-3xl font-bold"
           style={{
-            fontFamily: "var(--font-playfair, serif)",
+            color: "var(--text-primary)",
+            fontFamily: "var(--font-syne, sans-serif)",
             letterSpacing: "-0.02em",
           }}
         >
@@ -116,25 +140,31 @@ export default async function AdminDashboardPage() {
           <Link
             key={stat.label}
             href={stat.href}
-            className="group relative p-5 rounded-2xl bg-white
+            className="group relative p-5 rounded-2xl
               hover:-translate-y-1
               transition-[transform,box-shadow,border-color] duration-200
-              focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D4A853]"
+              focus-visible:outline-2 focus-visible:outline-offset-2"
             style={{
-              border: stat.alert
-                ? `1px solid rgba(239,68,68,0.2)`
-                : "1px solid rgba(0,0,0,0.07)",
+              background: "var(--bg-card)",
+              border: `1px solid ${stat.alert ? "rgba(220,38,38,0.2)" : "var(--border-brand)"}`,
               boxShadow: stat.alert
-                ? "0 2px 8px rgba(239,68,68,0.06), 0 8px 24px rgba(0,0,0,0.04)"
-                : "0 2px 4px rgba(0,0,0,0.04), 0 8px 16px rgba(0,0,0,0.03)",
+                ? "0 2px 8px rgba(220,38,38,0.06), 0 8px 24px rgba(0,0,0,0.04)"
+                : "var(--shadow-card)",
+              outlineColor: "var(--brand-hex)",
             }}
           >
-            {/* Alert pulse for low stock */}
+            {/* Alert pulse */}
             {stat.alert && (
               <span className="absolute top-4 right-4">
                 <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500" />
+                  <span
+                    className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"
+                    style={{ background: "var(--status-cancelled)" }}
+                  />
+                  <span
+                    className="relative inline-flex rounded-full h-2 w-2"
+                    style={{ background: "var(--status-cancelled)" }}
+                  />
                 </span>
               </span>
             )}
@@ -143,27 +173,34 @@ export default async function AdminDashboardPage() {
               <div
                 className="w-10 h-10 rounded-xl flex items-center justify-center"
                 style={{
-                  background: `${stat.color}12`,
-                  border: `1px solid ${stat.color}22`,
+                  background: stat.bgColor,
+                  border: `1px solid ${stat.borderColor}`,
                 }}
               >
                 <stat.icon size={18} style={{ color: stat.color }} />
               </div>
               <ArrowUpRight
                 size={14}
-                className="text-slate-300 group-hover:text-[#D4A853] transition-[color] duration-200 mt-0.5"
+                className="transition-[color] duration-200 mt-0.5"
+                style={{ color: "var(--text-faint)" }}
               />
             </div>
 
             <p
-              className="text-3xl font-bold text-slate-800 tabular-nums"
-              style={{ fontFamily: "var(--font-playfair, serif)" }}
+              className="text-3xl font-bold tabular-nums"
+              style={{
+                color: "var(--text-primary)",
+                fontFamily: "var(--font-syne, sans-serif)",
+              }}
             >
               {stat.value}
             </p>
             <p
-              className="text-sm text-slate-500 mt-0.5"
-              style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+              className="text-sm mt-0.5"
+              style={{
+                color: "var(--text-muted)",
+                fontFamily: "var(--font-dm-sans, sans-serif)",
+              }}
             >
               {stat.label}
             </p>
@@ -180,64 +217,82 @@ export default async function AdminDashboardPage() {
         ))}
       </div>
 
-      {/* Low stock mini-list (only if there are affected products) */}
+      {/* Low stock mini-list */}
       {lowStockProducts.length > 0 && (
         <div
           className="rounded-2xl overflow-hidden"
           style={{
-            border: "1px solid rgba(239,68,68,0.15)",
-            background: "rgba(239,68,68,0.015)",
+            border: "1px solid rgba(220,38,38,0.15)",
+            background: "rgba(220,38,38,0.015)",
           }}
         >
           <div
             className="flex items-center justify-between px-5 py-3.5"
-            style={{ borderBottom: "1px solid rgba(239,68,68,0.1)" }}
+            style={{ borderBottom: "1px solid rgba(220,38,38,0.1)" }}
           >
             <div className="flex items-center gap-2">
-              <TrendingDown size={14} className="text-red-400" />
+              <TrendingDown
+                size={14}
+                style={{ color: "var(--status-cancelled)" }}
+              />
               <span
-                className="text-sm font-semibold text-slate-700"
-                style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+                className="text-sm font-semibold"
+                style={{
+                  color: "var(--text-primary)",
+                  fontFamily: "var(--font-dm-sans, sans-serif)",
+                }}
               >
                 Requires immediate attention
               </span>
             </div>
             <Link
               href="/admin/low-stock"
-              className="text-xs text-[#D4A853] hover:text-slate-800 font-medium
-                transition-[color] duration-150
-                focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#D4A853]"
-              style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+              className="text-xs font-medium transition-[color] duration-150
+                focus-visible:outline-2 focus-visible:outline-offset-1"
+              style={{
+                color: "var(--brand-hex)",
+                outlineColor: "var(--brand-hex)",
+                fontFamily: "var(--font-dm-sans, sans-serif)",
+              }}
             >
               View all →
             </Link>
           </div>
-          <div className="divide-y divide-red-50">
+
+          <div>
             {lowStockProducts
               .slice(0, 3)
               .map(
-                (p: {
-                  id: string;
-                  name: string;
-                  totalYardsInStock: number;
-                }) => (
+                (
+                  p: { id: string; name: string; totalYardsInStock: number },
+                  i: number,
+                ) => (
                   <div
                     key={p.id}
                     className="flex items-center justify-between px-5 py-3"
+                    style={{
+                      borderTop:
+                        i === 0 ? "none" : "1px solid rgba(220,38,38,0.06)",
+                    }}
                   >
                     <span
-                      className="text-sm text-slate-700 font-medium"
-                      style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+                      className="text-sm font-medium"
+                      style={{
+                        color: "var(--text-secondary)",
+                        fontFamily: "var(--font-dm-sans, sans-serif)",
+                      }}
                     >
                       {p.name}
                     </span>
                     <span
-                      className={`text-sm font-bold tabular-nums ${
-                        p.totalYardsInStock < 10
-                          ? "text-red-500"
-                          : "text-amber-500"
-                      }`}
-                      style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+                      className="text-sm font-bold tabular-nums"
+                      style={{
+                        color:
+                          p.totalYardsInStock < 10
+                            ? "var(--status-cancelled)"
+                            : "var(--status-pending)",
+                        fontFamily: "var(--font-dm-sans, sans-serif)",
+                      }}
                     >
                       {p.totalYardsInStock} yds
                     </span>
@@ -245,11 +300,17 @@ export default async function AdminDashboardPage() {
                 ),
               )}
             {lowStockProducts.length > 3 && (
-              <div className="px-5 py-2.5">
+              <div
+                className="px-5 py-2.5"
+                style={{ borderTop: "1px solid rgba(220,38,38,0.06)" }}
+              >
                 <Link
                   href="/admin/low-stock"
-                  className="text-xs text-slate-400 hover:text-red-500 transition-[color] duration-150"
-                  style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+                  className="text-xs transition-[color] duration-150"
+                  style={{
+                    color: "var(--text-faint)",
+                    fontFamily: "var(--font-dm-sans, sans-serif)",
+                  }}
                 >
                   + {lowStockProducts.length - 3} more products
                 </Link>
@@ -263,21 +324,26 @@ export default async function AdminDashboardPage() {
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <h2
-            className="text-base font-bold text-slate-700"
-            style={{ fontFamily: "var(--font-playfair, serif)" }}
+            className="text-base font-bold"
+            style={{
+              color: "var(--text-primary)",
+              fontFamily: "var(--font-syne, sans-serif)",
+            }}
           >
             Recent Products
           </h2>
           <Link
             href="/admin/products/new"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold
-              bg-[#D4A853] text-white
-              shadow-[0_2px_6px_rgba(212,168,83,0.3)]
-              hover:brightness-105 hover:-translate-y-0.5
-              active:translate-y-0
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-white
+              hover:brightness-105 hover:-translate-y-0.5 active:translate-y-0
               transition-[filter,transform] duration-150
-              focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D4A853]"
-            style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+              focus-visible:outline-2 focus-visible:outline-offset-2"
+            style={{
+              background: `linear-gradient(135deg, var(--brand-hex) 0%, var(--brand-dim) 100%)`,
+              boxShadow: "var(--shadow-brand)",
+              outlineColor: "var(--brand-hex)",
+              fontFamily: "var(--font-dm-sans, sans-serif)",
+            }}
           >
             <Plus size={12} />
             Add Product
@@ -296,50 +362,66 @@ export default async function AdminDashboardPage() {
             }) => (
               <div
                 key={product.id}
-                className="flex items-center gap-4 px-4 py-3.5 rounded-2xl bg-white"
+                className="flex items-center gap-4 px-4 py-3.5 rounded-2xl"
                 style={{
-                  border: "1px solid rgba(0,0,0,0.06)",
-                  boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+                  background: "var(--bg-card)",
+                  border: "1px solid var(--border-brand)",
+                  boxShadow: "var(--shadow-card)",
                 }}
               >
                 <div
                   className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-                  style={{ background: "#F1EDE4" }}
+                  style={{
+                    background: "var(--bg-subtle)",
+                    border: "1px solid var(--border)",
+                  }}
                 >
                   <span className="text-sm">🧵</span>
                 </div>
+
                 <div className="flex-1 min-w-0">
                   <p
-                    className="text-sm font-semibold text-slate-800 truncate"
-                    style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+                    className="text-sm font-semibold truncate"
+                    style={{
+                      color: "var(--text-primary)",
+                      fontFamily: "var(--font-dm-sans, sans-serif)",
+                    }}
                   >
                     {product.name}
                   </p>
                   <p
-                    className="text-xs text-slate-400 mt-0.5"
-                    style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+                    className="text-xs mt-0.5"
+                    style={{
+                      color: "var(--text-faint)",
+                      fontFamily: "var(--font-dm-sans, sans-serif)",
+                    }}
                   >
                     {product.category} ·{" "}
-                    {formatPrice(product.retailPricePerYard)}
-                    /yd
+                    {formatPrice(product.retailPricePerYard)}/yd
                   </p>
                 </div>
+
                 <div className="flex items-center gap-3 flex-shrink-0">
                   <span
-                    className={`text-xs font-semibold tabular-nums ${
-                      product.totalYardsInStock < 10
-                        ? "text-red-500"
-                        : product.totalYardsInStock < 20
-                          ? "text-amber-500"
-                          : "text-slate-400"
-                    }`}
-                    style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+                    className="text-xs font-semibold tabular-nums"
+                    style={{
+                      color:
+                        product.totalYardsInStock < 10
+                          ? "var(--status-cancelled)"
+                          : product.totalYardsInStock < 20
+                            ? "var(--status-pending)"
+                            : "var(--text-faint)",
+                      fontFamily: "var(--font-dm-sans, sans-serif)",
+                    }}
                   >
                     {product.totalYardsInStock} yds
                   </span>
                   <span
-                    className="text-xs text-slate-300"
-                    style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+                    className="text-xs"
+                    style={{
+                      color: "var(--text-faint)",
+                      fontFamily: "var(--font-dm-sans, sans-serif)",
+                    }}
                   >
                     {timeAgo(product.createdAt)}
                   </span>
