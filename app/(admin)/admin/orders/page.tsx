@@ -2,40 +2,40 @@
 import { requireRole } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { unstable_noStore as noStore } from "next/cache";
-import Link from "next/link";
 import Image from "next/image";
-import { Package, ChevronRight } from "lucide-react";
+import { Package } from "lucide-react";
 import AdminOrderStatusSelect from "@/components/admin/AdminOrderStatusSelect";
 
 function formatPrice(cents: number) {
   return `₦${(cents / 100).toLocaleString("en-NG", { minimumFractionDigits: 2 })}`;
 }
 
+// All colours now use CSS variables — adapts to light and dark automatically
 const STATUS_STYLES = {
   PENDING: {
-    bg: "rgba(251,191,36,0.08)",
-    text: "#fbbf24",
-    border: "rgba(251,191,36,0.2)",
+    bg: "rgba(217,119,6,0.08)",
+    text: "var(--status-pending)",
+    border: "rgba(217,119,6,0.2)",
   },
   CONFIRMED: {
     bg: "rgba(5,150,105,0.08)",
-    text: "#34d399",
-    border: "rgba(52,211,153,0.2)",
+    text: "var(--status-confirmed)",
+    border: "rgba(5,150,105,0.2)",
   },
   SHIPPED: {
-    bg: "rgba(96,165,250,0.08)",
-    text: "#60a5fa",
-    border: "rgba(96,165,250,0.2)",
+    bg: "rgba(37,99,235,0.08)",
+    text: "var(--status-shipped)",
+    border: "rgba(37,99,235,0.2)",
   },
   DELIVERED: {
-    bg: "rgba(74,222,128,0.08)",
-    text: "#4ade80",
-    border: "rgba(74,222,128,0.2)",
+    bg: "rgba(22,163,74,0.08)",
+    text: "var(--status-delivered)",
+    border: "rgba(22,163,74,0.2)",
   },
   CANCELLED: {
-    bg: "rgba(248,113,113,0.08)",
-    text: "#f87171",
-    border: "rgba(248,113,113,0.2)",
+    bg: "rgba(220,38,38,0.08)",
+    text: "var(--status-cancelled)",
+    border: "rgba(220,38,38,0.2)",
   },
 } as const;
 
@@ -98,20 +98,20 @@ export default async function AdminOrdersPage() {
       {/* Stats row */}
       <div className="grid grid-cols-3 gap-3">
         {Object.entries(counts).map(([status, count]) => {
-          const style = STATUS_STYLES[status as keyof typeof STATUS_STYLES];
+          const s = STATUS_STYLES[status as keyof typeof STATUS_STYLES];
           return (
             <div
               key={status}
               className="px-4 py-3 rounded-2xl"
               style={{
-                background: style.bg,
-                border: `1px solid ${style.border}`,
+                background: s.bg,
+                border: `1px solid ${s.border}`,
               }}
             >
               <p
                 className="text-2xl font-bold"
                 style={{
-                  color: style.text,
+                  color: s.text,
                   fontFamily: "var(--font-syne, sans-serif)",
                 }}
               >
@@ -120,7 +120,7 @@ export default async function AdminOrdersPage() {
               <p
                 className="text-xs font-medium"
                 style={{
-                  color: style.text,
+                  color: s.text,
                   opacity: 0.8,
                   fontFamily: "var(--font-dm-sans, sans-serif)",
                 }}
@@ -134,8 +134,33 @@ export default async function AdminOrdersPage() {
 
       {/* Orders list */}
       <div className="space-y-2">
+        {orders.length === 0 && (
+          <div
+            className="flex flex-col items-center justify-center py-24 text-center rounded-3xl"
+            style={{
+              background: "var(--bg-subtle)",
+              border: "1px solid var(--border)",
+            }}
+          >
+            <Package
+              size={28}
+              className="mb-4"
+              style={{ color: "var(--text-faint)" }}
+            />
+            <p
+              className="font-medium"
+              style={{
+                color: "var(--text-muted)",
+                fontFamily: "var(--font-dm-sans, sans-serif)",
+              }}
+            >
+              No orders yet
+            </p>
+          </div>
+        )}
+
         {orders.map((order) => {
-          const style =
+          const s =
             STATUS_STYLES[order.status as keyof typeof STATUS_STYLES] ??
             STATUS_STYLES.PENDING;
           return (
@@ -148,7 +173,7 @@ export default async function AdminOrdersPage() {
                 boxShadow: "var(--shadow-card)",
               }}
             >
-              {/* Image */}
+              {/* Product image */}
               <div
                 className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0"
                 style={{ background: "var(--bg-subtle)" }}
@@ -216,7 +241,7 @@ export default async function AdminOrdersPage() {
                 }
               </span>
 
-              {/* Status select — client component */}
+              {/* Status select */}
               <AdminOrderStatusSelect
                 orderId={order.id}
                 currentStatus={order.status}

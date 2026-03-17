@@ -31,30 +31,38 @@ export default async function AdminProductsPage() {
   ).length;
 
   return (
-    <div className="p-6 lg:p-8 space-y-6 w-[90%] mx-auto ">
+    <div className="p-6 lg:p-8 space-y-6 w-[90%] mx-auto">
       {/* Header */}
       <div className="flex items-center justify-between gap-4">
         <div className="space-y-1">
           <h1
-            className="text-3xl font-bold text-slate-800 tracking-tight"
+            className="text-3xl font-bold tracking-tight"
             style={{
-              fontFamily: "var(--font-playfair, serif)",
+              color: "var(--text-primary)",
+              fontFamily: "var(--font-syne, sans-serif)",
               letterSpacing: "-0.02em",
             }}
           >
             Products
           </h1>
           <p
-            className="text-slate-500 text-sm"
-            style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+            className="text-sm"
+            style={{
+              color: "var(--text-muted)",
+              fontFamily: "var(--font-dm-sans, sans-serif)",
+            }}
           >
             {products.length} products in catalogue
             {lowStockCount > 0 && (
               <Link
                 href="/admin/low-stock"
-                className="ml-2 text-red-500 hover:text-red-700 font-medium
-                  transition-[color] duration-150 underline underline-offset-2
-                  focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-red-500"
+                className="ml-2 font-medium underline underline-offset-2
+                  transition-[color] duration-150
+                  focus-visible:outline-2 focus-visible:outline-offset-1"
+                style={{
+                  color: "var(--status-cancelled)",
+                  outlineColor: "var(--status-cancelled)",
+                }}
               >
                 · {lowStockCount} low stock
               </Link>
@@ -62,16 +70,19 @@ export default async function AdminProductsPage() {
           </p>
         </div>
 
+        {/* Add product CTA */}
         <Link
           href="/admin/products/new"
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold
-            text-white bg-[#D4A853]
-            shadow-[0_2px_8px_rgba(212,168,83,0.3)]
-            hover:brightness-105 hover:-translate-y-0.5
-            active:translate-y-0
-            transition-[filter,transform,box-shadow] duration-150
-            focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D4A853]"
-          style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white
+            hover:brightness-105 hover:-translate-y-0.5 active:translate-y-0
+            transition-[filter,transform] duration-150
+            focus-visible:outline-2 focus-visible:outline-offset-2"
+          style={{
+            background: `linear-gradient(135deg, var(--brand-hex) 0%, var(--brand-dim) 100%)`,
+            boxShadow: "var(--shadow-brand)",
+            outlineColor: "var(--brand-hex)",
+            fontFamily: "var(--font-dm-sans, sans-serif)",
+          }}
         >
           <Plus size={15} />
           Add Product
@@ -83,22 +94,31 @@ export default async function AdminProductsPage() {
         <div
           className="flex flex-col items-center justify-center py-24 text-center rounded-3xl"
           style={{
-            background: "rgba(0,0,0,0.02)",
-            border: "1px solid rgba(0,0,0,0.06)",
+            background: "var(--bg-subtle)",
+            border: "1px solid var(--border)",
           }}
         >
-          <Package size={28} className="text-slate-300 mb-4" />
+          <Package
+            size={28}
+            className="mb-4"
+            style={{ color: "var(--text-faint)" }}
+          />
           <p
-            className="text-slate-500 font-medium"
-            style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+            className="font-medium"
+            style={{
+              color: "var(--text-muted)",
+              fontFamily: "var(--font-dm-sans, sans-serif)",
+            }}
           >
             No products yet
           </p>
           <Link
             href="/admin/products/new"
-            className="mt-4 text-sm text-[#D4A853] hover:text-slate-800 font-medium
-              transition-[color] duration-150"
-            style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+            className="mt-4 text-sm font-medium transition-[color] duration-150"
+            style={{
+              color: "var(--brand-hex)",
+              fontFamily: "var(--font-dm-sans, sans-serif)",
+            }}
           >
             Add your first product →
           </Link>

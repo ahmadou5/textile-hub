@@ -101,7 +101,6 @@ export default function NewProductPage() {
         category: values.category,
         description: values.description || undefined,
         imageUrl: values.imageUrl || undefined,
-        // Send as numbers — API converts to cents
         retailPricePerYard: parseFloat(values.retailPricePerYard),
         wholesalePricePerYard: parseFloat(values.wholesalePricePerYard),
         totalYardsInStock: parseInt(values.totalYardsInStock),
@@ -129,7 +128,13 @@ export default function NewProductPage() {
       {/* Back link */}
       <Link
         href="/admin/products"
-        className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-800 transition-[color] duration-150 group"
+        className="inline-flex items-center gap-2 text-sm transition-[color] duration-150 group
+          focus-visible:outline-2 focus-visible:outline-offset-2"
+        style={{
+          color: "var(--text-muted)",
+          outlineColor: "var(--brand-hex)",
+          fontFamily: "var(--font-dm-sans, sans-serif)",
+        }}
       >
         <ArrowLeft
           size={15}
@@ -141,31 +146,51 @@ export default function NewProductPage() {
       {/* Page header */}
       <div className="space-y-1">
         <h1
-          className="text-3xl font-bold text-slate-800 tracking-tight"
+          className="text-3xl font-bold tracking-tight"
           style={{
-            fontFamily: "var(--font-playfair, serif)",
+            color: "var(--text-primary)",
+            fontFamily: "var(--font-syne, sans-serif)",
             letterSpacing: "-0.02em",
           }}
         >
           Add New Product
         </h1>
-        <p className="text-slate-500 text-sm">
+        <p
+          className="text-sm"
+          style={{
+            color: "var(--text-muted)",
+            fontFamily: "var(--font-dm-sans, sans-serif)",
+          }}
+        >
           Prices are entered in your currency — stored as integers internally.
         </p>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
         {/* Basic Info */}
-        <Card className="border border-slate-200/80 shadow-[0_2px_8px_rgba(0,0,0,0.05)]">
-          <CardHeader className="pb-3 border-b border-slate-100">
+        <Card
+          className="border shadow-none"
+          style={{
+            background: "var(--bg-card)",
+            borderColor: "var(--border-brand)",
+            boxShadow: "var(--shadow-card)",
+          }}
+        >
+          <CardHeader
+            className="pb-3"
+            style={{ borderBottom: "1px solid var(--border)" }}
+          >
             <CardTitle
-              className="text-base font-semibold text-slate-700 flex items-center gap-2"
-              style={{ fontFamily: "var(--font-playfair, serif)" }}
+              className="text-base font-semibold flex items-center gap-2"
+              style={{
+                color: "var(--text-primary)",
+                fontFamily: "var(--font-syne, sans-serif)",
+              }}
             >
-              <Package size={16} className="text-[#D4A853]" />
+              <Package size={16} style={{ color: "var(--brand-hex)" }} />
               Product Information
             </CardTitle>
-            <CardDescription className="text-xs text-slate-400">
+            <CardDescription style={{ color: "var(--text-faint)" }}>
               Basic details visible to all users
             </CardDescription>
           </CardHeader>
@@ -174,31 +199,79 @@ export default function NewProductPage() {
             <div className="space-y-1.5">
               <Label
                 htmlFor="name"
-                className="text-sm font-medium text-slate-600"
+                className="text-xs font-semibold uppercase tracking-wider"
+                style={{
+                  color: "var(--text-muted)",
+                  fontFamily: "var(--font-dm-sans, sans-serif)",
+                }}
               >
-                Product Name <span className="text-red-400">*</span>
+                Product Name{" "}
+                <span style={{ color: "var(--status-cancelled)" }}>*</span>
               </Label>
               <Input
                 id="name"
                 placeholder="e.g. Royal Blue Ankara Print"
                 {...register("name")}
-                className="border-slate-200 focus:border-[#D4A853] focus:ring-[#D4A853]/20 transition-[border-color,box-shadow] duration-200"
+                className="text-sm outline-none transition-[border-color,box-shadow] duration-200"
+                style={{
+                  background: "var(--bg-subtle)",
+                  border: "1px solid var(--border)",
+                  color: "var(--text-primary)",
+                  fontFamily: "var(--font-dm-sans, sans-serif)",
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = "var(--brand-hex)";
+                  e.target.style.boxShadow = "0 0 0 3px var(--brand-glow)";
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = "var(--border)";
+                  e.target.style.boxShadow = "none";
+                }}
               />
               {errors.name && (
-                <p className="text-xs text-red-500">{errors.name.message}</p>
+                <p
+                  className="text-xs"
+                  style={{ color: "var(--status-cancelled)" }}
+                >
+                  {errors.name.message}
+                </p>
               )}
             </div>
 
             {/* Category */}
             <div className="space-y-1.5">
-              <Label className="text-sm font-medium text-slate-600">
-                Category <span className="text-red-400">*</span>
+              <Label
+                className="text-xs font-semibold uppercase tracking-wider"
+                style={{
+                  color: "var(--text-muted)",
+                  fontFamily: "var(--font-dm-sans, sans-serif)",
+                }}
+              >
+                Category{" "}
+                <span style={{ color: "var(--status-cancelled)" }}>*</span>
               </Label>
               <Select onValueChange={(val) => setValue("category", val)}>
-                <SelectTrigger className="border-slate-200 focus:border-[#D4A853] transition-[border-color] duration-200">
-                  <SelectValue placeholder="Select fabric category…" />
+                <SelectTrigger
+                  className="text-sm transition-[border-color,box-shadow] duration-200"
+                  style={{
+                    background: "var(--bg-subtle)",
+                    border: "1px solid var(--border)",
+                    color: "var(--text-primary)",
+                    fontFamily: "var(--font-dm-sans, sans-serif)",
+                  }}
+                >
+                  <SelectValue
+                    placeholder="Select fabric category…"
+                    style={{ color: "var(--text-faint)" }}
+                  />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent
+                  style={{
+                    background: "var(--bg-card)",
+                    border: "1px solid var(--border-brand)",
+                    color: "var(--text-primary)",
+                  }}
+                >
                   {CATEGORIES.map((cat) => (
                     <SelectItem key={cat} value={cat}>
                       {cat}
@@ -207,7 +280,10 @@ export default function NewProductPage() {
                 </SelectContent>
               </Select>
               {errors.category && (
-                <p className="text-xs text-red-500">
+                <p
+                  className="text-xs"
+                  style={{ color: "var(--status-cancelled)" }}
+                >
                   {errors.category.message}
                 </p>
               )}
@@ -217,10 +293,17 @@ export default function NewProductPage() {
             <div className="space-y-1.5">
               <Label
                 htmlFor="description"
-                className="text-sm font-medium text-slate-600"
+                className="text-xs font-semibold uppercase tracking-wider"
+                style={{
+                  color: "var(--text-muted)",
+                  fontFamily: "var(--font-dm-sans, sans-serif)",
+                }}
               >
-                Description
-                <span className="text-slate-400 font-normal ml-1">
+                Description{" "}
+                <span
+                  className="font-normal normal-case tracking-normal"
+                  style={{ color: "var(--text-faint)" }}
+                >
                   (optional)
                 </span>
               </Label>
@@ -229,7 +312,21 @@ export default function NewProductPage() {
                 placeholder="Material composition, pattern details, care instructions…"
                 rows={3}
                 {...register("description")}
-                className="border-slate-200 focus:border-[#D4A853] resize-none transition-[border-color] duration-200"
+                className="text-sm outline-none resize-none transition-[border-color,box-shadow] duration-200"
+                style={{
+                  background: "var(--bg-subtle)",
+                  border: "1px solid var(--border)",
+                  color: "var(--text-primary)",
+                  fontFamily: "var(--font-dm-sans, sans-serif)",
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = "var(--brand-hex)";
+                  e.target.style.boxShadow = "0 0 0 3px var(--brand-glow)";
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = "var(--border)";
+                  e.target.style.boxShadow = "none";
+                }}
               />
             </div>
 
@@ -237,10 +334,17 @@ export default function NewProductPage() {
             <div className="space-y-1.5">
               <Label
                 htmlFor="imageUrl"
-                className="text-sm font-medium text-slate-600"
+                className="text-xs font-semibold uppercase tracking-wider"
+                style={{
+                  color: "var(--text-muted)",
+                  fontFamily: "var(--font-dm-sans, sans-serif)",
+                }}
               >
-                Image URL
-                <span className="text-slate-400 font-normal ml-1">
+                Image URL{" "}
+                <span
+                  className="font-normal normal-case tracking-normal"
+                  style={{ color: "var(--text-faint)" }}
+                >
                   (optional)
                 </span>
               </Label>
@@ -248,10 +352,27 @@ export default function NewProductPage() {
                 id="imageUrl"
                 placeholder="https://example.com/fabric-image.jpg"
                 {...register("imageUrl")}
-                className="border-slate-200 focus:border-[#D4A853] transition-[border-color] duration-200"
+                className="text-sm outline-none transition-[border-color,box-shadow] duration-200"
+                style={{
+                  background: "var(--bg-subtle)",
+                  border: "1px solid var(--border)",
+                  color: "var(--text-primary)",
+                  fontFamily: "var(--font-dm-sans, sans-serif)",
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = "var(--brand-hex)";
+                  e.target.style.boxShadow = "0 0 0 3px var(--brand-glow)";
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = "var(--border)";
+                  e.target.style.boxShadow = "none";
+                }}
               />
               {errors.imageUrl && (
-                <p className="text-xs text-red-500">
+                <p
+                  className="text-xs"
+                  style={{ color: "var(--status-cancelled)" }}
+                >
                   {errors.imageUrl.message}
                 </p>
               )}
@@ -260,15 +381,28 @@ export default function NewProductPage() {
         </Card>
 
         {/* Pricing */}
-        <Card className="border border-slate-200/80 shadow-[0_2px_8px_rgba(0,0,0,0.05)]">
-          <CardHeader className="pb-3 border-b border-slate-100">
+        <Card
+          className="border shadow-none"
+          style={{
+            background: "var(--bg-card)",
+            borderColor: "var(--border-brand)",
+            boxShadow: "var(--shadow-card)",
+          }}
+        >
+          <CardHeader
+            className="pb-3"
+            style={{ borderBottom: "1px solid var(--border)" }}
+          >
             <CardTitle
-              className="text-base font-semibold text-slate-700"
-              style={{ fontFamily: "var(--font-playfair, serif)" }}
+              className="text-base font-semibold"
+              style={{
+                color: "var(--text-primary)",
+                fontFamily: "var(--font-syne, sans-serif)",
+              }}
             >
               Pricing per Yard
             </CardTitle>
-            <CardDescription className="text-xs text-slate-400">
+            <CardDescription style={{ color: "var(--text-faint)" }}>
               Enter in your currency (₦ or $). Stored as integers to avoid
               floating point errors.
             </CardDescription>
@@ -279,12 +413,20 @@ export default function NewProductPage() {
               <div className="space-y-1.5">
                 <Label
                   htmlFor="retailPrice"
-                  className="text-sm font-medium text-slate-600"
+                  className="text-xs font-semibold uppercase tracking-wider"
+                  style={{
+                    color: "var(--text-muted)",
+                    fontFamily: "var(--font-dm-sans, sans-serif)",
+                  }}
                 >
-                  Retail Price / Yard <span className="text-red-400">*</span>
+                  Retail Price / Yard{" "}
+                  <span style={{ color: "var(--status-cancelled)" }}>*</span>
                 </Label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-medium">
+                  <span
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-medium pointer-events-none"
+                    style={{ color: "var(--text-faint)" }}
+                  >
                     ₦
                   </span>
                   <Input
@@ -294,11 +436,28 @@ export default function NewProductPage() {
                     min="0"
                     placeholder="1500.00"
                     {...register("retailPricePerYard")}
-                    className="pl-7 border-slate-200 focus:border-[#D4A853] transition-[border-color] duration-200"
+                    className="pl-7 text-sm outline-none transition-[border-color,box-shadow] duration-200"
+                    style={{
+                      background: "var(--bg-subtle)",
+                      border: "1px solid var(--border)",
+                      color: "var(--text-primary)",
+                      fontFamily: "var(--font-dm-sans, sans-serif)",
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = "var(--brand-hex)";
+                      e.target.style.boxShadow = "0 0 0 3px var(--brand-glow)";
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = "var(--border)";
+                      e.target.style.boxShadow = "none";
+                    }}
                   />
                 </div>
                 {errors.retailPricePerYard && (
-                  <p className="text-xs text-red-500">
+                  <p
+                    className="text-xs"
+                    style={{ color: "var(--status-cancelled)" }}
+                  >
                     {errors.retailPricePerYard.message}
                   </p>
                 )}
@@ -308,12 +467,20 @@ export default function NewProductPage() {
               <div className="space-y-1.5">
                 <Label
                   htmlFor="wholesalePrice"
-                  className="text-sm font-medium text-slate-600"
+                  className="text-xs font-semibold uppercase tracking-wider"
+                  style={{
+                    color: "var(--text-muted)",
+                    fontFamily: "var(--font-dm-sans, sans-serif)",
+                  }}
                 >
-                  Wholesale Price / Yard <span className="text-red-400">*</span>
+                  Wholesale Price / Yard{" "}
+                  <span style={{ color: "var(--status-cancelled)" }}>*</span>
                 </Label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-medium">
+                  <span
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-medium pointer-events-none"
+                    style={{ color: "var(--text-faint)" }}
+                  >
                     ₦
                   </span>
                   <Input
@@ -323,11 +490,28 @@ export default function NewProductPage() {
                     min="0"
                     placeholder="1200.00"
                     {...register("wholesalePricePerYard")}
-                    className="pl-7 border-slate-200 focus:border-[#D4A853] transition-[border-color] duration-200"
+                    className="pl-7 text-sm outline-none transition-[border-color,box-shadow] duration-200"
+                    style={{
+                      background: "var(--bg-subtle)",
+                      border: "1px solid var(--border)",
+                      color: "var(--text-primary)",
+                      fontFamily: "var(--font-dm-sans, sans-serif)",
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = "var(--brand-hex)";
+                      e.target.style.boxShadow = "0 0 0 3px var(--brand-glow)";
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = "var(--border)";
+                      e.target.style.boxShadow = "none";
+                    }}
                   />
                 </div>
                 {errors.wholesalePricePerYard && (
-                  <p className="text-xs text-red-500">
+                  <p
+                    className="text-xs"
+                    style={{ color: "var(--status-cancelled)" }}
+                  >
                     {errors.wholesalePricePerYard.message}
                   </p>
                 )}
@@ -336,9 +520,24 @@ export default function NewProductPage() {
 
             {/* Live margin indicator */}
             {priceDiff && (
-              <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-50 border border-emerald-200">
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                <p className="text-xs text-emerald-700 font-medium">
+              <div
+                className="flex items-center gap-2 px-3 py-2 rounded-lg"
+                style={{
+                  background: "rgba(5,150,105,0.08)",
+                  border: "1px solid rgba(5,150,105,0.2)",
+                }}
+              >
+                <div
+                  className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                  style={{ background: "var(--status-confirmed)" }}
+                />
+                <p
+                  className="text-xs font-medium"
+                  style={{
+                    color: "var(--status-confirmed)",
+                    fontFamily: "var(--font-dm-sans, sans-serif)",
+                  }}
+                >
                   Wholesale is{" "}
                   <span className="font-bold">{priceDiff}% below retail</span> —
                   margin looks good
@@ -347,9 +546,24 @@ export default function NewProductPage() {
             )}
 
             {retail > 0 && wholesale >= retail && (
-              <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-red-50 border border-red-200">
-                <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
-                <p className="text-xs text-red-700 font-medium">
+              <div
+                className="flex items-center gap-2 px-3 py-2 rounded-lg"
+                style={{
+                  background: "rgba(220,38,38,0.08)",
+                  border: "1px solid rgba(220,38,38,0.2)",
+                }}
+              >
+                <div
+                  className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                  style={{ background: "var(--status-cancelled)" }}
+                />
+                <p
+                  className="text-xs font-medium"
+                  style={{
+                    color: "var(--status-cancelled)",
+                    fontFamily: "var(--font-dm-sans, sans-serif)",
+                  }}
+                >
                   Wholesale price must be lower than retail price
                 </p>
               </div>
@@ -358,11 +572,24 @@ export default function NewProductPage() {
         </Card>
 
         {/* Stock */}
-        <Card className="border border-slate-200/80 shadow-[0_2px_8px_rgba(0,0,0,0.05)]">
-          <CardHeader className="pb-3 border-b border-slate-100">
+        <Card
+          className="border shadow-none"
+          style={{
+            background: "var(--bg-card)",
+            borderColor: "var(--border-brand)",
+            boxShadow: "var(--shadow-card)",
+          }}
+        >
+          <CardHeader
+            className="pb-3"
+            style={{ borderBottom: "1px solid var(--border)" }}
+          >
             <CardTitle
-              className="text-base font-semibold text-slate-700"
-              style={{ fontFamily: "var(--font-playfair, serif)" }}
+              className="text-base font-semibold"
+              style={{
+                color: "var(--text-primary)",
+                fontFamily: "var(--font-syne, sans-serif)",
+              }}
             >
               Inventory
             </CardTitle>
@@ -371,9 +598,14 @@ export default function NewProductPage() {
             <div className="space-y-1.5 max-w-xs">
               <Label
                 htmlFor="stock"
-                className="text-sm font-medium text-slate-600"
+                className="text-xs font-semibold uppercase tracking-wider"
+                style={{
+                  color: "var(--text-muted)",
+                  fontFamily: "var(--font-dm-sans, sans-serif)",
+                }}
               >
-                Total Yards in Stock <span className="text-red-400">*</span>
+                Total Yards in Stock{" "}
+                <span style={{ color: "var(--status-cancelled)" }}>*</span>
               </Label>
               <div className="relative">
                 <Input
@@ -383,18 +615,44 @@ export default function NewProductPage() {
                   step="1"
                   placeholder="500"
                   {...register("totalYardsInStock")}
-                  className="border-slate-200 focus:border-[#D4A853] transition-[border-color] duration-200"
+                  className="text-sm outline-none transition-[border-color,box-shadow] duration-200"
+                  style={{
+                    background: "var(--bg-subtle)",
+                    border: "1px solid var(--border)",
+                    color: "var(--text-primary)",
+                    fontFamily: "var(--font-dm-sans, sans-serif)",
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = "var(--brand-hex)";
+                    e.target.style.boxShadow = "0 0 0 3px var(--brand-glow)";
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = "var(--border)";
+                    e.target.style.boxShadow = "none";
+                  }}
                 />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs">
+                <span
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs pointer-events-none"
+                  style={{ color: "var(--text-faint)" }}
+                >
                   yds
                 </span>
               </div>
               {errors.totalYardsInStock && (
-                <p className="text-xs text-red-500">
+                <p
+                  className="text-xs"
+                  style={{ color: "var(--status-cancelled)" }}
+                >
                   {errors.totalYardsInStock.message}
                 </p>
               )}
-              <p className="text-xs text-slate-400">
+              <p
+                className="text-xs"
+                style={{
+                  color: "var(--text-faint)",
+                  fontFamily: "var(--font-dm-sans, sans-serif)",
+                }}
+              >
                 Items below 20 yards will trigger a low stock alert.
               </p>
             </div>
@@ -403,20 +661,50 @@ export default function NewProductPage() {
 
         {/* Error banner */}
         {error && (
-          <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-red-50 border border-red-200">
-            <div className="w-2 h-2 rounded-full bg-red-500 flex-shrink-0" />
-            <p className="text-sm text-red-700">{error}</p>
+          <div
+            className="flex items-center gap-3 px-4 py-3 rounded-xl"
+            style={{
+              background: "rgba(220,38,38,0.08)",
+              border: "1px solid rgba(220,38,38,0.2)",
+            }}
+          >
+            <div
+              className="w-2 h-2 rounded-full flex-shrink-0"
+              style={{ background: "var(--status-cancelled)" }}
+            />
+            <p
+              className="text-sm"
+              style={{
+                color: "var(--status-cancelled)",
+                fontFamily: "var(--font-dm-sans, sans-serif)",
+              }}
+            >
+              {error}
+            </p>
           </div>
         )}
 
         {/* Success banner */}
         {success && (
-          <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-emerald-50 border border-emerald-200">
+          <div
+            className="flex items-center gap-3 px-4 py-3 rounded-xl"
+            style={{
+              background: "rgba(5,150,105,0.08)",
+              border: "1px solid rgba(5,150,105,0.2)",
+            }}
+          >
             <CheckCircle2
               size={16}
-              className="text-emerald-600 flex-shrink-0"
+              className="flex-shrink-0"
+              style={{ color: "var(--status-confirmed)" }}
             />
-            <p className="text-sm text-emerald-700 font-medium">
+            <p
+              className="text-sm font-medium"
+              style={{
+                color: "var(--status-confirmed)",
+                fontFamily: "var(--font-dm-sans, sans-serif)",
+              }}
+            >
               Product created! Redirecting…
             </p>
           </div>
@@ -427,16 +715,18 @@ export default function NewProductPage() {
           <Button
             type="submit"
             disabled={loading || success}
-            className="
-              px-8 py-2.5 rounded-xl font-semibold text-sm
-              bg-[#D4A853] text-slate-900
-              shadow-[0_2px_8px_rgba(212,168,83,0.3),0_1px_2px_rgba(0,0,0,0.1)]
+            className="px-8 py-2.5 rounded-xl font-semibold text-sm text-white
               hover:brightness-105 hover:-translate-y-0.5
               active:translate-y-0 active:brightness-95
               transition-[transform,filter,box-shadow] duration-150
-              focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D4A853]
-              disabled:opacity-50 disabled:cursor-not-allowed disabled:translate-y-0
-            "
+              focus-visible:outline-2 focus-visible:outline-offset-2
+              disabled:opacity-50 disabled:cursor-not-allowed disabled:translate-y-0"
+            style={{
+              background: `linear-gradient(135deg, var(--brand-hex) 0%, var(--brand-dim) 100%)`,
+              boxShadow: "var(--shadow-brand)",
+              outlineColor: "var(--brand-hex)",
+              fontFamily: "var(--font-dm-sans, sans-serif)",
+            }}
           >
             {loading ? (
               <span className="flex items-center gap-2">
@@ -457,7 +747,11 @@ export default function NewProductPage() {
             <Button
               type="button"
               variant="ghost"
-              className="text-slate-500 hover:text-slate-700 transition-[color] duration-150"
+              className="transition-[color] duration-150"
+              style={{
+                color: "var(--text-muted)",
+                fontFamily: "var(--font-dm-sans, sans-serif)",
+              }}
             >
               Cancel
             </Button>

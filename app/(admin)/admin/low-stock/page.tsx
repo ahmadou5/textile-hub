@@ -2,14 +2,7 @@
 import { requireRole } from "@/lib/auth";
 import { db } from "@/lib/db";
 import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
-import {
-  ArrowLeft,
-  AlertTriangle,
-  Package,
-  TrendingDown,
-  ShieldAlert,
-} from "lucide-react";
+import { ArrowLeft, AlertTriangle, Package, ShieldAlert } from "lucide-react";
 import type { Metadata } from "next";
 import RestockButton from "@/components/admin/RestockButton";
 
@@ -26,14 +19,14 @@ function formatPrice(cents: number): string {
 
 const CRITICAL = 10;
 const LOW = 20;
-const MAX_DISPLAY = 100; // bar scale cap
+const MAX_DISPLAY = 100;
 
 export default async function LowStockPage() {
   await requireRole("ADMIN");
 
   const lowStockProducts = await db.products.findMany({
     where: { totalYardsInStock: { lt: LOW } },
-    orderBy: { totalYardsInStock: "asc" }, // most critical first
+    orderBy: { totalYardsInStock: "asc" },
     select: {
       id: true,
       name: true,
@@ -53,7 +46,6 @@ export default async function LowStockPage() {
       p.totalYardsInStock >= CRITICAL && p.totalYardsInStock < LOW,
   ).length;
 
-  // Overall stock health for context bar
   const totalProducts = await db.products.count();
   const healthyCount = totalProducts - lowStockProducts.length;
 
@@ -62,10 +54,14 @@ export default async function LowStockPage() {
       {/* Back */}
       <Link
         href="/admin"
-        className="inline-flex items-center gap-2 text-sm text-slate-500
-          hover:text-slate-800 transition-[color] duration-150 group
-          focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D4A853]"
-        style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+        className="inline-flex items-center gap-2 text-sm group
+          transition-[color] duration-150
+          focus-visible:outline-2 focus-visible:outline-offset-2"
+        style={{
+          color: "var(--text-muted)",
+          outlineColor: "var(--brand-hex)",
+          fontFamily: "var(--font-dm-sans, sans-serif)",
+        }}
       >
         <ArrowLeft
           size={14}
@@ -79,9 +75,10 @@ export default async function LowStockPage() {
         <div className="space-y-1">
           <div className="flex items-center gap-3">
             <h1
-              className="text-3xl font-bold text-slate-800 tracking-tight"
+              className="text-3xl font-bold tracking-tight"
               style={{
-                fontFamily: "var(--font-playfair, serif)",
+                color: "var(--text-primary)",
+                fontFamily: "var(--font-syne, sans-serif)",
                 letterSpacing: "-0.02em",
               }}
             >
@@ -91,9 +88,9 @@ export default async function LowStockPage() {
               <span
                 className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold"
                 style={{
-                  background: "rgba(239,68,68,0.08)",
-                  border: "1px solid rgba(239,68,68,0.2)",
-                  color: "#ef4444",
+                  background: "rgba(220,38,38,0.08)",
+                  border: "1px solid rgba(220,38,38,0.2)",
+                  color: "var(--status-cancelled)",
                   fontFamily: "var(--font-dm-sans, sans-serif)",
                 }}
               >
@@ -103,8 +100,11 @@ export default async function LowStockPage() {
             )}
           </div>
           <p
-            className="text-slate-500 text-sm"
-            style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+            className="text-sm"
+            style={{
+              color: "var(--text-muted)",
+              fontFamily: "var(--font-dm-sans, sans-serif)",
+            }}
           >
             Products with fewer than 20 yards remaining
           </p>
@@ -115,21 +115,27 @@ export default async function LowStockPage() {
       <div
         className="p-5 rounded-2xl space-y-4"
         style={{
-          background: "rgba(255,255,255,0.6)",
-          border: "1px solid rgba(0,0,0,0.06)",
-          boxShadow: "0 2px_4px rgba(0,0,0,0.04), 0 8px_16px rgba(0,0,0,0.03)",
+          background: "var(--bg-card)",
+          border: "1px solid var(--border-brand)",
+          boxShadow: "var(--shadow-card)",
         }}
       >
         <div className="flex items-center justify-between">
           <span
-            className="text-xs font-semibold uppercase tracking-wider text-slate-500"
-            style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+            className="text-xs font-semibold uppercase tracking-wider"
+            style={{
+              color: "var(--text-muted)",
+              fontFamily: "var(--font-dm-sans, sans-serif)",
+            }}
           >
             Inventory Health — {totalProducts} products total
           </span>
           <span
-            className="text-xs text-slate-400"
-            style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+            className="text-xs"
+            style={{
+              color: "var(--text-faint)",
+              fontFamily: "var(--font-dm-sans, sans-serif)",
+            }}
           >
             {Math.round((healthyCount / totalProducts) * 100)}% healthy
           </span>
@@ -137,54 +143,69 @@ export default async function LowStockPage() {
 
         {/* Segmented bar */}
         <div className="h-3 rounded-full overflow-hidden flex gap-0.5">
-          {/* Critical */}
           {criticalCount > 0 && (
             <div
               className="h-full rounded-l-full"
               style={{
                 width: `${(criticalCount / totalProducts) * 100}%`,
                 background: "linear-gradient(90deg, #dc2626, #ef4444)",
-                boxShadow: "0 0 8px rgba(239,68,68,0.4)",
-                minWidth: criticalCount > 0 ? "8px" : "0",
+                boxShadow: "0 0 8px rgba(220,38,38,0.4)",
+                minWidth: "8px",
               }}
             />
           )}
-          {/* Low */}
           {lowCount > 0 && (
             <div
               className="h-full"
               style={{
                 width: `${(lowCount / totalProducts) * 100}%`,
                 background: "linear-gradient(90deg, #d97706, #f59e0b)",
-                boxShadow: "0 0 6px rgba(245,158,11,0.3)",
-                minWidth: lowCount > 0 ? "8px" : "0",
+                boxShadow: "0 0 6px rgba(217,119,6,0.3)",
+                minWidth: "8px",
               }}
             />
           )}
-          {/* Healthy */}
           <div
             className="h-full flex-1 rounded-r-full"
             style={{
-              background: "linear-gradient(90deg, #10b981, #34d399)",
+              background: `linear-gradient(90deg, var(--brand-hex), var(--brand-bright))`,
             }}
           />
         </div>
 
         {/* Legend */}
         <div
-          className="flex items-center gap-5 text-xs"
+          className="flex items-center gap-5 text-xs flex-wrap"
           style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
         >
-          <span className="flex items-center gap-1.5 text-red-500">
-            <span className="w-2.5 h-2.5 rounded-full bg-red-500 flex-shrink-0" />
+          <span
+            className="flex items-center gap-1.5"
+            style={{ color: "var(--status-cancelled)" }}
+          >
+            <span
+              className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+              style={{ background: "var(--status-cancelled)" }}
+            />
             Critical (&lt;10 yds) · {criticalCount}
           </span>
-          <span className="flex items-center gap-1.5 text-amber-500">
-            <span className="w-2.5 h-2.5 rounded-full bg-amber-500 flex-shrink-0" />
+          <span
+            className="flex items-center gap-1.5"
+            style={{ color: "var(--status-pending)" }}
+          >
+            <span
+              className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+              style={{ background: "var(--status-pending)" }}
+            />
             Low (10–19 yds) · {lowCount}
           </span>
-          <span className="flex items-center gap-1.5 text-emerald-500">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 flex-shrink-0" />
+          <span
+            className="flex items-center gap-1.5"
+            style={{ color: "var(--status-confirmed)" }}
+          >
+            <span
+              className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+              style={{ background: "var(--status-confirmed)" }}
+            />
             Healthy (20+ yds) · {healthyCount}
           </span>
         </div>
@@ -195,28 +216,34 @@ export default async function LowStockPage() {
         <div
           className="flex flex-col items-center justify-center py-24 text-center rounded-3xl"
           style={{
-            background: "rgba(16,185,129,0.03)",
-            border: "1px solid rgba(16,185,129,0.12)",
+            background: "var(--bg-subtle)",
+            border: "1px solid var(--border-brand)",
           }}
         >
           <div
             className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4"
             style={{
-              background: "rgba(16,185,129,0.08)",
-              border: "1px solid rgba(16,185,129,0.2)",
+              background: "var(--brand-glow)",
+              border: "1px solid var(--border-brand)",
             }}
           >
-            <Package size={22} className="text-emerald-500" />
+            <Package size={22} style={{ color: "var(--brand-hex)" }} />
           </div>
           <h3
-            className="text-lg font-bold text-slate-700"
-            style={{ fontFamily: "var(--font-playfair, serif)" }}
+            className="text-lg font-bold"
+            style={{
+              color: "var(--text-primary)",
+              fontFamily: "var(--font-syne, sans-serif)",
+            }}
           >
             All stock levels healthy
           </h3>
           <p
-            className="text-slate-500 text-sm mt-1 max-w-xs"
-            style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+            className="text-sm mt-1 max-w-xs"
+            style={{
+              color: "var(--text-muted)",
+              fontFamily: "var(--font-dm-sans, sans-serif)",
+            }}
           >
             Every product has 20 or more yards in stock. No action needed.
           </p>
@@ -226,25 +253,27 @@ export default async function LowStockPage() {
         <div
           className="rounded-2xl overflow-hidden"
           style={{
-            border: "1px solid rgba(0,0,0,0.07)",
-            boxShadow:
-              "0 2px_4px rgba(0,0,0,0.04), 0 8px_24px rgba(0,0,0,0.04)",
+            border: "1px solid var(--border)",
+            boxShadow: "var(--shadow-card)",
           }}
         >
           {/* Table header */}
           <div
             className="grid grid-cols-[1fr_120px_160px_120px_140px] gap-4 px-5 py-3"
             style={{
-              background: "rgba(0,0,0,0.02)",
-              borderBottom: "1px solid rgba(0,0,0,0.06)",
+              background: "var(--bg-subtle)",
+              borderBottom: "1px solid var(--border)",
             }}
           >
             {["Product", "Category", "Stock Level", "Value/yd", "Action"].map(
               (h) => (
                 <span
                   key={h}
-                  className="text-[10px] font-bold uppercase tracking-wider text-slate-400"
-                  style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+                  className="text-[10px] font-bold uppercase tracking-wider"
+                  style={{
+                    color: "var(--text-faint)",
+                    fontFamily: "var(--font-dm-sans, sans-serif)",
+                  }}
                 >
                   {h}
                 </span>
@@ -253,7 +282,7 @@ export default async function LowStockPage() {
           </div>
 
           {/* Rows */}
-          <div className="divide-y divide-slate-100">
+          <div>
             {lowStockProducts.map(
               (
                 product: {
@@ -275,11 +304,13 @@ export default async function LowStockPage() {
                 return (
                   <div
                     key={product.id}
-                    className="grid grid-cols-[1fr_120px_160px_120px_140px] gap-4 px-5 py-4 items-center bg-white"
+                    className="grid grid-cols-[1fr_120px_160px_120px_140px] gap-4 px-5 py-4 items-center"
                     style={{
                       background: isCritical
-                        ? "rgba(239,68,68,0.02)"
-                        : "rgba(245,158,11,0.015)",
+                        ? "rgba(220,38,38,0.03)"
+                        : "rgba(217,119,6,0.02)",
+                      borderTop:
+                        index === 0 ? "none" : "1px solid var(--border)",
                     }}
                   >
                     {/* Name */}
@@ -288,24 +319,33 @@ export default async function LowStockPage() {
                         {isCritical && (
                           <ShieldAlert
                             size={13}
-                            className="text-red-500 flex-shrink-0"
+                            className="flex-shrink-0"
+                            style={{ color: "var(--status-cancelled)" }}
                           />
                         )}
                         <Link
-                          href={`/admin/products`}
-                          className="text-sm font-semibold text-slate-800 truncate hover:text-[#D4A853]
-                          transition-[color] duration-150
-                          focus-visible:outline-none focus-visible:underline"
+                          href="/admin/products"
+                          className="text-sm font-semibold truncate transition-[color] duration-150
+                            focus-visible:outline-none focus-visible:underline"
                           style={{
+                            color: "var(--text-primary)",
                             fontFamily: "var(--font-dm-sans, sans-serif)",
                           }}
+                          onMouseEnter={(e) =>
+                            (e.currentTarget.style.color = "var(--brand-hex)")
+                          }
+                          onMouseLeave={(e) =>
+                            (e.currentTarget.style.color =
+                              "var(--text-primary)")
+                          }
                         >
                           {product.name}
                         </Link>
                       </div>
                       <p
-                        className="text-[11px] text-slate-400 truncate"
+                        className="text-[11px]"
                         style={{
+                          color: "var(--text-faint)",
                           fontFamily: "var(--font-dm-sans, sans-serif)",
                         }}
                       >
@@ -318,47 +358,62 @@ export default async function LowStockPage() {
                     </div>
 
                     {/* Category */}
-                    <Badge
-                      variant="outline"
-                      className="text-[10px] font-medium border-slate-200 text-slate-500 h-auto py-0.5 w-fit"
+                    <span
+                      className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-medium w-fit"
+                      style={{
+                        background: "var(--bg-subtle)",
+                        border: "1px solid var(--border)",
+                        color: "var(--text-muted)",
+                        fontFamily: "var(--font-dm-sans, sans-serif)",
+                      }}
                     >
                       {product.category}
-                    </Badge>
+                    </span>
 
                     {/* Stock level + bar */}
                     <div className="space-y-1.5">
                       <div className="flex items-center gap-2">
                         <span
-                          className={`text-sm font-bold tabular-nums ${
-                            isCritical ? "text-red-500" : "text-amber-500"
-                          }`}
-                          style={{ fontFamily: "var(--font-syne, sans-serif)" }}
+                          className="text-sm font-bold tabular-nums"
+                          style={{
+                            color: isCritical
+                              ? "var(--status-cancelled)"
+                              : "var(--status-pending)",
+                            fontFamily: "var(--font-syne, sans-serif)",
+                          }}
                         >
                           {product.totalYardsInStock}
                         </span>
                         <span
-                          className="text-xs text-slate-400"
+                          className="text-xs"
                           style={{
+                            color: "var(--text-faint)",
                             fontFamily: "var(--font-dm-sans, sans-serif)",
                           }}
                         >
                           yards
                         </span>
-                        <Badge
-                          className={`text-[9px] font-bold border h-auto py-0.5 px-1.5 ${
-                            isCritical
-                              ? "bg-red-50 text-red-500 border-red-200"
-                              : "bg-amber-50 text-amber-600 border-amber-200"
-                          }`}
-                          variant="outline"
+                        <span
+                          className="text-[9px] font-bold px-1.5 py-0.5 rounded-md"
+                          style={{
+                            background: isCritical
+                              ? "rgba(220,38,38,0.08)"
+                              : "rgba(217,119,6,0.08)",
+                            color: isCritical
+                              ? "var(--status-cancelled)"
+                              : "var(--status-pending)",
+                            border: isCritical
+                              ? "1px solid rgba(220,38,38,0.2)"
+                              : "1px solid rgba(217,119,6,0.2)",
+                          }}
                         >
                           {isCritical ? "CRITICAL" : "LOW"}
-                        </Badge>
+                        </span>
                       </div>
                       {/* Mini bar */}
                       <div
                         className="h-1.5 rounded-full overflow-hidden"
-                        style={{ background: "rgba(0,0,0,0.06)" }}
+                        style={{ background: "var(--border)" }}
                       >
                         <div
                           className="h-full rounded-full"
@@ -368,8 +423,8 @@ export default async function LowStockPage() {
                               ? "linear-gradient(90deg, #dc2626, #ef4444)"
                               : "linear-gradient(90deg, #d97706, #f59e0b)",
                             boxShadow: isCritical
-                              ? "0 0 4px rgba(239,68,68,0.5)"
-                              : "0 0 4px rgba(245,158,11,0.4)",
+                              ? "0 0 4px rgba(220,38,38,0.5)"
+                              : "0 0 4px rgba(217,119,6,0.4)",
                           }}
                         />
                       </div>
@@ -377,8 +432,11 @@ export default async function LowStockPage() {
 
                     {/* Wholesale price */}
                     <span
-                      className="text-sm font-medium text-slate-700 tabular-nums"
-                      style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+                      className="text-sm font-medium tabular-nums"
+                      style={{
+                        color: "var(--text-primary)",
+                        fontFamily: "var(--font-dm-sans, sans-serif)",
+                      }}
                     >
                       {formatPrice(product.wholesalePricePerYard)}
                     </span>
@@ -391,25 +449,34 @@ export default async function LowStockPage() {
             )}
           </div>
 
-          {/* Table footer summary */}
+          {/* Table footer */}
           <div
             className="px-5 py-3 flex items-center justify-between"
             style={{
-              background: "rgba(0,0,0,0.015)",
-              borderTop: "1px solid rgba(0,0,0,0.05)",
+              background: "var(--bg-subtle)",
+              borderTop: "1px solid var(--border)",
             }}
           >
             <span
-              className="text-xs text-slate-400"
-              style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+              className="text-xs"
+              style={{
+                color: "var(--text-faint)",
+                fontFamily: "var(--font-dm-sans, sans-serif)",
+              }}
             >
               {criticalCount > 0 && (
-                <span className="text-red-500 font-semibold">
+                <span
+                  className="font-semibold"
+                  style={{ color: "var(--status-cancelled)" }}
+                >
                   {criticalCount} critical{" "}
                 </span>
               )}
               {lowCount > 0 && (
-                <span className="text-amber-500 font-semibold">
+                <span
+                  className="font-semibold"
+                  style={{ color: "var(--status-pending)" }}
+                >
                   {lowCount} low
                 </span>
               )}{" "}
@@ -417,9 +484,13 @@ export default async function LowStockPage() {
             </span>
             <Link
               href="/admin/products"
-              className="text-xs text-[#D4A853] hover:text-slate-800 transition-[color] duration-150 font-medium
-                focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#D4A853]"
-              style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+              className="text-xs font-medium transition-[color] duration-150
+                focus-visible:outline-2 focus-visible:outline-offset-1"
+              style={{
+                color: "var(--brand-hex)",
+                outlineColor: "var(--brand-hex)",
+                fontFamily: "var(--font-dm-sans, sans-serif)",
+              }}
             >
               View all products →
             </Link>

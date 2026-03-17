@@ -67,7 +67,7 @@ export default async function ProfilePage() {
 
   return (
     <div
-      className="min-h-screen w-[90%] lg:max-w-7xl"
+      className="min-h-screen w-[90%] lg:max-w-5xl"
       style={{ background: "var(--bg)" }}
     >
       <div className="w-[90%] mx-auto px-4 py-10 space-y-8">

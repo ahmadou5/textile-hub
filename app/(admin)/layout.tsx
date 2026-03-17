@@ -20,7 +20,7 @@ export default async function AdminLayout({
 
       {/* Main content */}
       <main
-        className="flex-1 max-w-5xl mx-autoflex flex-col min-h-screen "
+        className="flex-1 max-w-5xl mx-auto flex flex-col min-h-screen "
         style={{ backgroundColor: "var(--bg)" }}
       >
         {children}

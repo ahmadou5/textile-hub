@@ -6,11 +6,11 @@ export default function InquiriesLoading() {
       <div className="space-y-2">
         <div
           className="h-8 w-40 rounded-xl animate-pulse"
-          style={{ background: "rgba(0,0,0,0.06)" }}
+          style={{ background: "var(--bg-subtle)" }}
         />
         <div
           className="h-3.5 w-32 rounded-full animate-pulse"
-          style={{ background: "rgba(0,0,0,0.04)" }}
+          style={{ background: "var(--bg-subtle)" }}
         />
       </div>
 
@@ -20,7 +20,7 @@ export default function InquiriesLoading() {
           <div
             key={i}
             className="h-3 rounded-full animate-pulse"
-            style={{ width: w, background: "rgba(0,0,0,0.05)" }}
+            style={{ width: w, background: "var(--bg-subtle)" }}
           />
         ))}
       </div>
@@ -30,45 +30,52 @@ export default function InquiriesLoading() {
         {Array.from({ length: 8 }).map((_, i) => (
           <div
             key={i}
-            className="flex items-center gap-4 p-4 rounded-2xl bg-white border border-slate-100"
-            style={{ animationDelay: `${i * 60}ms` }}
+            className="flex items-center gap-4 p-4 rounded-2xl animate-pulse"
+            style={{
+              background: "var(--bg-card)",
+              border: "1px solid var(--border-brand)",
+              animationDelay: `${i * 60}ms`,
+            }}
           >
-            {/* Dot */}
+            {/* Status dot */}
             <div
-              className="w-2.5 h-2.5 rounded-full flex-shrink-0 animate-pulse"
-              style={{ background: "#e2e8f0" }}
+              className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+              style={{ background: "var(--border)" }}
             />
+
             {/* Avatar */}
             <div
-              className="w-9 h-9 rounded-xl flex-shrink-0 animate-pulse"
-              style={{ background: "#f1ede4" }}
+              className="w-9 h-9 rounded-xl flex-shrink-0"
+              style={{ background: "var(--bg-subtle)" }}
             />
+
             {/* Content */}
             <div className="flex-1 space-y-2">
               <div
-                className="h-3.5 rounded-lg animate-pulse"
+                className="h-3.5 rounded-lg"
                 style={{
-                  background: "#e2e8f0",
+                  background: "var(--bg-subtle)",
                   width: `${55 + (i % 3) * 12}%`,
                 }}
               />
               <div
-                className="h-3 rounded-full animate-pulse"
+                className="h-3 rounded-full"
                 style={{
-                  background: "#f1f5f9",
+                  background: "var(--border-subtle)",
                   width: `${40 + (i % 4) * 8}%`,
                 }}
               />
             </div>
+
             {/* Right meta */}
             <div className="flex items-center gap-3 flex-shrink-0">
               <div
-                className="h-5 w-16 rounded-full animate-pulse hidden sm:block"
-                style={{ background: "#f1f5f9" }}
+                className="h-5 w-16 rounded-full hidden sm:block"
+                style={{ background: "var(--bg-subtle)" }}
               />
               <div
-                className="h-4 w-12 rounded-full animate-pulse"
-                style={{ background: "#f1f5f9" }}
+                className="h-4 w-12 rounded-full"
+                style={{ background: "var(--bg-subtle)" }}
               />
             </div>
           </div>

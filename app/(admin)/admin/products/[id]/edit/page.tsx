@@ -25,26 +25,38 @@ export default async function EditProductPage({
     <div className="max-w-2xl mx-auto p-6 lg:p-8 space-y-6">
       <Link
         href="/admin/products"
-        className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-800 transition-colors group"
-        style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+        className="inline-flex items-center gap-2 text-sm group
+          transition-[color] duration-150
+          focus-visible:outline-2 focus-visible:outline-offset-2"
+        style={{
+          color: "var(--text-muted)",
+          outlineColor: "var(--brand-hex)",
+          fontFamily: "var(--font-dm-sans, sans-serif)",
+        }}
       >
         <ArrowLeft
           size={14}
-          className="group-hover:-translate-x-0.5 transition-transform duration-150"
+          className="group-hover:-translate-x-0.5 transition-[transform] duration-150"
         />
         Back to Products
       </Link>
 
       <div>
         <h1
-          className="text-2xl font-bold text-slate-800"
-          style={{ fontFamily: "var(--font-playfair, serif)" }}
+          className="text-2xl font-bold"
+          style={{
+            color: "var(--text-primary)",
+            fontFamily: "var(--font-syne, sans-serif)",
+          }}
         >
           Edit Product
         </h1>
         <p
-          className="text-sm text-slate-500 mt-1"
-          style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+          className="text-sm mt-1"
+          style={{
+            color: "var(--text-muted)",
+            fontFamily: "var(--font-dm-sans, sans-serif)",
+          }}
         >
           Changes are saved immediately on submit.
         </p>
@@ -57,7 +69,6 @@ export default async function EditProductPage({
           description: product.description ?? "",
           category: product.category,
           imageUrl: product.imageUrl ?? "",
-          // convert cents back to naira for display
           retailPricePerYard: product.retailPricePerYard / 100,
           wholesalePricePerYard: product.wholesalePricePerYard / 100,
           totalYardsInStock: product.totalYardsInStock,

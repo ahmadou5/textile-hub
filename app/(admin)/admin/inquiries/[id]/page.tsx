@@ -3,9 +3,7 @@ import { notFound } from "next/navigation";
 import { requireRole } from "@/lib/auth";
 import { db } from "@/lib/db";
 import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
 import { ArrowLeft, Package, User, Clock } from "lucide-react";
 import type { Metadata } from "next";
 import { unstable_noStore as noStore } from "next/cache";
@@ -17,10 +15,22 @@ interface PageProps {
   params: Promise<{ id: string }>;
 }
 
-const STATUS_STYLES = {
-  OPEN: "bg-amber-500/10 text-amber-600 border-amber-500/25",
-  REPLIED: "bg-sky-500/10 text-sky-600 border-sky-500/25",
-  CLOSED: "bg-slate-100 text-slate-500 border-slate-200",
+const STATUS_STYLES: Record<string, React.CSSProperties> = {
+  OPEN: {
+    background: "rgba(217,119,6,0.08)",
+    color: "var(--status-pending)",
+    border: "1px solid rgba(217,119,6,0.25)",
+  },
+  REPLIED: {
+    background: "rgba(37,99,235,0.08)",
+    color: "var(--status-shipped)",
+    border: "1px solid rgba(37,99,235,0.25)",
+  },
+  CLOSED: {
+    background: "var(--bg-subtle)",
+    color: "var(--text-faint)",
+    border: "1px solid var(--border)",
+  },
 };
 
 export async function generateMetadata({
@@ -49,7 +59,6 @@ function formatDate(date: Date): string {
 }
 
 export default async function AdminInquiryThreadPage({ params }: PageProps) {
-  // ✅ always fresh — no stale cache
   noStore();
 
   const session = await requireRole("ADMIN");
@@ -88,9 +97,14 @@ export default async function AdminInquiryThreadPage({ params }: PageProps) {
       {/* Back */}
       <Link
         href="/admin/inquiries"
-        className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-800
-          transition-[color] duration-150 group flex-shrink-0"
-        style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+        className="inline-flex items-center gap-2 text-sm group flex-shrink-0
+          transition-[color] duration-150
+          focus-visible:outline-2 focus-visible:outline-offset-2"
+        style={{
+          color: "var(--text-muted)",
+          outlineColor: "var(--brand-hex)",
+          fontFamily: "var(--font-dm-sans, sans-serif)",
+        }}
       >
         <ArrowLeft
           size={14}
@@ -100,61 +114,101 @@ export default async function AdminInquiryThreadPage({ params }: PageProps) {
       </Link>
 
       {/* Thread header */}
-      <div className="flex items-start justify-between gap-4 p-5 rounded-2xl bg-white border border-slate-200/80 flex-shrink-0 shadow-[0_2px_8px_rgba(0,0,0,0.05)]">
+      <div
+        className="flex items-start justify-between gap-4 p-5 rounded-2xl flex-shrink-0"
+        style={{
+          background: "var(--bg-card)",
+          border: "1px solid var(--border-brand)",
+          boxShadow: "var(--shadow-card)",
+        }}
+      >
         <div className="space-y-2 flex-1 min-w-0">
           <div className="flex items-center gap-3 flex-wrap">
             <h1
-              className="text-xl font-bold text-slate-800 leading-snug"
-              style={{ fontFamily: "var(--font-playfair, serif)" }}
+              className="text-xl font-bold leading-snug"
+              style={{
+                color: "var(--text-primary)",
+                fontFamily: "var(--font-syne, sans-serif)",
+                letterSpacing: "-0.02em",
+              }}
             >
               {inquiry.subject}
             </h1>
-            <Badge
-              variant="outline"
-              className={`text-[10px] font-bold border h-auto flex-shrink-0 ${
-                STATUS_STYLES[inquiry.status as keyof typeof STATUS_STYLES]
-              }`}
+            {/* Status badge */}
+            <span
+              className="text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0"
+              style={{
+                ...(STATUS_STYLES[inquiry.status] ?? STATUS_STYLES.CLOSED),
+                fontFamily: "var(--font-dm-sans, sans-serif)",
+              }}
             >
               {inquiry.status}
-            </Badge>
+            </span>
           </div>
 
           <div className="flex items-center gap-4 flex-wrap">
             {/* Wholesaler */}
             <div
-              className="flex items-center gap-1.5 text-xs text-slate-500"
-              style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+              className="flex items-center gap-1.5 text-xs"
+              style={{
+                color: "var(--text-muted)",
+                fontFamily: "var(--font-dm-sans, sans-serif)",
+              }}
             >
               <User size={12} />
-              <span className="font-medium text-slate-700">
+              <span
+                className="font-medium"
+                style={{ color: "var(--text-secondary)" }}
+              >
                 {inquiry.users.name ?? inquiry.users.email}
               </span>
-              <span className="text-slate-400 hidden sm:block">
+              <span
+                className="hidden sm:block"
+                style={{ color: "var(--text-faint)" }}
+              >
                 {inquiry.users.email}
               </span>
             </div>
 
-            <Separator orientation="vertical" className="h-3 hidden sm:block" />
+            <span
+              className="hidden sm:block h-3 w-px"
+              style={{ background: "var(--border)" }}
+            />
 
             {/* Product */}
             <div
-              className="flex items-center gap-1.5 text-xs text-slate-500"
-              style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+              className="flex items-center gap-1.5 text-xs"
+              style={{
+                color: "var(--text-muted)",
+                fontFamily: "var(--font-dm-sans, sans-serif)",
+              }}
             >
               <Package size={12} />
-              <span className="font-medium text-slate-600">
+              <span
+                className="font-medium"
+                style={{ color: "var(--text-secondary)" }}
+              >
                 {inquiry.products.name}
               </span>
-              <span className="text-slate-400 hidden sm:block">
+              <span
+                className="hidden sm:block"
+                style={{ color: "var(--text-faint)" }}
+              >
                 — {inquiry.products.category}
               </span>
             </div>
 
-            <Separator orientation="vertical" className="h-3 hidden sm:block" />
+            <span
+              className="hidden sm:block h-3 w-px"
+              style={{ background: "var(--border)" }}
+            />
 
             <span
-              className="flex items-center gap-1 text-xs text-slate-400 hidden sm:flex"
-              style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+              className="hidden sm:flex items-center gap-1 text-xs"
+              style={{
+                color: "var(--text-faint)",
+                fontFamily: "var(--font-dm-sans, sans-serif)",
+              }}
             >
               <Clock size={10} />
               {inquiry.messages.length} message
@@ -193,12 +247,19 @@ export default async function AdminInquiryThreadPage({ params }: PageProps) {
 
             return (
               <div key={msg.id}>
+                {/* Date separator */}
                 {showDateSep && (
                   <div className="flex items-center gap-3 py-4">
-                    <Separator className="flex-1 bg-slate-100" />
+                    <div
+                      className="flex-1 h-px"
+                      style={{ background: "var(--border)" }}
+                    />
                     <span
-                      className="text-[10px] font-medium text-slate-400 uppercase tracking-wider px-2 flex-shrink-0"
-                      style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+                      className="text-[10px] font-medium uppercase tracking-wider px-2 flex-shrink-0"
+                      style={{
+                        color: "var(--text-faint)",
+                        fontFamily: "var(--font-dm-sans, sans-serif)",
+                      }}
                     >
                       {new Date(msg.createdAt).toLocaleDateString("en-NG", {
                         weekday: "short",
@@ -206,7 +267,10 @@ export default async function AdminInquiryThreadPage({ params }: PageProps) {
                         month: "short",
                       })}
                     </span>
-                    <Separator className="flex-1 bg-slate-100" />
+                    <div
+                      className="flex-1 h-px"
+                      style={{ background: "var(--border)" }}
+                    />
                   </div>
                 )}
 
@@ -215,12 +279,17 @@ export default async function AdminInquiryThreadPage({ params }: PageProps) {
                 >
                   {/* Avatar */}
                   <div
-                    className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs font-bold flex-shrink-0 self-end ${
-                      isAdmin
-                        ? "bg-[#D4A853]/15 text-[#D4A853]"
-                        : "bg-slate-100 text-slate-600"
-                    }`}
-                    style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+                    className="w-8 h-8 rounded-xl overflow-hidden flex items-center justify-center text-xs font-bold flex-shrink-0 self-end"
+                    style={{
+                      background: isAdmin
+                        ? "var(--brand-glow)"
+                        : "var(--bg-subtle)",
+                      color: isAdmin ? "var(--brand-hex)" : "var(--text-muted)",
+                      border: isAdmin
+                        ? "1px solid var(--border-brand)"
+                        : "1px solid var(--border)",
+                      fontFamily: "var(--font-dm-sans, sans-serif)",
+                    }}
                   >
                     {senderImageUrl ? (
                       <Image
@@ -228,7 +297,7 @@ export default async function AdminInquiryThreadPage({ params }: PageProps) {
                         alt={senderName}
                         width={32}
                         height={32}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full rounded-xl object-cover"
                       />
                     ) : (
                       <span>{initials}</span>
@@ -239,30 +308,51 @@ export default async function AdminInquiryThreadPage({ params }: PageProps) {
                   <div
                     className={`max-w-[72%] space-y-1 flex flex-col ${isAdmin ? "items-end" : "items-start"}`}
                   >
+                    {/* Sender + time */}
                     <div
-                      className={`flex items-center gap-2 text-[11px] text-slate-400 ${isAdmin ? "flex-row-reverse" : "flex-row"}`}
-                      style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+                      className={`flex items-center gap-2 text-[11px] ${isAdmin ? "flex-row-reverse" : "flex-row"}`}
+                      style={{
+                        color: "var(--text-faint)",
+                        fontFamily: "var(--font-dm-sans, sans-serif)",
+                      }}
                     >
-                      <span className="font-medium text-slate-500">
+                      <span
+                        className="font-medium"
+                        style={{ color: "var(--text-muted)" }}
+                      >
                         {msg.users?.name ?? "Unknown"}
                       </span>
                       {isAdmin && (
-                        <span className="text-[#D4A853] font-semibold text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded-md bg-[#D4A853]/10">
+                        <span
+                          className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-md"
+                          style={{
+                            background: "var(--brand-glow)",
+                            color: "var(--brand-hex)",
+                            border: "1px solid var(--border-brand)",
+                          }}
+                        >
                           Admin
                         </span>
                       )}
                       <span>{formatDate(msg.createdAt)}</span>
                     </div>
 
+                    {/* Message body */}
                     <div
-                      className={`px-4 py-3 rounded-2xl text-sm ${
-                        isAdmin
-                          ? "bg-[#D4A853]/10 text-slate-800 border border-[#D4A853]/15 rounded-tr-sm"
-                          : "bg-white text-slate-700 border border-slate-200 rounded-tl-sm shadow-[0_1px_4px_rgba(0,0,0,0.06)]"
-                      }`}
+                      className={`px-4 py-3 rounded-2xl text-sm ${isAdmin ? "rounded-tr-sm" : "rounded-tl-sm"}`}
                       style={{
+                        color: "var(--text-primary)",
                         fontFamily: "var(--font-dm-sans, sans-serif)",
                         lineHeight: "1.7",
+                        background: isAdmin
+                          ? "var(--brand-glow)"
+                          : "var(--bg-subtle)",
+                        border: isAdmin
+                          ? "1px solid var(--border-brand)"
+                          : "1px solid var(--border)",
+                        boxShadow: isAdmin
+                          ? "var(--shadow-brand)"
+                          : "var(--shadow-card)",
                       }}
                     >
                       {msg.body}
@@ -277,31 +367,48 @@ export default async function AdminInquiryThreadPage({ params }: PageProps) {
 
       {/* Reply box */}
       <div className="flex-shrink-0 space-y-3">
-        <Separator className="bg-slate-100" />
+        <div className="h-px" style={{ background: "var(--border)" }} />
+
         <div className="flex items-center gap-2 mb-2">
-          <div className="w-6 h-6 rounded-lg bg-[#D4A853]/15 flex items-center justify-center">
+          <div
+            className="w-6 h-6 rounded-lg flex items-center justify-center"
+            style={{
+              background: "var(--brand-glow)",
+              border: "1px solid var(--border-brand)",
+            }}
+          >
             <span
-              className="text-[9px] font-bold text-[#D4A853]"
-              style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+              className="text-[9px] font-bold"
+              style={{
+                color: "var(--brand-hex)",
+                fontFamily: "var(--font-dm-sans, sans-serif)",
+              }}
             >
               {(session?.user.name ?? "A").charAt(0).toUpperCase()}
             </span>
           </div>
           <span
-            className="text-xs font-medium text-slate-500"
-            style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+            className="text-xs font-medium"
+            style={{
+              color: "var(--text-muted)",
+              fontFamily: "var(--font-dm-sans, sans-serif)",
+            }}
           >
             Reply as Admin
           </span>
-          <span className="text-slate-300 text-xs">·</span>
+          <span style={{ color: "var(--border)" }}>·</span>
           <span
-            className="text-xs text-slate-400"
-            style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+            className="text-xs"
+            style={{
+              color: "var(--text-faint)",
+              fontFamily: "var(--font-dm-sans, sans-serif)",
+            }}
           >
             {inquiry.messages.length} message
             {inquiry.messages.length !== 1 ? "s" : ""} in thread
           </span>
         </div>
+
         <InquiryReplyBox inquiryId={inquiry.id} isClosed={isClosed} />
       </div>
     </div>
