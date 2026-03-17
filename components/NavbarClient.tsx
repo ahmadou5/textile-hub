@@ -344,7 +344,7 @@ function NavLink({
     <Link
       href={href}
       onClick={onClick}
-      className="relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-[color,background] duration-150"
+      className="relative flex items-center gap-1.5 px-1 py-1.5 rounded-lg text-xs font-medium transition-[color,background] duration-150"
       style={{
         color: highlight ? "var(--brand-hex)" : "var(--text-muted)",
         fontFamily: "var(--font-dm-sans, sans-serif)",
