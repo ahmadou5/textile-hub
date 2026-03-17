@@ -1,13 +1,21 @@
 // app/(admin)/admin/products/new/page.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import Link from "next/link";
-import { ArrowLeft, Package, Loader2, CheckCircle2 } from "lucide-react";
+import {
+  ArrowLeft,
+  Package,
+  Loader2,
+  CheckCircle2,
+  Upload,
+  X,
+  Camera,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -27,6 +35,7 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { toast } from "sonner";
+import { useUploadThing } from "@/lib/uploadthing-client";
 
 const CATEGORIES = [
   "Ankara / African Print",
@@ -46,7 +55,6 @@ const formSchema = z.object({
   name: z.string().min(2, "Product name must be at least 2 characters"),
   category: z.string().min(1, "Please select a category"),
   description: z.string().optional(),
-  imageUrl: z.string().url("Enter a valid URL").optional().or(z.literal("")),
   retailPricePerYard: z
     .string()
     .refine((v) => !isNaN(parseFloat(v)) && parseFloat(v) > 0, {
@@ -72,15 +80,67 @@ export default function NewProductPage() {
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  // ── Image upload ─────────────────────────────────────────────────────────
+  const [imageUrl, setImageUrl] = useState("");
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imageUploading, setImageUploading] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const { startUpload } = useUploadThing("profileImage", {
+    onUploadBegin: () => setImageUploading(true),
+    onClientUploadComplete: (res) => {
+      const url = res?.[0]?.url;
+      if (url) {
+        setImageUrl(url);
+        setImagePreview(url);
+        toast.success("Image uploaded!");
+      }
+      setImageUploading(false);
+    },
+    onUploadError: (err) => {
+      toast.error(err.message ?? "Upload failed");
+      setImageUploading(false);
+    },
+  });
+
+  async function handleFileSelect(files: FileList | null) {
+    if (!files?.length) return;
+    const file = files[0];
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please select an image file");
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("Image must be under 2MB");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => setImagePreview(e.target?.result as string);
+    reader.readAsDataURL(file);
+    await startUpload([file]);
+  }
+
+  function handleDrop(e: React.DragEvent) {
+    e.preventDefault();
+    setDragOver(false);
+    handleFileSelect(e.dataTransfer.files);
+  }
+
+  function removeImage() {
+    setImageUrl("");
+    setImagePreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  }
+  // ────────────────────────────────────────────────────────────────────────
+
   const {
     register,
     handleSubmit,
     setValue,
     watch,
     formState: { errors },
-  } = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
-  });
+  } = useForm<FormValues>({ resolver: zodResolver(formSchema) });
 
   const retail = parseFloat(watch("retailPricePerYard") || "0");
   const wholesale = parseFloat(watch("wholesalePricePerYard") || "0");
@@ -92,7 +152,6 @@ export default function NewProductPage() {
   async function onSubmit(values: FormValues) {
     setLoading(true);
     setError(null);
-
     const res = await fetch("/api/products", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -100,21 +159,18 @@ export default function NewProductPage() {
         name: values.name,
         category: values.category,
         description: values.description || undefined,
-        imageUrl: values.imageUrl || undefined,
+        imageUrl: imageUrl || undefined,
         retailPricePerYard: parseFloat(values.retailPricePerYard),
         wholesalePricePerYard: parseFloat(values.wholesalePricePerYard),
         totalYardsInStock: parseInt(values.totalYardsInStock),
       }),
     });
-
     const data = await res.json();
     setLoading(false);
-
     if (!res.ok) {
       setError(data.error || "Something went wrong");
       return;
     }
-
     setSuccess(true);
     toast.success("Product published!", {
       description: `${data.name} is now live in the catalogue.`,
@@ -123,13 +179,34 @@ export default function NewProductPage() {
     setTimeout(() => router.push("/admin/products"), 1200);
   }
 
+  const inputStyle = {
+    background: "var(--bg-subtle)",
+    border: "1px solid var(--border)",
+    color: "var(--text-primary)",
+    fontFamily: "var(--font-dm-sans, sans-serif)",
+  };
+  const labelStyle = {
+    color: "var(--text-muted)",
+    fontFamily: "var(--font-dm-sans, sans-serif)",
+  };
+  const onFocus = (
+    e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    e.target.style.borderColor = "var(--brand-hex)";
+    e.target.style.boxShadow = "0 0 0 3px var(--brand-glow)";
+  };
+  const onBlur = (
+    e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    e.target.style.borderColor = "var(--border)";
+    e.target.style.boxShadow = "none";
+  };
+
   return (
     <div className="w-full max-w-2xl mx-auto space-y-6">
-      {/* Back link */}
       <Link
         href="/admin/products"
-        className="inline-flex items-center gap-2 text-sm transition-[color] duration-150 group
-          focus-visible:outline-2 focus-visible:outline-offset-2"
+        className="inline-flex items-center gap-2 text-sm transition-[color] duration-150 group focus-visible:outline-2 focus-visible:outline-offset-2"
         style={{
           color: "var(--text-muted)",
           outlineColor: "var(--brand-hex)",
@@ -143,7 +220,6 @@ export default function NewProductPage() {
         Back to Products
       </Link>
 
-      {/* Page header */}
       <div className="space-y-1">
         <h1
           className="text-3xl font-bold tracking-tight"
@@ -167,7 +243,7 @@ export default function NewProductPage() {
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-        {/* Basic Info */}
+        {/* ── Product Information ── */}
         <Card
           className="border shadow-none"
           style={{
@@ -198,35 +274,19 @@ export default function NewProductPage() {
             {/* Name */}
             <div className="space-y-1.5">
               <Label
-                htmlFor="name"
                 className="text-xs font-semibold uppercase tracking-wider"
-                style={{
-                  color: "var(--text-muted)",
-                  fontFamily: "var(--font-dm-sans, sans-serif)",
-                }}
+                style={labelStyle}
               >
                 Product Name{" "}
                 <span style={{ color: "var(--status-cancelled)" }}>*</span>
               </Label>
               <Input
-                id="name"
                 placeholder="e.g. Royal Blue Ankara Print"
                 {...register("name")}
                 className="text-sm outline-none transition-[border-color,box-shadow] duration-200"
-                style={{
-                  background: "var(--bg-subtle)",
-                  border: "1px solid var(--border)",
-                  color: "var(--text-primary)",
-                  fontFamily: "var(--font-dm-sans, sans-serif)",
-                }}
-                onFocus={(e) => {
-                  e.target.style.borderColor = "var(--brand-hex)";
-                  e.target.style.boxShadow = "0 0 0 3px var(--brand-glow)";
-                }}
-                onBlur={(e) => {
-                  e.target.style.borderColor = "var(--border)";
-                  e.target.style.boxShadow = "none";
-                }}
+                style={inputStyle}
+                onFocus={onFocus}
+                onBlur={onBlur}
               />
               {errors.name && (
                 <p
@@ -242,28 +302,14 @@ export default function NewProductPage() {
             <div className="space-y-1.5">
               <Label
                 className="text-xs font-semibold uppercase tracking-wider"
-                style={{
-                  color: "var(--text-muted)",
-                  fontFamily: "var(--font-dm-sans, sans-serif)",
-                }}
+                style={labelStyle}
               >
                 Category{" "}
                 <span style={{ color: "var(--status-cancelled)" }}>*</span>
               </Label>
               <Select onValueChange={(val) => setValue("category", val)}>
-                <SelectTrigger
-                  className="text-sm transition-[border-color,box-shadow] duration-200"
-                  style={{
-                    background: "var(--bg-subtle)",
-                    border: "1px solid var(--border)",
-                    color: "var(--text-primary)",
-                    fontFamily: "var(--font-dm-sans, sans-serif)",
-                  }}
-                >
-                  <SelectValue
-                    placeholder="Select fabric category…"
-                    style={{ color: "var(--text-faint)" }}
-                  />
+                <SelectTrigger className="text-sm" style={inputStyle}>
+                  <SelectValue placeholder="Select fabric category…" />
                 </SelectTrigger>
                 <SelectContent
                   style={{
@@ -292,12 +338,8 @@ export default function NewProductPage() {
             {/* Description */}
             <div className="space-y-1.5">
               <Label
-                htmlFor="description"
                 className="text-xs font-semibold uppercase tracking-wider"
-                style={{
-                  color: "var(--text-muted)",
-                  fontFamily: "var(--font-dm-sans, sans-serif)",
-                }}
+                style={labelStyle}
               >
                 Description{" "}
                 <span
@@ -308,39 +350,23 @@ export default function NewProductPage() {
                 </span>
               </Label>
               <Textarea
-                id="description"
                 placeholder="Material composition, pattern details, care instructions…"
                 rows={3}
                 {...register("description")}
                 className="text-sm outline-none resize-none transition-[border-color,box-shadow] duration-200"
-                style={{
-                  background: "var(--bg-subtle)",
-                  border: "1px solid var(--border)",
-                  color: "var(--text-primary)",
-                  fontFamily: "var(--font-dm-sans, sans-serif)",
-                }}
-                onFocus={(e) => {
-                  e.target.style.borderColor = "var(--brand-hex)";
-                  e.target.style.boxShadow = "0 0 0 3px var(--brand-glow)";
-                }}
-                onBlur={(e) => {
-                  e.target.style.borderColor = "var(--border)";
-                  e.target.style.boxShadow = "none";
-                }}
+                style={inputStyle}
+                onFocus={onFocus}
+                onBlur={onBlur}
               />
             </div>
 
-            {/* Image URL */}
-            <div className="space-y-1.5">
+            {/* ── Image Upload ── */}
+            <div className="space-y-2">
               <Label
-                htmlFor="imageUrl"
                 className="text-xs font-semibold uppercase tracking-wider"
-                style={{
-                  color: "var(--text-muted)",
-                  fontFamily: "var(--font-dm-sans, sans-serif)",
-                }}
+                style={labelStyle}
               >
-                Image URL{" "}
+                Product Image{" "}
                 <span
                   className="font-normal normal-case tracking-normal"
                   style={{ color: "var(--text-faint)" }}
@@ -348,39 +374,149 @@ export default function NewProductPage() {
                   (optional)
                 </span>
               </Label>
-              <Input
-                id="imageUrl"
-                placeholder="https://example.com/fabric-image.jpg"
-                {...register("imageUrl")}
-                className="text-sm outline-none transition-[border-color,box-shadow] duration-200"
-                style={{
-                  background: "var(--bg-subtle)",
-                  border: "1px solid var(--border)",
-                  color: "var(--text-primary)",
-                  fontFamily: "var(--font-dm-sans, sans-serif)",
-                }}
-                onFocus={(e) => {
-                  e.target.style.borderColor = "var(--brand-hex)";
-                  e.target.style.boxShadow = "0 0 0 3px var(--brand-glow)";
-                }}
-                onBlur={(e) => {
-                  e.target.style.borderColor = "var(--border)";
-                  e.target.style.boxShadow = "none";
-                }}
-              />
-              {errors.imageUrl && (
-                <p
-                  className="text-xs"
-                  style={{ color: "var(--status-cancelled)" }}
+
+              <div className="flex items-start gap-4">
+                {/* Preview */}
+                <div className="relative flex-shrink-0">
+                  <div
+                    className="w-20 h-20 rounded-2xl overflow-hidden flex items-center justify-center"
+                    style={{
+                      background: "var(--bg-subtle)",
+                      border: "1px solid var(--border-brand)",
+                    }}
+                  >
+                    {imagePreview ? (
+                      <img
+                        src={imagePreview}
+                        alt="Preview"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex flex-col items-center gap-1 opacity-40">
+                        <Camera
+                          size={20}
+                          style={{ color: "var(--text-faint)" }}
+                        />
+                        <span
+                          className="text-[9px]"
+                          style={{ color: "var(--text-faint)" }}
+                        >
+                          No image
+                        </span>
+                      </div>
+                    )}
+                    {imageUploading && (
+                      <div
+                        className="absolute inset-0 flex items-center justify-center"
+                        style={{ background: "rgba(0,0,0,0.5)" }}
+                      >
+                        <Loader2
+                          size={18}
+                          className="animate-spin text-white"
+                        />
+                      </div>
+                    )}
+                  </div>
+                  {imagePreview && !imageUploading && (
+                    <button
+                      type="button"
+                      onClick={removeImage}
+                      className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full flex items-center justify-center text-white"
+                      style={{ background: "var(--status-cancelled)" }}
+                    >
+                      <X size={10} />
+                    </button>
+                  )}
+                </div>
+
+                {/* Drop zone */}
+                <div
+                  className="flex-1 rounded-xl flex flex-col items-center justify-center gap-2 py-5 px-4 cursor-pointer transition-[border-color,background] duration-150"
+                  style={{
+                    border: `2px dashed ${dragOver ? "var(--brand-hex)" : "var(--border)"}`,
+                    background: dragOver
+                      ? "var(--brand-glow)"
+                      : "var(--bg-subtle)",
+                  }}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    setDragOver(true);
+                  }}
+                  onDragLeave={() => setDragOver(false)}
+                  onDrop={handleDrop}
+                  onClick={() => fileInputRef.current?.click()}
                 >
-                  {errors.imageUrl.message}
-                </p>
-              )}
+                  {imageUploading ? (
+                    <div className="flex items-center gap-2">
+                      <Loader2
+                        size={14}
+                        className="animate-spin"
+                        style={{ color: "var(--brand-hex)" }}
+                      />
+                      <span
+                        className="text-xs"
+                        style={{
+                          color: "var(--brand-hex)",
+                          fontFamily: "var(--font-dm-sans, sans-serif)",
+                        }}
+                      >
+                        Uploading…
+                      </span>
+                    </div>
+                  ) : (
+                    <>
+                      <div
+                        className="w-8 h-8 rounded-lg flex items-center justify-center"
+                        style={{
+                          background: "var(--brand-glow)",
+                          border: "1px solid var(--border-brand)",
+                        }}
+                      >
+                        <Upload
+                          size={14}
+                          style={{ color: "var(--brand-hex)" }}
+                        />
+                      </div>
+                      <div className="text-center">
+                        <p
+                          className="text-xs font-medium"
+                          style={{
+                            color: "var(--text-primary)",
+                            fontFamily: "var(--font-dm-sans, sans-serif)",
+                          }}
+                        >
+                          Drop image here or{" "}
+                          <span style={{ color: "var(--brand-hex)" }}>
+                            browse
+                          </span>
+                        </p>
+                        <p
+                          className="text-[11px] mt-0.5"
+                          style={{
+                            color: "var(--text-faint)",
+                            fontFamily: "var(--font-dm-sans, sans-serif)",
+                          }}
+                        >
+                          PNG, JPG, WEBP — max 2MB
+                        </p>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => handleFileSelect(e.target.files)}
+              />
             </div>
           </CardContent>
         </Card>
 
-        {/* Pricing */}
+        {/* ── Pricing ── */}
         <Card
           className="border shadow-none"
           style={{
@@ -403,21 +539,16 @@ export default function NewProductPage() {
               Pricing per Yard
             </CardTitle>
             <CardDescription style={{ color: "var(--text-faint)" }}>
-              Enter in your currency (₦ or $). Stored as integers to avoid
-              floating point errors.
+              Enter in your currency (₦). Stored as integers to avoid floating
+              point errors.
             </CardDescription>
           </CardHeader>
           <CardContent className="pt-5 space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {/* Retail price */}
               <div className="space-y-1.5">
                 <Label
-                  htmlFor="retailPrice"
                   className="text-xs font-semibold uppercase tracking-wider"
-                  style={{
-                    color: "var(--text-muted)",
-                    fontFamily: "var(--font-dm-sans, sans-serif)",
-                  }}
+                  style={labelStyle}
                 >
                   Retail Price / Yard{" "}
                   <span style={{ color: "var(--status-cancelled)" }}>*</span>
@@ -430,27 +561,15 @@ export default function NewProductPage() {
                     ₦
                   </span>
                   <Input
-                    id="retailPrice"
                     type="number"
                     step="0.01"
                     min="0"
                     placeholder="1500.00"
                     {...register("retailPricePerYard")}
                     className="pl-7 text-sm outline-none transition-[border-color,box-shadow] duration-200"
-                    style={{
-                      background: "var(--bg-subtle)",
-                      border: "1px solid var(--border)",
-                      color: "var(--text-primary)",
-                      fontFamily: "var(--font-dm-sans, sans-serif)",
-                    }}
-                    onFocus={(e) => {
-                      e.target.style.borderColor = "var(--brand-hex)";
-                      e.target.style.boxShadow = "0 0 0 3px var(--brand-glow)";
-                    }}
-                    onBlur={(e) => {
-                      e.target.style.borderColor = "var(--border)";
-                      e.target.style.boxShadow = "none";
-                    }}
+                    style={inputStyle}
+                    onFocus={onFocus}
+                    onBlur={onBlur}
                   />
                 </div>
                 {errors.retailPricePerYard && (
@@ -462,16 +581,10 @@ export default function NewProductPage() {
                   </p>
                 )}
               </div>
-
-              {/* Wholesale price */}
               <div className="space-y-1.5">
                 <Label
-                  htmlFor="wholesalePrice"
                   className="text-xs font-semibold uppercase tracking-wider"
-                  style={{
-                    color: "var(--text-muted)",
-                    fontFamily: "var(--font-dm-sans, sans-serif)",
-                  }}
+                  style={labelStyle}
                 >
                   Wholesale Price / Yard{" "}
                   <span style={{ color: "var(--status-cancelled)" }}>*</span>
@@ -484,27 +597,15 @@ export default function NewProductPage() {
                     ₦
                   </span>
                   <Input
-                    id="wholesalePrice"
                     type="number"
                     step="0.01"
                     min="0"
                     placeholder="1200.00"
                     {...register("wholesalePricePerYard")}
                     className="pl-7 text-sm outline-none transition-[border-color,box-shadow] duration-200"
-                    style={{
-                      background: "var(--bg-subtle)",
-                      border: "1px solid var(--border)",
-                      color: "var(--text-primary)",
-                      fontFamily: "var(--font-dm-sans, sans-serif)",
-                    }}
-                    onFocus={(e) => {
-                      e.target.style.borderColor = "var(--brand-hex)";
-                      e.target.style.boxShadow = "0 0 0 3px var(--brand-glow)";
-                    }}
-                    onBlur={(e) => {
-                      e.target.style.borderColor = "var(--border)";
-                      e.target.style.boxShadow = "none";
-                    }}
+                    style={inputStyle}
+                    onFocus={onFocus}
+                    onBlur={onBlur}
                   />
                 </div>
                 {errors.wholesalePricePerYard && (
@@ -518,7 +619,6 @@ export default function NewProductPage() {
               </div>
             </div>
 
-            {/* Live margin indicator */}
             {priceDiff && (
               <div
                 className="flex items-center gap-2 px-3 py-2 rounded-lg"
@@ -544,7 +644,6 @@ export default function NewProductPage() {
                 </p>
               </div>
             )}
-
             {retail > 0 && wholesale >= retail && (
               <div
                 className="flex items-center gap-2 px-3 py-2 rounded-lg"
@@ -571,7 +670,7 @@ export default function NewProductPage() {
           </CardContent>
         </Card>
 
-        {/* Stock */}
+        {/* ── Inventory ── */}
         <Card
           className="border shadow-none"
           style={{
@@ -597,39 +696,23 @@ export default function NewProductPage() {
           <CardContent className="pt-5">
             <div className="space-y-1.5 max-w-xs">
               <Label
-                htmlFor="stock"
                 className="text-xs font-semibold uppercase tracking-wider"
-                style={{
-                  color: "var(--text-muted)",
-                  fontFamily: "var(--font-dm-sans, sans-serif)",
-                }}
+                style={labelStyle}
               >
                 Total Yards in Stock{" "}
                 <span style={{ color: "var(--status-cancelled)" }}>*</span>
               </Label>
               <div className="relative">
                 <Input
-                  id="stock"
                   type="number"
                   min="0"
                   step="1"
                   placeholder="500"
                   {...register("totalYardsInStock")}
                   className="text-sm outline-none transition-[border-color,box-shadow] duration-200"
-                  style={{
-                    background: "var(--bg-subtle)",
-                    border: "1px solid var(--border)",
-                    color: "var(--text-primary)",
-                    fontFamily: "var(--font-dm-sans, sans-serif)",
-                  }}
-                  onFocus={(e) => {
-                    e.target.style.borderColor = "var(--brand-hex)";
-                    e.target.style.boxShadow = "0 0 0 3px var(--brand-glow)";
-                  }}
-                  onBlur={(e) => {
-                    e.target.style.borderColor = "var(--border)";
-                    e.target.style.boxShadow = "none";
-                  }}
+                  style={inputStyle}
+                  onFocus={onFocus}
+                  onBlur={onBlur}
                 />
                 <span
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-xs pointer-events-none"
@@ -659,7 +742,7 @@ export default function NewProductPage() {
           </CardContent>
         </Card>
 
-        {/* Error banner */}
+        {/* Error */}
         {error && (
           <div
             className="flex items-center gap-3 px-4 py-3 rounded-xl"
@@ -684,7 +767,7 @@ export default function NewProductPage() {
           </div>
         )}
 
-        {/* Success banner */}
+        {/* Success */}
         {success && (
           <div
             className="flex items-center gap-3 px-4 py-3 rounded-xl"
@@ -714,11 +797,10 @@ export default function NewProductPage() {
         <div className="flex items-center gap-3 pt-2 pb-8">
           <Button
             type="submit"
-            disabled={loading || success}
+            disabled={loading || success || imageUploading}
             className="px-8 py-2.5 rounded-xl font-semibold text-sm text-white
-              hover:brightness-105 hover:-translate-y-0.5
-              active:translate-y-0 active:brightness-95
-              transition-[transform,filter,box-shadow] duration-150
+              hover:brightness-105 hover:-translate-y-0.5 active:translate-y-0 active:brightness-95
+              transition-[transform,filter] duration-150
               focus-visible:outline-2 focus-visible:outline-offset-2
               disabled:opacity-50 disabled:cursor-not-allowed disabled:translate-y-0"
             style={{
@@ -730,19 +812,20 @@ export default function NewProductPage() {
           >
             {loading ? (
               <span className="flex items-center gap-2">
-                <Loader2 size={14} className="animate-spin" />
-                Saving…
+                <Loader2 size={14} className="animate-spin" /> Saving…
+              </span>
+            ) : imageUploading ? (
+              <span className="flex items-center gap-2">
+                <Loader2 size={14} className="animate-spin" /> Uploading image…
               </span>
             ) : success ? (
               <span className="flex items-center gap-2">
-                <CheckCircle2 size={14} />
-                Saved!
+                <CheckCircle2 size={14} /> Saved!
               </span>
             ) : (
               "Save Product"
             )}
           </Button>
-
           <Link href="/admin/products">
             <Button
               type="button"
