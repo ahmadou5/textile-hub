@@ -11,14 +11,17 @@ export const metadata: Metadata = {
   title: "Edit Product — Admin | TextileHub",
 };
 
-export default async function EditProductPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+interface PageProps {
+  params: Promise<{ id: string }>;
+}
+
+export default async function EditProductPage({ params }: PageProps) {
   await requireRole("ADMIN");
 
-  const product = await db.products.findUnique({ where: { id: params.id } });
+  // ✅ await params — required in Next.js 15
+  const { id } = await params;
+
+  const product = await db.products.findUnique({ where: { id } });
   if (!product) notFound();
 
   return (
