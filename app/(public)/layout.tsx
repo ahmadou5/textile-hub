@@ -8,36 +8,17 @@ export default function PublicLayout({
 }) {
   return (
     <div
-      className="min-h-screen "
-      style={{
-        fontFamily: "var(--font-dm-sans, sans-serif)",
-        backgroundColor: "var(--bg)",
-      }}
+      className="min-h-screen flex flex-col"
+      style={{ background: "var(--bg)" }}
     >
-      {/* Grain overlay */}
-      <svg style={{ position: "fixed", width: 0, height: 0 }}>
-        <filter id="grain">
-          <feTurbulence
-            type="fractalNoise"
-            baseFrequency="0.65"
-            numOctaves="3"
-            stitchTiles="stitch"
-          />
-          <feColorMatrix type="saturate" values="0" />
-        </filter>
-      </svg>
-      <div
-        style={{
-          position: "fixed",
-          inset: 0,
-          filter: "url(#grain)",
-          opacity: 0.025,
-          pointerEvents: "none",
-          zIndex: 999,
-        }}
-      />
       <Navbar />
-      <main className="max-w-5xl mx-auto min-h-screen">{children}</main>
+      {/*
+           - Remove items-center justify-center — those were centering the login/register
+             cards but break full-width pages like profile
+           - Let each child page handle its own width/centering
+           - Keep px-4 so content never touches screen edges on mobile
+         */}
+      <main className="flex-1 w-full px-4 py-10">{children}</main>
     </div>
   );
 }

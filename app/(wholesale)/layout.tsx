@@ -7,14 +7,18 @@ export default async function WholesaleLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div style={{ backgroundColor: "var(--bg)" }} className="min-h-screen  ">
+    <div
+      className="min-h-screen flex flex-col"
+      style={{ background: "var(--bg)" }}
+    >
       <Navbar />
-      <main
-        className="flex-1 min-h-screen max-w-5xl mx-auto"
-        style={{ backgroundColor: "var(--bg)" }}
-      >
-        {children}
-      </main>
+      {/*
+            - Remove items-center justify-center — those were centering the login/register
+              cards but break full-width pages like profile
+            - Let each child page handle its own width/centering
+            - Keep px-4 so content never touches screen edges on mobile
+          */}
+      <main className="flex-1 w-full px-4 py-10">{children}</main>
     </div>
   );
 }
