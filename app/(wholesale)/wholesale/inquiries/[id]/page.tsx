@@ -335,8 +335,9 @@ export default async function WholesaleInquiryThreadPage({
                     className={`flex gap-3 mb-3 ${alignRight ? "flex-row-reverse" : "flex-row"}`}
                   >
                     {/* Avatar */}
+                    {/* Avatar — FIXED: added overflow-hidden so the image clips to rounded-xl */}
                     <div
-                      className="w-8 h-8 rounded-xl flex items-center justify-center text-xs font-bold shrink-0 self-end"
+                      className="w-8 h-8 rounded-xl overflow-hidden flex items-center justify-center text-xs font-bold shrink-0 self-end"
                       style={{
                         background: isAdminMsg
                           ? "var(--brand-glow)"
@@ -356,10 +357,10 @@ export default async function WholesaleInquiryThreadPage({
                           alt={senderName}
                           width={32}
                           height={32}
-                          className="rounded-xl h-full w-full  object-cover"
+                          className="w-full h-full object-cover"
                         />
                       ) : (
-                        <p>{initials}</p>
+                        <span>{initials}</span>
                       )}
                     </div>
 
