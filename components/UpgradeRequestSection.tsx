@@ -145,7 +145,7 @@ export default function UpgradeRequestSection({
     >
       <div className="flex items-start gap-4">
         <div className="w-10 h-10 rounded-xl bg-[var(--bg-subtle)] border border-[var(--border)] flex items-center justify-center flex-shrink-0">
-          <ArrowUpCircle size={18} className="text-[var(--bg-subtle)]" />
+          <ArrowUpCircle size={18} className="text-[var(--brand-hex)]" />
         </div>
         <div className="flex-1">
           <h3
