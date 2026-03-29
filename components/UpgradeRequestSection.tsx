@@ -144,7 +144,7 @@ export default function UpgradeRequestSection({
       className="bg-white rounded-2xl p-6 "
     >
       <div className="flex items-start gap-4">
-        <div className="w-10 h-10 rounded-xl bg-[var(--bg-subtle)]/10 border border-[var(--border)]/20 flex items-center justify-center flex-shrink-0">
+        <div className="w-10 h-10 rounded-xl bg-[var(--bg-subtle)] border border-[var(--border)] flex items-center justify-center flex-shrink-0">
           <ArrowUpCircle size={18} className="text-[var(--bg-subtle)]" />
         </div>
         <div className="flex-1">
@@ -180,7 +180,7 @@ export default function UpgradeRequestSection({
             maxLength={500}
             className="w-full px-3 py-2.5 rounded-xl text-sm text-slate-800 resize-none
               bg-white border border-slate-200 placeholder:text-slate-400
-              focus:outline-none focus:border-[#D4A853] focus:ring-1 focus:ring-[#D4A853]/20
+              focus:outline-none focus:border-[var(--brand-hex)] focus:ring-1 focus:ring-[var(--brand-glow)]/20
               transition-[border-color,box-shadow] duration-200"
             style={inputStyle}
           />
