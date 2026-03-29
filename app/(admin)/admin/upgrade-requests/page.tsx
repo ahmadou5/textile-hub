@@ -7,7 +7,7 @@ import { UserCheck, Clock, Mail } from "lucide-react";
 import UpgradeRequestActions from "@/components/admin/UpgradeRequestActions";
 
 export const metadata: Metadata = {
-  title: "Upgrade Requests — Admin | TextileHub",
+  title: "Upgrade Requests — Admin | Maitangaran Textiles",
 };
 
 const STATUS_STYLES: Record<string, React.CSSProperties> = {

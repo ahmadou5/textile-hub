@@ -13,7 +13,7 @@ import {
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Dashboard — Admin | TextileHub",
+  title: "Dashboard — Admin | Maitangaran Textiles",
 };
 
 function formatPrice(cents: number) {

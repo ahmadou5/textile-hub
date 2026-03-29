@@ -49,7 +49,7 @@ export async function generateMetadata({
   });
   return {
     title: inquiry
-      ? `${inquiry.subject} — Wholesale | TextileHub`
+      ? `${inquiry.subject} — Wholesale | Maitangaran Textiles`
       : "Inquiry Not Found",
   };
 }

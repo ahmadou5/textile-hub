@@ -30,7 +30,7 @@ export async function generateMetadata({
     where: { id },
     select: { name: true },
   });
-  return { title: `${product?.name ?? "Product"} — TextileHub Wholesale` };
+  return { title: `${product?.name ?? "Product"} — Maitangaran Textiles` };
 }
 
 export default async function WholesaleProductDetailPage({

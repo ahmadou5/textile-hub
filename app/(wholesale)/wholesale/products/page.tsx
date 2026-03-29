@@ -6,7 +6,7 @@ import type { Metadata } from "next";
 import ProductsGrid from "@/components/wholesale/ProductGrid";
 
 export const metadata: Metadata = {
-  title: "Products — TextileHub Wholesale",
+  title: "Products — Maitangaran Textiles",
 };
 
 export default async function WholesaleProductsPage({

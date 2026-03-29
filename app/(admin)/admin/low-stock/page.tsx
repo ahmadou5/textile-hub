@@ -7,7 +7,7 @@ import type { Metadata } from "next";
 import RestockButton from "@/components/admin/RestockButton";
 
 export const metadata: Metadata = {
-  title: "Low Stock Alerts — Admin | TextileHub",
+  title: "Low Stock Alerts — Admin | Maitangaran Textiles",
 };
 
 function formatPrice(cents: number): string {

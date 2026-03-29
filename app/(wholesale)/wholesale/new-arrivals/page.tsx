@@ -9,7 +9,7 @@ import type { Metadata } from "next";
 import { ProductList } from "@/components/wholesale/ProductList";
 
 export const metadata: Metadata = {
-  title: "New Arrivals — TextileHub Wholesale",
+  title: "New Arrivals — Maitangaran Textiles",
 };
 
 const now = Date.now();

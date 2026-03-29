@@ -14,7 +14,7 @@ import type { Metadata } from "next";
 import { StatCard } from "@/components/wholesale/StatCard";
 
 export const metadata: Metadata = {
-  title: "Dashboard — TextileHub Wholesale",
+  title: "Dashboard — Maitangaran Textiles",
 };
 
 export default async function WholesaleDashboardPage() {

@@ -8,7 +8,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Edit Product — Admin | TextileHub",
+  title: "Edit Product — Admin | Maitangaran Textiles",
 };
 
 interface PageProps {

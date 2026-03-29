@@ -7,7 +7,7 @@ import type { Metadata } from "next";
 import ProductsTableWithFilter from "@/components/admin/ProductsTableWithFilter";
 
 export const metadata: Metadata = {
-  title: "Products — Admin | TextileHub",
+  title: "Products — Admin | Maitangaran Textiles",
 };
 
 export default async function AdminProductsPage() {

@@ -9,7 +9,9 @@ import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import BankDetailsForm from "@/components/admin/BankDetailsForm";
 import { ShieldCheck, Calendar, Mail } from "lucide-react";
 
-export const metadata: Metadata = { title: "My Profile — TextileHub" };
+export const metadata: Metadata = {
+  title: "My Profile — Maitangaran Textiles",
+};
 
 const ROLE_BADGE: Record<
   string,

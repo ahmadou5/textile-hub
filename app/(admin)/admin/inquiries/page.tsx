@@ -5,7 +5,9 @@ import Link from "next/link";
 import { MessageSquare, ChevronRight, Clock } from "lucide-react";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Inquiries — Admin | TextileHub" };
+export const metadata: Metadata = {
+  title: "Inquiries — Admin | Maitangaran Textiles",
+};
 
 const STATUS_STYLES: Record<string, React.CSSProperties> = {
   OPEN: {
