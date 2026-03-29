@@ -2,7 +2,13 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { Loader2, ArrowUpCircle, Clock, CheckCircle2, XCircle } from "lucide-react";
+import {
+  Loader2,
+  ArrowUpCircle,
+  Clock,
+  CheckCircle2,
+  XCircle,
+} from "lucide-react";
 
 interface ExistingRequest {
   id: string;
@@ -15,7 +21,10 @@ interface UpgradeRequestSectionProps {
   existingRequest: ExistingRequest | null;
 }
 
-const STATUS_INFO: Record<string, { icon: React.ReactNode; text: string; style: string }> = {
+const STATUS_INFO: Record<
+  string,
+  { icon: React.ReactNode; text: string; style: string }
+> = {
   PENDING: {
     icon: <Clock size={14} className="text-amber-500" />,
     text: "Your request is pending admin review.",
@@ -33,7 +42,9 @@ const STATUS_INFO: Record<string, { icon: React.ReactNode; text: string; style: 
   },
 };
 
-export default function UpgradeRequestSection({ existingRequest }: UpgradeRequestSectionProps) {
+export default function UpgradeRequestSection({
+  existingRequest,
+}: UpgradeRequestSectionProps) {
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [message, setMessage] = useState("");
@@ -66,19 +77,33 @@ export default function UpgradeRequestSection({ existingRequest }: UpgradeReques
     const status = existingRequest?.status ?? "PENDING";
     const info = STATUS_INFO[status];
     return (
-      <div className={`flex items-start gap-3 p-4 rounded-2xl border ${info.style}`}>
+      <div
+        className={`flex items-start gap-3 p-4 rounded-2xl border ${info.style}`}
+      >
         <div className="flex-shrink-0 mt-0.5">{info.icon}</div>
         <div>
-          <p className="text-sm font-semibold" style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}>
+          <p
+            className="text-sm font-semibold"
+            style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+          >
             Wholesale Upgrade Request
           </p>
-          <p className="text-xs mt-0.5 opacity-80" style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}>
+          <p
+            className="text-xs mt-0.5 opacity-80"
+            style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+          >
             {info.text}
           </p>
           {existingRequest?.createdAt && (
-            <p className="text-xs mt-1 opacity-60" style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}>
-              Submitted {new Date(existingRequest.createdAt).toLocaleDateString("en-NG", {
-                day: "numeric", month: "short", year: "numeric",
+            <p
+              className="text-xs mt-1 opacity-60"
+              style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+            >
+              Submitted{" "}
+              {new Date(existingRequest.createdAt).toLocaleDateString("en-NG", {
+                day: "numeric",
+                month: "short",
+                year: "numeric",
               })}
             </p>
           )}
@@ -86,30 +111,65 @@ export default function UpgradeRequestSection({ existingRequest }: UpgradeReques
       </div>
     );
   }
+  function focusInput(e: React.FocusEvent<HTMLInputElement>) {
+    e.target.style.borderColor = "var(--brand-hex)";
+    e.target.style.boxShadow = "0 0 0 3px var(--brand-glow)";
+  }
+
+  function blurInput(e: React.FocusEvent<HTMLInputElement>) {
+    e.target.style.borderColor = "var(--border)";
+    e.target.style.boxShadow = "none";
+  }
+
+  const inputStyle: React.CSSProperties = {
+    background: "var(--bg-subtle)",
+    border: "1px solid var(--border)",
+    color: "var(--text-primary)",
+    fontFamily: "var(--font-dm-sans, sans-serif)",
+  };
+
+  const labelStyle: React.CSSProperties = {
+    color: "var(--text-muted)",
+    fontFamily: "var(--font-dm-sans, sans-serif)",
+  };
 
   // Show request form
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+    <div
+      style={{
+        background: "var(--bg-card)",
+        border: "1px solid var(--border-brand)",
+        boxShadow: "var(--shadow-card)",
+      }}
+      className="bg-white rounded-2xlp-6 "
+    >
       <div className="flex items-start gap-4">
         <div className="w-10 h-10 rounded-xl bg-[#D4A853]/10 border border-[#D4A853]/20 flex items-center justify-center flex-shrink-0">
           <ArrowUpCircle size={18} className="text-[#D4A853]" />
         </div>
         <div className="flex-1">
-          <h3 className="text-base font-bold text-slate-800"
-            style={{ fontFamily: "var(--font-playfair, serif)" }}>
+          <h3
+            className="text-base font-bold"
+            style={{
+              color: "var(--text-primary)",
+              fontFamily: "var(--font-syne, sans-serif)",
+            }}
+          >
             Upgrade to Wholesale Account
           </h3>
-          <p className="text-xs text-slate-500 mt-0.5"
-            style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}>
-            Get access to wholesale pricing, new arrivals feed, and direct admin messaging.
+          <p className="text-xs  mt-0.5" style={labelStyle}>
+            Get access to wholesale pricing, new arrivals feed, and direct admin
+            messaging.
           </p>
         </div>
       </div>
 
       <form onSubmit={handleSubmit} className="mt-5 space-y-4">
         <div>
-          <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5"
-            style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}>
+          <label
+            className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5"
+            style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+          >
             Message (optional)
           </label>
           <textarea
@@ -122,28 +182,34 @@ export default function UpgradeRequestSection({ existingRequest }: UpgradeReques
               bg-white border border-slate-200 placeholder:text-slate-400
               focus:outline-none focus:border-[#D4A853] focus:ring-1 focus:ring-[#D4A853]/20
               transition-[border-color,box-shadow] duration-200"
-            style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
+            style={inputStyle}
           />
-          <p className="text-xs text-slate-400 text-right mt-1">{message.length}/500</p>
+          <p className="text-xs text-slate-400 text-right mt-1">
+            {message.length}/500
+          </p>
         </div>
 
         <button
           type="submit"
           disabled={loading}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white
-            disabled:opacity-50 disabled:cursor-not-allowed
-            hover:-translate-y-0.5 active:translate-y-0
-            transition-[transform] duration-150"
+          className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold text-white
+          disabled:opacity-50 disabled:cursor-not-allowed
+          hover:-translate-y-0.5 active:translate-y-0
+          transition-[transform] duration-150"
           style={{
-            background: "linear-gradient(135deg, #D4A853 0%, #b8893a 100%)",
-            boxShadow: "0 2px 8px rgba(212,168,83,0.25)",
+            background: `linear-gradient(135deg, var(--brand-hex) 0%, var(--brand-dim) 100%)`,
+            boxShadow: "var(--shadow-brand)",
             fontFamily: "var(--font-dm-sans, sans-serif)",
           }}
         >
           {loading ? (
-            <><Loader2 size={14} className="animate-spin" /> Submitting…</>
+            <>
+              <Loader2 size={14} className="animate-spin" /> Submitting…
+            </>
           ) : (
-            <><ArrowUpCircle size={14} /> Request Upgrade</>
+            <>
+              <ArrowUpCircle size={14} /> Request Upgrade
+            </>
           )}
         </button>
       </form>

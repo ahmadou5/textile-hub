@@ -265,13 +265,13 @@ export default function NavbarClient({
                   "linear-gradient(135deg, var(--brand-hex) 0%, var(--brand-dim) 100%)",
               }}
             >
-              T
+              A-M
             </div>
             <span
               className="text-sm font-bold"
               style={{ color: "var(--text-primary)" }}
             >
-              TextileHub
+              A Maitangaran
             </span>
           </Link>
 
