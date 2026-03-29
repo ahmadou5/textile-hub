@@ -141,7 +141,7 @@ export default function UpgradeRequestSection({
         border: "1px solid var(--border-brand)",
         boxShadow: "var(--shadow-card)",
       }}
-      className="bg-white rounded-2xlp-6 "
+      className="bg-white rounded-2xl p-6 "
     >
       <div className="flex items-start gap-4">
         <div className="w-10 h-10 rounded-xl bg-[#D4A853]/10 border border-[#D4A853]/20 flex items-center justify-center flex-shrink-0">

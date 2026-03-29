@@ -259,13 +259,13 @@ export default function NavbarClient({
             style={{ fontFamily: "var(--font-syne, sans-serif)" }}
           >
             <div
-              className="w-7 h-7 rounded-lg flex items-center justify-center text-white text-xs font-bold"
+              className="w-auto h-7 rounded-lg px-3 flex items-center justify-center text-white text-xs font-bold"
               style={{
                 background:
                   "linear-gradient(135deg, var(--brand-hex) 0%, var(--brand-dim) 100%)",
               }}
             >
-              A-M
+              AM
             </div>
             <span
               className="text-sm font-bold"
