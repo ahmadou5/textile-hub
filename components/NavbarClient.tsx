@@ -271,7 +271,7 @@ export default function NavbarClient({
               className="text-sm font-bold"
               style={{ color: "var(--text-primary)" }}
             >
-              A Maitangaran
+              Aminu Maitangaran Textiles
             </span>
           </Link>
 
