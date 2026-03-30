@@ -56,7 +56,7 @@ export default function CheckoutModal({
   const [copied, setCopied] = useState<string | null>(null);
   const [createdOrder, setCreatedOrder] = useState<{ id: string } | null>(null);
 
-  const total = product.wholesalePricePerYard * yardsOrdered;
+  const total = yardsOrdered;
 
   // Fetch bank details for transfer card
   useEffect(() => {

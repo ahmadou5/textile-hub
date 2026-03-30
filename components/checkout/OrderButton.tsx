@@ -6,6 +6,7 @@
 import { useState } from "react";
 import { ShoppingBag } from "lucide-react";
 import CheckoutModal from "@/components/checkout/CheckoutModal";
+import { useWholesaleCalculator } from "@/context/calculatorContext";
 
 interface Product {
   id: string;
@@ -16,10 +17,11 @@ interface Product {
 }
 
 export default function OrderButton({ product }: { product: Product }) {
+  const { totals } = useWholesaleCalculator();
   const [open, setOpen] = useState(false);
   // Default yards to 1; CheckoutModal can expose a yards selector internally
   // or you can wire YardageCalculator's value here via lifted state
-  const [yards] = useState(1);
+  //const [yards] = useState(1);
 
   if (product.totalYardsInStock === 0) {
     return (
@@ -58,7 +60,7 @@ export default function OrderButton({ product }: { product: Product }) {
       {open && (
         <CheckoutModal
           product={product}
-          yardsOrdered={yards}
+          yardsOrdered={totals.wholesale}
           onClose={() => setOpen(false)}
         />
       )}

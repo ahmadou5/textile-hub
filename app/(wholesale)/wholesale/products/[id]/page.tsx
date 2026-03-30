@@ -322,9 +322,6 @@ export default async function WholesaleProductDetailPage({
               wholesalePricePerYard={product.wholesalePricePerYard}
               retailPricePerYard={product.retailPricePerYard}
             />
-
-            {/* Order summary in another location */}
-            <OrderSummaryDisplay />
           </div>
 
           {/* CTAs — Inquiry + Order */}
