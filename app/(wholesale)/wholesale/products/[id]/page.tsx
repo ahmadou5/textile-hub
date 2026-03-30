@@ -11,6 +11,8 @@ import InquiryModal from "@/components/wholesale/InquiryModal";
 
 import OrderButton from "@/components/checkout/OrderButton";
 import WholesaleCalculator from "@/components/wholesale/WholesaleCalculator";
+import WholesaleCalculatorClient from "@/components/wholesale/WholesaleCalculatorClient";
+import OrderSummaryDisplay from "@/components/wholesale/OrderSummaryDisplay";
 
 const LOW_STOCK = 50;
 
@@ -41,7 +43,6 @@ export default async function WholesaleProductDetailPage({
   noStore();
   const session = await requireRole(["WHOLESALER", "ADMIN"] as never);
   const { id } = await params;
-
   const product = await db.products.findUnique({
     where: { id },
     select: {
@@ -315,11 +316,16 @@ export default async function WholesaleProductDetailPage({
             </div>
           </div>
 
-          {/* Yardage calculator */}
-          <WholesaleCalculator
-            wholesalePricePerYard={product.wholesalePricePerYard}
-            retailPricePerYard={product.retailPricePerYard}
-          />
+          <div>
+            {/* Calculator in one location */}
+            <WholesaleCalculatorClient
+              wholesalePricePerYard={product.wholesalePricePerYard}
+              retailPricePerYard={product.retailPricePerYard}
+            />
+
+            {/* Order summary in another location */}
+            <OrderSummaryDisplay />
+          </div>
 
           {/* CTAs — Inquiry + Order */}
           <div className="flex flex-col gap-3">

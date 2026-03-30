@@ -1,6 +1,4 @@
 // app/(admin)/admin/layout.tsx
-import { requireRole } from "@/lib/auth";
-import AdminSidebar from "@/components/admin/AdminSidebar";
 import Navbar from "@/components/layout/Navbar";
 
 export default async function AdminLayout({

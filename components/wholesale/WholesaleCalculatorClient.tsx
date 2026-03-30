@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Calculator } from "lucide-react";
+import { useWholesaleCalculator } from "@/context/calculatorContext";
 
-interface WholesaleCalculatorProps {
+interface WholesaleCalculatorClientProps {
   wholesalePricePerYard: number; // cents
   retailPricePerYard: number; // cents
-  defaultYards?: number;
+  initialYards?: number;
 }
 
 function formatPrice(cents: number): string {
@@ -16,15 +17,23 @@ function formatPrice(cents: number): string {
   })}`;
 }
 
-export default function WholesaleCalculator({
+export default function WholesaleCalculatorClient({
   wholesalePricePerYard,
   retailPricePerYard,
-  defaultYards = 5,
-}: WholesaleCalculatorProps) {
-  const yardsNum = defaultYards;
+  initialYards = 5,
+}: WholesaleCalculatorClientProps) {
+  const { updateTotals } = useWholesaleCalculator();
+  const [yards, setYards] = useState<string>(String(initialYards));
+
+  const yardsNum = Math.max(1, parseInt(yards) || 1);
   const wholesaleTotal = wholesalePricePerYard * yardsNum;
   const retailTotal = retailPricePerYard * yardsNum;
   const savings = retailTotal - wholesaleTotal;
+
+  // Call the context update function whenever calculated values change
+  useEffect(() => {
+    updateTotals(wholesaleTotal, retailTotal, savings);
+  }, [wholesaleTotal, retailTotal, savings, updateTotals]);
 
   return (
     <div className="space-y-3">
@@ -42,15 +51,21 @@ export default function WholesaleCalculator({
       <div className="space-y-2">
         <div className="flex items-center gap-2">
           <div className="relative flex-1">
-            <div
+            <input
+              type="number"
+              min="1"
+              step="1"
+              value={yards}
+              onChange={(e) => setYards(e.target.value)}
               className="
                 w-full px-4 py-3 rounded-xl text-white font-bold text-xl
                 bg-white/[0.04] border border-white/[0.08]
+                focus:outline-none focus:border-emerald-500/40
+                transition-[border-color] duration-200
+                [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none
               "
               style={{ fontFamily: "var(--font-syne, sans-serif)" }}
-            >
-              {yardsNum}
-            </div>
+            />
             <span
               className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-500"
               style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
@@ -63,21 +78,23 @@ export default function WholesaleCalculator({
         {/* Quick picks */}
         <div className="flex gap-2 flex-wrap">
           {[5, 25, 50, 100, 200].map((qty) => (
-            <div
+            <button
               key={qty}
+              onClick={() => setYards(String(qty))}
               className={`
                 px-3 py-1.5 rounded-lg text-xs font-semibold
-                border
+                border transition-[background,border-color,color] duration-150
+                focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-emerald-500
                 ${
                   yardsNum === qty
                     ? "bg-emerald-500/15 border-emerald-500/30 text-emerald-400"
-                    : "bg-white/[0.03] border-white/[0.08] text-slate-500"
+                    : "bg-white/[0.03] border-white/[0.08] text-slate-500 hover:border-emerald-500/20 hover:text-emerald-400"
                 }
               `}
               style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
             >
               {qty}
-            </div>
+            </button>
           ))}
         </div>
       </div>
