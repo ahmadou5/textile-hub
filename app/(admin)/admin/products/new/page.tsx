@@ -203,7 +203,7 @@ export default function NewProductPage() {
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto space-y-6">
+    <div className="w-full max-w-4xl mx-auto space-y-6">
       <Link
         href="/admin/products"
         className="inline-flex items-center gap-2 text-sm transition-[color] duration-150 group focus-visible:outline-2 focus-visible:outline-offset-2"

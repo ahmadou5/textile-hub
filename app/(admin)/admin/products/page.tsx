@@ -31,7 +31,7 @@ export default async function AdminProductsPage() {
   ).length;
 
   return (
-    <div className="w-full max-w-2xl mx-auto space-y-6">
+    <div className="w-full max-w-4xl mx-auto space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between gap-4">
         <div className="space-y-1">
