@@ -204,8 +204,8 @@ export default function CheckoutModal({
                   fontFamily: "var(--font-dm-sans, sans-serif)",
                 }}
               >
-                {yardsOrdered} yd{yardsOrdered !== 1 ? "s" : ""} ·{" "}
-                {product.name}
+                {yardsOrdered / product.wholesalePricePerYard} yd
+                {yardsOrdered !== 1 ? "s" : ""} · {product.name}
               </p>
             </div>
             <button
@@ -253,7 +253,7 @@ export default function CheckoutModal({
                   className="font-medium"
                   style={{ color: "var(--text-primary)" }}
                 >
-                  {yardsOrdered}
+                  {yardsOrdered / product.wholesalePricePerYard}
                 </span>
               </div>
               <div
