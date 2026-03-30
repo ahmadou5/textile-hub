@@ -41,6 +41,7 @@ export default async function WholesaleProductDetailPage({
   params: Promise<{ id: string }>;
 }) {
   noStore();
+
   const session = await requireRole(["WHOLESALER", "ADMIN"] as never);
   const { id } = await params;
   const product = await db.products.findUnique({
@@ -68,7 +69,7 @@ export default async function WholesaleProductDetailPage({
       : 0;
 
   return (
-    <div className="w-full max-w-2xl mx-auto space-y-6">
+    <div className="w-full max-w-4xl mx-auto space-y-6">
       {/* Grain */}
       <svg style={{ position: "fixed", width: 0, height: 0 }}>
         <filter id="grain">

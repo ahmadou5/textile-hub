@@ -49,7 +49,7 @@ export default async function WholesaleDashboardPage() {
   );
 
   return (
-    <div className="w-full max-w-2xl mx-auto space-y-6">
+    <div className="w-full max-w-4xl mx-auto space-y-6">
       {/* Grain */}
       <svg style={{ position: "fixed", width: 0, height: 0 }}>
         <filter id="ws-grain">

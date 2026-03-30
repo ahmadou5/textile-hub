@@ -60,7 +60,7 @@ export default async function WholesaleOrdersPage() {
   });
 
   return (
-    <div className=" w-full max-w-2xl mx-auto space-y-6">
+    <div className=" w-full max-w-4xl mx-auto space-y-6">
       {/* Header */}
       <div className="space-y-1">
         <p

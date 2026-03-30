@@ -7,7 +7,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 
 export const metadata: Metadata = {
-  title: "My Inquiries — TextileHub Wholesale",
+  title: "My Inquiries — Maitangaran Textiles",
 };
 
 const STATUS_STYLES: Record<string, React.CSSProperties> = {
@@ -71,7 +71,7 @@ export default async function WholesaleInquiriesPage() {
   ).length;
 
   return (
-    <div className="w-full max-w-2xl mx-auto space-y-6">
+    <div className="w-full max-w-4xl mx-auto space-y-6">
       {/* Header */}
       <div className="space-y-1">
         <h1
