@@ -259,7 +259,7 @@ export default function NavbarClient({
             style={{ fontFamily: "var(--font-syne, sans-serif)" }}
           >
             <div
-              className="w-auto h-7 rounded-lg px-3 flex items-center justify-center text-white text-xs font-bold"
+              className="w-auto h-7 rounded-lg lg:px-3 px-2 flex items-center justify-center text-white text-xs font-bold"
               style={{
                 background:
                   "linear-gradient(135deg, var(--brand-hex) 0%, var(--brand-dim) 100%)",
@@ -271,7 +271,7 @@ export default function NavbarClient({
               className="text-sm font-bold"
               style={{ color: "var(--text-primary)" }}
             >
-              Aminu Maitangaran Textiles
+              A Maitangaran Textiles
             </span>
           </Link>
 
